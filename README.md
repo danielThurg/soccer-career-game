@@ -31,3 +31,10 @@ Les fichiers `.dc.html` s'ouvrent dans l'artifact Design de Claude (ils ont beso
 1. Simulation de match par zones.
 2. Conversations pour gérer le moral.
 3. Vrai code du jeu (hors maquettes).
+
+## Jouer
+Ouvre `index.html` dans un navigateur, de préférence sur téléphone en mode horizontal.
+Le jeu fonctionne tout seul, sans serveur. La sauvegarde est dans le navigateur.
+
+Ce qui est jouable : 5 écrans, 12 matchs par saison, match simulé par zones avec mi-temps tactique,
+moral, fatigue, blessures, discussions avec les joueurs, entraînement, finances et installations.

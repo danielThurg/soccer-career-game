@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#4B3527">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Soccer Career</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2B1D14;--brown:#4B3527;--paper:#FFFDF8;--bg:#FFF7EC;--cream:#FFF0CD;--line:#DDB98E;--line2:#EAD3B0;--muted:#7A5A3A;--gold:#F0C253;--sage:#86AD78;--blue:#438BC0;--rose:#DF9287;--pitch:#7FA077;--pitch2:#89AA80;--acc:#FFF0CD;--accfg:#2B1D14}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-size:13px;overflow:hidden;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;color:var(--ink)}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+.top{flex:none;height:46px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:2px solid var(--ink);background:var(--acc);color:var(--accfg)}
+.top h1{margin:0;font-size:17px;line-height:1}
+.top small{display:block;font-size:10px;font-weight:800;opacity:.85}
+.chips{flex:1;display:flex;gap:6px;justify-content:center;overflow:hidden}
+.chip{background:var(--paper);color:var(--ink);border:1.5px solid var(--ink);border-radius:9px;padding:2px 9px;line-height:1.1;white-space:nowrap}
+.chip b{display:block;font-size:12px}.chip span{font-size:9px;font-weight:700;color:var(--muted)}
+.scr{flex:1;min-height:0;overflow:auto;padding:8px 10px;-webkit-overflow-scrolling:touch}
+.nav{flex:none;height:calc(52px + env(safe-area-inset-bottom));padding:5px 8px env(safe-area-inset-bottom);background:var(--brown);border-top:2px solid var(--ink);display:flex;justify-content:center;gap:6px}
+.nav button{color:#ECDCC7;flex:1;max-width:150px;border:1.5px solid transparent;border-radius:11px;background:transparent;color:#ECDCC7;font-weight:800;font-size:11.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer}
+.nav button svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav button.on{box-shadow:0 3px 0 #301E16;border-color:#FFEFD0}
+.card{background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:9px}
+.card h3{margin:0 0 5px;font-size:14px}
+.btn{min-height:38px;padding:0 12px;border-radius:11px;border:2px solid var(--ink);background:var(--paper);font-weight:800;font-size:12.5px;cursor:pointer}
+.btn.pri{background:var(--acc);color:var(--accfg);box-shadow:0 3px 0 var(--ink)}
+.btn.dark{background:var(--ink);color:var(--cream)}
+.btn:disabled{opacity:.45;box-shadow:none;cursor:default}
+.btn.sm{min-height:32px;padding:0 9px;font-size:11.5px}
+.row{display:flex;align-items:center;gap:8px}
+.grow{flex:1;min-width:0}
+.muted{color:var(--muted)}
+.tag{display:inline-block;font-size:10px;font-weight:800;padding:1px 8px;border-radius:99px;white-space:nowrap}
+.meter{height:8px;border-radius:4px;background:var(--line2);border:1.5px solid var(--ink);overflow:hidden}
+.meter i{display:block;height:100%}
+.ml{display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-top:4px}
+.g3{display:grid;grid-template-columns:27% 1fr 27%;gap:9px;height:100%}
+.col{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0}
+.pitch{position:relative;border:2px solid var(--ink);border-radius:12px;background:repeating-linear-gradient(90deg,var(--pitch) 0 9%,var(--pitch2) 9% 18%);overflow:hidden}
+.pitch svg{position:absolute;inset:0;width:100%;height:100%}
+.tk{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:0;padding:0;cursor:pointer;z-index:2}
+.tk .h{width:var(--ts,36px);height:var(--ts,36px);border-radius:50%;overflow:hidden;border:3px solid var(--sage);background:var(--line2)}
+.tk .h svg{position:static;width:100%;height:100%}
+.tk .n{background:var(--ink);color:var(--cream);font-size:9.5px;font-weight:800;padding:0 6px;border-radius:99px;white-space:nowrap}
+.tk.sel .h{box-shadow:0 0 0 3px var(--ink);border-color:var(--cream)}
+.tk.sel .n{background:var(--gold);color:var(--ink)}
+.pc{display:flex;flex-direction:column;align-items:center;padding:5px 4px;border:2px solid var(--ink);border-radius:12px;background:var(--paper);cursor:pointer;min-width:0}
+.pc.sel{border-color:var(--sage);box-shadow:0 3px 0 var(--ink)}
+.pc .fig{width:58px;height:78px;background:#F3E0B0;border-radius:8px;overflow:hidden}
+.pc .fig svg{width:100%;height:100%}
+.fl{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.fl button{min-height:32px;padding:0 11px;border-radius:10px;border:2px solid var(--line);background:var(--paper);font-weight:800;font-size:12px;cursor:pointer}
+.fl button.on{border-color:var(--ink);background:var(--acc);color:var(--accfg);box-shadow:0 2px 0 var(--ink)}
+.seg{display:flex;gap:3px}
+.seg button{flex:1;min-height:32px;border-radius:9px;border:2px solid var(--line);background:var(--paper);font-weight:800;font-size:10.5px;cursor:pointer;padding:0 2px}
+.seg button.on{border-color:var(--ink);background:var(--acc);color:var(--accfg);box-shadow:0 2px 0 var(--ink)}
+.ov{position:fixed;inset:0;background:rgba(43,29,20,.72);z-index:20;display:flex;align-items:center;justify-content:center;padding:10px}
+.md{background:var(--bg);border:2px solid var(--ink);border-radius:16px;padding:12px;width:min(760px,100%);max-height:100%;overflow:auto}
+.sb{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--brown);color:var(--cream);border-radius:12px;padding:6px 10px}
+.sb .s{font-size:26px;font-weight:800;min-width:30px;text-align:center}
+.sb .t{font-size:13px;font-weight:800;min-width:90px;text-align:center}
+.feed{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:700}
+.feed div{padding:3px 7px;border-radius:8px;background:var(--paper);border:1.5px solid var(--line2)}
+.feed .g{background:var(--gold);border-color:var(--ink)}
+.feed .o{background:#F2D6D3}
+.ball{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--ink);top:50%;margin:-7px 0 0 -7px;transition:left .35s ease;z-index:3}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{padding:4px 3px;border-top:1.5px solid var(--line2);text-align:right;font-weight:800}
+td:nth-child(2),th:nth-child(2){text-align:left}
+tr.me td{background:var(--cream)}
+.wk{border:2px solid var(--line);border-radius:12px;padding:6px;background:var(--paper);min-width:0;display:flex;flex-direction:column;gap:2px}
+.wk.cur{border-color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+.rot{display:none;position:fixed;inset:0;z-index:50;background:var(--brown);color:var(--cream);align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:20px;font-weight:800;font-size:16px}
+@media (orientation:portrait) and (max-width:700px){.rot.show{display:flex}}
+@media (max-height:420px){.pc .fig{width:50px;height:64px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="rot" class="rot show"><div style="font-size:40px">↻</div><div>Tourne ton téléphone en mode horizontal</div><button class="btn" onclick="document.getElementById('rot').classList.remove('show')">Continuer quand même</button></div>
+<script>
+'use strict';
+const INK = '#2B1D14';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const $ = (s) => document.querySelector(s);
+
+/* ---------- Chibi SVG ---------- */
+function chibi(p, mode, moodOverride) {
+  const b = p.build, L = p.look, kit = p.kit || ['#C46A55', '#FFF0CD'];
+  const mood = moodOverride || moodOf(p).mood;
+  const hr = 20 + (b - 0.75) * 9, hy = 44, cx = 50, ry = 25;
+  const tw = 15 + (b - 0.75) * 17;
+  const hc = L.hc, sk = L.skin;
+  let s = '';
+  const st = 'stroke="' + INK + '" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"';
+  if (L.hair === 'afro') s += '<circle cx="50" cy="' + (hy - 6) + '" r="' + (hr + 9) + '" fill="' + hc + '" ' + st + '/>';
+  if (L.hair === 'long') s += '<path d="M' + (cx - hr - 3) + ' ' + (hy - 8) + ' Q' + (cx - hr - 7) + ' ' + (hy + 30) + ' ' + (cx - hr + 4) + ' ' + (hy + 36) + ' L' + (cx + hr - 4) + ' ' + (hy + 36) + ' Q' + (cx + hr + 7) + ' ' + (hy + 30) + ' ' + (cx + hr + 3) + ' ' + (hy - 8) + 'Z" fill="' + hc + '" ' + st + '/>';
+  if (mode === 'full') {
+    const legW = 10 + (b - 0.75) * 4;
+    s += '<rect x="' + (cx - legW - 3) + '" y="124" width="' + legW + '" height="26" rx="4" fill="' + sk + '" ' + st + '/>';
+    s += '<rect x="' + (cx + 3) + '" y="124" width="' + legW + '" height="26" rx="4" fill="' + sk + '" ' + st + '/>';
+    s += '<rect x="' + (cx - legW - 3) + '" y="136" width="' + legW + '" height="14" rx="3" fill="' + kit[0] + '" ' + st + '/>';
+    s += '<rect x="' + (cx + 3) + '" y="136" width="' + legW + '" height="14" rx="3" fill="' + kit[0] + '" ' + st + '/>';
+    s += '<ellipse cx="' + (cx - legW / 2 - 3) + '" cy="152" rx="9" ry="4" fill="' + INK + '"/><ellipse cx="' + (cx + 3 + legW / 2) + '" cy="152" rx="9" ry="4" fill="' + INK + '"/>';
+    const armW = 9 + (b - 0.75) * 4;
+    s += '<rect x="' + (cx - tw - armW + 2) + '" y="88" width="' + armW + '" height="28" rx="5" fill="' + sk + '" ' + st + '/>';
+    s += '<rect x="' + (cx + tw - 2) + '" y="88" width="' + armW + '" height="28" rx="5" fill="' + sk + '" ' + st + '/>';
+    s += '<rect x="' + (cx - tw - armW + 2) + '" y="86" width="' + armW + '" height="11" rx="4" fill="' + kit[0] + '" ' + st + '/>';
+    s += '<rect x="' + (cx + tw - 2) + '" y="86" width="' + armW + '" height="11" rx="4" fill="' + kit[0] + '" ' + st + '/>';
+    if (p.id === G.captain) s += '<rect x="' + (cx - tw - armW + 2) + '" y="100" width="' + armW + '" height="5" fill="#F0C253" ' + st + '/>';
+    if (p.pos === 'GB') s += '<circle cx="' + (cx - tw - armW / 2 + 2) + '" cy="118" r="6" fill="#F0C253" ' + st + '/><circle cx="' + (cx + tw + armW / 2 - 2) + '" cy="118" r="6" fill="#F0C253" ' + st + '/>';
+    s += '<rect x="' + (cx - tw) + '" y="80" width="' + (tw * 2) + '" height="48" rx="12" fill="' + kit[0] + '" ' + st + '/>';
+    if (p.kitStyle !== 'plain') {
+      for (let i = -1; i <= 1; i += 2) s += '<line x1="' + (cx + i * tw * 0.35) + '" y1="86" x2="' + (cx + i * tw * 0.35) + '" y2="124" stroke="' + kit[1] + '" stroke-width="4" opacity=".9"/>';
+    }
+    s += '<rect x="' + (cx - tw + 1) + '" y="118" width="' + (tw * 2 - 2) + '" height="14" rx="5" fill="' + kit[1] + '" ' + st + '/>';
+    s += '<text x="50" y="108" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="' + (b > 1.2 ? 15 : 13) + '" fill="' + kit[1] + '">' + p.num + '</text>';
+  }
+  // head
+  if (b > 1.2) s += '<ellipse cx="' + cx + '" cy="' + (hy + 7) + '" rx="' + (hr + 2) + '" ry="' + (ry - 3) + '" fill="' + sk + '" ' + st + '/>';
+  s += '<circle cx="' + (cx - hr - 1) + '" cy="' + (hy + 3) + '" r="' + (4.5 * (p.ear || 1)) + '" fill="' + sk + '" ' + st + '/><circle cx="' + (cx + hr + 1) + '" cy="' + (hy + 3) + '" r="' + (4.5 * (p.ear || 1)) + '" fill="' + sk + '" ' + st + '/>';
+  s += '<ellipse cx="' + cx + '" cy="' + hy + '" rx="' + hr + '" ry="' + ry + '" fill="' + sk + '" ' + st + '/>';
+  // beard
+  if (L.beard === 'full') s += '<path d="M' + (cx - hr + 1) + ' ' + (hy + 4) + ' Q' + (cx - hr - 1) + ' ' + (hy + ry + 5) + ' ' + cx + ' ' + (hy + ry + 5) + ' Q' + (cx + hr + 1) + ' ' + (hy + ry + 5) + ' ' + (cx + hr - 1) + ' ' + (hy + 4) + ' Q' + cx + ' ' + (hy + 14) + ' ' + (cx - hr + 1) + ' ' + (hy + 4) + 'Z" fill="' + L.bc + '" ' + st + '/>';
+  if (L.beard === 'goatee') s += '<ellipse cx="' + cx + '" cy="' + (hy + 20) + '" rx="8" ry="6" fill="' + L.bc + '"/>';
+  if (L.beard === 'stubble') s += '<path d="M' + (cx - hr + 3) + ' ' + (hy + 8) + ' Q' + cx + ' ' + (hy + ry + 4) + ' ' + (cx + hr - 3) + ' ' + (hy + 8) + ' Q' + cx + ' ' + (hy + 14) + ' ' + (cx - hr + 3) + ' ' + (hy + 8) + 'Z" fill="' + INK + '" opacity=".22"/>';
+  // hair front
+  const top = (low, extra) => '<path d="M' + (cx - hr - 1) + ' ' + (hy - 3) + ' A' + (hr + 1) + ' ' + (ry + 3) + ' 0 0 1 ' + (cx + hr + 1) + ' ' + (hy - 3) + ' Q' + cx + ' ' + (hy - low) + ' ' + (cx - hr - 1) + ' ' + (hy - 3) + 'Z" fill="' + (L.gray ? '#BDB6AE' : hc) + '" ' + st + '/>' + (extra || '');
+  if (L.hair === 'buzz') s += '<path d="M' + (cx - hr + 1) + ' ' + (hy - 6) + ' A' + hr + ' ' + (ry + 1) + ' 0 0 1 ' + (cx + hr - 1) + ' ' + (hy - 6) + ' Q' + cx + ' ' + (hy - 15) + ' ' + (cx - hr + 1) + ' ' + (hy - 6) + 'Z" fill="' + hc + '" opacity=".85"/>';
+  else if (L.hair === 'slick') s += top(17, '<path d="M' + (cx - hr + 4) + ' ' + (hy - 18) + ' Q' + cx + ' ' + (hy - 24) + ' ' + (cx + hr - 3) + ' ' + (hy - 14) + '" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>');
+  else if (L.hair === 'fringe') s += top(8, '');
+  else if (L.hair === 'long') s += top(12, '');
+  else if (L.hair === 'curly') { s += top(14, ''); for (let i = -2; i <= 2; i++) s += '<circle cx="' + (cx + i * (hr / 2.4)) + '" cy="' + (hy - ry + (Math.abs(i) > 1 ? 6 : 0)) + '" r="7" fill="' + hc + '" ' + st + '/>'; }
+  else if (L.hair === 'mohawk') s += '<path d="M' + (cx - 6) + ' ' + (hy - 6) + ' L' + (cx - 5) + ' ' + (hy - ry - 11) + ' L' + (cx + 5) + ' ' + (hy - ry - 11) + ' L' + (cx + 6) + ' ' + (hy - 6) + 'Z" fill="' + hc + '" ' + st + '/>';
+  else if (L.hair === 'afro') s += '<path d="M' + (cx - hr + 2) + ' ' + (hy - 6) + ' Q' + cx + ' ' + (hy - 20) + ' ' + (cx + hr - 2) + ' ' + (hy - 6) + ' Q' + cx + ' ' + (hy - 12) + ' ' + (cx - hr + 2) + ' ' + (hy - 6) + 'Z" fill="' + hc + '"/>';
+  else if (L.hair === 'bald') s += '<path d="M' + (cx - 9) + ' ' + (hy - 19) + ' Q' + cx + ' ' + (hy - 23) + ' ' + (cx + 5) + ' ' + (hy - 20) + '" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>';
+  if (L.band) s += '<rect x="' + (cx - hr) + '" y="' + (hy - 15) + '" width="' + (hr * 2) + '" height="7" fill="#DF9287" ' + st + '/>';
+  // face
+  const ex = hr * 0.42, ey = hy + 3;
+  const open = mood === 'laugh' ? 0.85 : mood === 'happy' ? 0.95 : 1;
+  const tired = mood === 'tired', hurt = mood === 'hurt';
+  for (let i = -1; i <= 1; i += 2) {
+    const x = cx + i * ex;
+    s += '<ellipse cx="' + x + '" cy="' + ey + '" rx="' + (5.2 * (p.eye || 1)) + '" ry="' + (5.8 * (p.eye || 1) * open) + '" fill="#fff" ' + st.replace('2.4', '1.8') + '/>';
+    s += '<circle cx="' + (x + (mood === 'focus' ? i * -0.6 : 0)) + '" cy="' + (ey + (tired ? 1.5 : 0.4)) + '" r="2.9" fill="' + (L.eye || INK) + '"/><circle cx="' + (x - 1) + '" cy="' + (ey - 1) + '" r="1" fill="#fff"/>';
+    if (tired) { s += '<path d="M' + (x - 6) + ' ' + (ey - 1) + ' L' + (x + 6) + ' ' + (ey - 1) + ' L' + (x + 6) + ' ' + (ey - 7) + ' L' + (x - 6) + ' ' + (ey - 7) + 'Z" fill="' + sk + '"/><path d="M' + (x - 6) + ' ' + (ey - 1) + ' L' + (x + 6) + ' ' + (ey - 1) + '" stroke="' + INK + '" stroke-width="1.8"/><path d="M' + (x - 5) + ' ' + (ey + 7) + ' Q' + x + ' ' + (ey + 10) + ' ' + (x + 5) + ' ' + (ey + 7) + '" fill="none" stroke="' + INK + '" stroke-opacity=".4" stroke-width="1.6"/>'; }
+    const by = ey - 9;
+    let bd;
+    if (mood === 'focus') bd = 'M' + (x - 6) + ' ' + (by - 2 + (i < 0 ? 0 : 0)) + ' L' + (x + 6) + ' ' + (by + 1);
+    else if (hurt) bd = 'M' + (x - 6) + ' ' + (by + (i < 0 ? 2 : -2)) + ' L' + (x + 6) + ' ' + (by + (i < 0 ? -2 : 2));
+    else if (mood === 'laugh' || mood === 'happy') bd = 'M' + (x - 6) + ' ' + (by + 1) + ' Q' + x + ' ' + (by - 4) + ' ' + (x + 6) + ' ' + (by + 1);
+    else bd = 'M' + (x - 6) + ' ' + by + ' L' + (x + 6) + ' ' + by;
+    if (mood === 'focus') bd = 'M' + (x - 6) + ' ' + (by + (i < 0 ? -1 : 2)) + ' L' + (x + 6) + ' ' + (by + (i < 0 ? 2 : -1));
+    s += '<path d="' + bd + '" fill="none" stroke="' + (L.gray ? '#6A625A' : (hc === '#0F0A08' ? INK : hc)) + '" stroke-width="2.8" stroke-linecap="round"/>';
+  }
+  const my = hy + 16, mc = L.beard === 'full' ? '#FFF0CD' : INK;
+  if (mood === 'laugh') s += '<path d="M' + (cx - 8) + ' ' + (my - 2) + ' Q' + cx + ' ' + (my + 12) + ' ' + (cx + 8) + ' ' + (my - 2) + 'Z" fill="#7A2E2E" stroke="' + mc + '" stroke-width="2" stroke-linejoin="round"/>';
+  else if (mood === 'happy') s += '<path d="M' + (cx - 7) + ' ' + my + ' Q' + cx + ' ' + (my + 8) + ' ' + (cx + 7) + ' ' + my + '" fill="none" stroke="' + mc + '" stroke-width="2.4" stroke-linecap="round"/>';
+  else if (hurt) s += '<path d="M' + (cx - 6) + ' ' + (my + 3) + ' Q' + cx + ' ' + (my - 3) + ' ' + (cx + 6) + ' ' + (my + 3) + '" fill="none" stroke="' + mc + '" stroke-width="2.4" stroke-linecap="round"/>';
+  else s += '<path d="M' + (cx - 5) + ' ' + (my + 1) + ' L' + (cx + 5) + ' ' + (my + 1) + '" stroke="' + mc + '" stroke-width="2.4" stroke-linecap="round"/>';
+  if (L.beard === 'stache') s += '<path d="M' + (cx - 10) + ' ' + (hy + 12) + ' Q' + (cx - 5) + ' ' + (hy + 8) + ' ' + cx + ' ' + (hy + 12) + ' Q' + (cx + 5) + ' ' + (hy + 8) + ' ' + (cx + 10) + ' ' + (hy + 12) + ' Q' + cx + ' ' + (hy + 17) + ' ' + (cx - 10) + ' ' + (hy + 12) + 'Z" fill="' + L.bc + '" ' + st.replace('2.4', '1.2') + '/>';
+  if (L.freck) for (let i = -1; i <= 1; i += 2) s += '<circle cx="' + (cx + i * 12) + '" cy="' + (hy + 9) + '" r="1.1" fill="#B5502A"/><circle cx="' + (cx + i * 8) + '" cy="' + (hy + 11) + '" r="1.1" fill="#B5502A"/><circle cx="' + (cx + i * 15) + '" cy="' + (hy + 11) + '" r="1.1" fill="#B5502A"/>';
+  if (L.scar) s += '<path d="M' + (cx + 8) + ' ' + (hy - 13) + ' L' + (cx + 13) + ' ' + (hy - 5) + '" stroke="#B23A3A" stroke-width="2" stroke-linecap="round"/>';
+  if (p.inj > 0) s += '<rect x="' + (cx - 10) + '" y="' + (hy - 16) + '" width="20" height="8" rx="2" transform="rotate(-8 ' + cx + ' ' + (hy - 12) + ')" fill="#F4DCC8" ' + st.replace('2.4', '1.8') + '/><path d="M' + (cx - 3) + ' ' + (hy - 14) + ' L' + (cx + 3) + ' ' + (hy - 11) + 'M' + (cx - 3) + ' ' + (hy - 11) + ' L' + (cx + 3) + ' ' + (hy - 14) + '" stroke="#B23A3A" stroke-width="1.6"/>';
+  const vb = mode === 'full' ? '0 0 100 158' : '6 ' + (hy - ry - 12) + ' 88 ' + (ry * 2 + 28);
+  return '<svg viewBox="' + vb + '" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + s + '</svg>';
+}
+
+/* ---------- Data ---------- */
+const BM = { Mince: { spd: 10, tec: 2, phy: -14 }, 'Athlétique': { spd: 0, tec: 0, phy: 0 }, Trapu: { spd: -7, tec: 0, phy: 8 }, Costaud: { spd: -15, tec: -4, phy: 14 } };
+const bLabel = (b) => b < 0.9 ? 'Mince' : b < 1.08 ? 'Athlétique' : b < 1.25 ? 'Trapu' : 'Costaud';
+const bTone = (b) => b < 0.9 ? 'background:#CFE3E8;color:#1F4A5A' : b < 1.08 ? 'background:#D7E2CF;color:#263E23' : b < 1.25 ? 'background:#F3E0B0;color:#6B4A12' : 'background:#F2D6D3;color:#6B2A22';
+const TAL = {
+  chef: { n: 'Chef de défense', line: 'def', b: 6, t: 'Ses défenseurs jouent mieux, tant qu’il a le brassard.', ok: (p) => p.moral >= 45 && G.captain === p.id },
+  sprint: { n: 'Sprint de feu', line: 'def', b: 4, t: 'Gagne les courses. Il lui faut de la confiance (moral 60+).', ok: (p) => p.moral >= 60 },
+  lecture: { n: 'Lecture du jeu', line: 'def', b: 5, t: 'Anticipe les passes. Perd son don quand il est épuisé.', ok: (p) => p.fat < 60 },
+  mur: { n: 'Mur humain', line: 'def', b: 5, t: 'Presque impossible à dribbler.', ok: (p) => p.moral >= 35 },
+  moteur: { n: 'Moteur d’équipe', line: 'mid', b: 3, t: 'Inspiré, il fait monter le moral de tout le groupe.', ok: (p) => p.moral >= 55 },
+  laser: { n: 'Passe laser', line: 'mid', b: 6, t: 'Trouve l’attaquant seul. Demande un moral de 55 ou plus.', ok: (p) => p.moral >= 55 },
+  milieu: { n: 'Mur de milieu', line: 'mid', b: 5, t: 'Récupère presque tous les ballons au centre.', ok: (p) => p.moral >= 35 },
+  finisseur: { n: 'Finisseur froid', line: 'att', b: 6, t: 'Marque sous pression.', ok: (p) => p.moral >= 50 },
+  contre: { n: 'Feu de contre', line: 'att', b: 7, t: 'Mortel en contre-attaque. Se bloque quand il est frustré.', ok: (p) => p.moral >= 40 },
+  miracle: { n: 'Arrêt miracle', line: 'gk', b: 7, t: 'Sauve des ballons perdus.', ok: (p) => p.moral >= 45 }
+};
+const ROLES = { GB: ['Gardien classique', 'Libéro'], DEF: ['Stoppeur', 'Relanceur', 'Latéral'], MIL: ['Récupérateur', 'Meneur', 'Ailier'], ATT: ['Finisseur', 'Pivot', 'Appel en profondeur'] };
+const FM = { '1-3-2-1': [3, 2, 1], '1-2-3-1': [2, 3, 1], '1-3-1-2': [3, 1, 2], '1-2-2-2': [2, 2, 2] };
+const FNOTE = { '1-3-2-1': 'Équilibré : solide derrière, une seule pointe.', '1-2-3-1': 'Milieu dense : plus de passes, moins de protection.', '1-3-1-2': 'Défense en béton, deux attaquants en contre.', '1-2-2-2': 'Très offensif : la défense paie le prix.' };
+const TRAITS = { sensible: 'Sensible', fier: 'Fier', ambitieux: 'Ambitieux', loyal: 'Loyal' };
+const TALK = {
+  sensible: { enc: [12, 'Il sourit. Ça lui fait du bien.'], fer: [-8, 'Il baisse les yeux. Mauvaise approche.'], pro: [4, 'Il écoute, sans plus.'] },
+  fier: { enc: [3, 'Il hausse les épaules.'], fer: [8, 'Il se redresse. Il respecte la franchise.'], pro: [5, 'Il acquiesce avec fierté.'] },
+  ambitieux: { enc: [4, 'Il attend des actes.'], fer: [-4, 'Il serre la mâchoire.'], pro: [12, 'Ses yeux s’allument. Tu dois tenir parole.'] },
+  loyal: { enc: [8, 'Il te remercie.'], fer: [5, 'Il accepte, sans rancune.'], pro: [6, 'Il te fait confiance.'] }
+};
+const MKP = (o) => o;
+const P0 = [
+  { id: 'kofi', name: 'Kofi', pos: 'GB', age: 29, num: 1, build: 1.3, look: { skin: '#6E4228', hair: 'bald', hc: '#0F0A08', beard: 'full', bc: '#26211D' }, eye: 1.05, kit: ['#5E7A5A', '#2F4A2E'], kitStyle: 'plain', st: { spd: 45, tec: 50, phy: 70, def: 40, att: 20, gk: 74 }, tal: 'miracle', trait: 'loyal', moral: 76, fat: 15, want: 'Ne pas encaisser à domicile.' },
+  { id: 'rafa', name: 'Rafa', pos: 'DEF', age: 31, num: 4, build: 1.12, look: { skin: '#B97C52', hair: 'slick', hc: '#1A1410', gray: true, beard: 'stubble', bc: '#1A1410' }, eye: 0.9, st: { spd: 55, tec: 58, phy: 70, def: 76, att: 40 }, tal: 'chef', trait: 'fier', moral: 70, fat: 30, want: 'Finir sa carrière avec un titre.' },
+  { id: 'jb', name: 'JB', pos: 'DEF', age: 22, num: 5, build: 0.82, look: { skin: '#F1D1B8', hair: 'curly', hc: '#B5502A', freck: true }, eye: 1.1, ear: 1.35, st: { spd: 62, tec: 60, phy: 58, def: 68, att: 42 }, tal: 'lecture', trait: 'sensible', moral: 61, fat: 35, want: 'Jouer tous les matchs.' },
+  { id: 'mateo', name: 'Mateo', pos: 'DEF', age: 19, num: 3, build: 0.8, look: { skin: '#F4DCC8', hair: 'fringe', hc: '#D9B25A', freck: true }, eye: 1.15, st: { spd: 72, tec: 55, phy: 58, def: 64, att: 45 }, tal: 'sprint', trait: 'ambitieux', moral: 74, fat: 22, want: 'Signer son premier contrat pro.' },
+  { id: 'ibra', name: 'Ibra', pos: 'DEF', age: 33, num: 2, build: 1.4, look: { skin: '#5A3520', hair: 'bald', hc: '#0F0A08', beard: 'goatee', bc: '#0F0A08' }, st: { spd: 50, tec: 48, phy: 74, def: 72, att: 35 }, tal: 'mur', trait: 'loyal', moral: 66, fat: 50, want: 'Jouer jusqu’à 36 ans.' },
+  { id: 'yanis', name: 'Yanis', pos: 'MIL', age: 25, num: 8, build: 1.18, look: { skin: '#D9A878', hair: 'curly', hc: '#1C1410', beard: 'stache', bc: '#1C1410' }, eye: 1.05, st: { spd: 62, tec: 70, phy: 64, def: 56, att: 62 }, tal: 'moteur', trait: 'loyal', moral: 88, fat: 18, want: 'Garder le vestiaire uni.' },
+  { id: 'samir', name: 'Samir', pos: 'MIL', age: 27, num: 6, build: 0.92, look: { skin: '#C49A6C', hair: 'long', hc: '#1C1410', beard: 'goatee', bc: '#1C1410' }, eye: 0.9, st: { spd: 64, tec: 78, phy: 55, def: 48, att: 66 }, tal: 'laser', trait: 'sensible', moral: 48, fat: 81, want: 'Porter le brassard de capitaine.' },
+  { id: 'tomas', name: 'Tomás', pos: 'MIL', age: 26, num: 10, build: 1.28, look: { skin: '#E3BC98', hair: 'buzz', hc: '#3A2414' }, st: { spd: 55, tec: 62, phy: 68, def: 68, att: 52 }, tal: 'milieu', trait: 'fier', moral: 62, fat: 44, want: 'Devenir un leader.' },
+  { id: 'leo', name: 'Léo', pos: 'ATT', age: 21, num: 9, build: 1.0, look: { skin: '#7A4A2D', hair: 'afro', hc: '#0F0A08', band: true, scar: true }, st: { spd: 70, tec: 68, phy: 60, def: 35, att: 76 }, tal: 'finisseur', trait: 'ambitieux', moral: 72, fat: 28, want: 'Être meilleur buteur.' },
+  { id: 'diego', name: 'Diego', pos: 'ATT', age: 24, num: 11, build: 0.95, look: { skin: '#D8B08A', hair: 'mohawk', hc: '#14100E', beard: 'stubble', bc: '#14100E' }, eye: 0.8, st: { spd: 68, tec: 66, phy: 58, def: 30, att: 72 }, tal: 'contre', trait: 'fier', moral: 31, fat: 40, inj: 1, want: 'Être titulaire, sinon il part.' }
+];
+const OPPS = [
+  { name: 'Les Faucons', s: 62, short: 'LF' }, { name: 'FC Rivière', s: 58, short: 'FR' }, { name: 'Union Sud', s: 55, short: 'US' },
+  { name: 'Nordville B', s: 52, short: 'NB' }, { name: 'Étoile Verte', s: 50, short: 'ÉV' }, { name: 'Olympique Est', s: 56, short: 'OE' }
+];
+const SURN = ['Moreau', 'Diallo', 'Costa', 'Lemay', 'Okoye', 'Silva', 'Petit', 'Haddad', 'Novak', 'Roy', 'Ferreira', 'Brun', 'Tessier', 'Ndiaye', 'Bélanger', 'Vega'];
+const ME = 'AS Nordville';
+
+/* ---------- State ---------- */
+let G = null;
+const UI = { screen: 'home', sel: 'rafa', flt: 'Tous', tsel: null, talk: null, talkMsg: '', mt: null, season: false, note: '' };
+const SAVE = 'scg-save-v2';
+
+function newGame(keep) {
+  const players = P0.map((o) => {
+    const p = JSON.parse(JSON.stringify(o));
+    const m = BM[bLabel(p.build)];
+    p.st.spd += m.spd; p.st.tec += m.tec; p.st.phy += m.phy;
+    p.inj = p.inj || 0; p.bench = 0; p.goals = 0; p.promise = false; p.talked = 0; p.kitStyle = p.kitStyle || 'stripes';
+    return p;
+  });
+  const order = OPPS.map((_, i) => i).sort(() => Math.random() - 0.5);
+  const sched = [];
+  order.forEach((o, i) => sched.push({ opp: o, home: i % 2 === 0 }));
+  order.forEach((o, i) => sched.push({ opp: o, home: i % 2 !== 0 }));
+  const league = {}; league[ME] = { pts: 0, pl: 0, gf: 0, ga: 0 };
+  OPPS.forEach((o) => { league[o.name] = { pts: 0, pl: 0, gf: 0, ga: 0 }; });
+  G = {
+    v: 2, season: 1, week: 1, players, formation: '1-3-2-1', lineup: [], roles: {}, team: { m: 1, p: 1, t: 1, w: 1 }, captain: 'rafa',
+    budget: 12400, supporters: 1240, coh: 54, energy: 3, train: 'tactique', facil: { terrain: 2, vest: 1, entr: 2 }, sched, league, history: [], news: [],
+    oppNames: OPPS.map(() => Array.from({ length: 7 }, () => pick(SURN)))
+  };
+  if (keep) { G.budget = keep.budget; G.supporters = keep.supporters; G.facil = keep.facil; G.season = keep.season + 1; G.players = keep.players; G.coh = keep.coh; G.captain = keep.captain; G.roles = keep.roles; G.formation = keep.formation; G.team = keep.team; G.players.forEach((p) => { p.age += 1; p.goals = 0; p.bench = 0; }); }
+  fitLineup();
+  save();
+}
+function save() { try { localStorage.setItem(SAVE, JSON.stringify(G)); } catch (e) { /* ignore */ } }
+function load() { try { const s = localStorage.getItem(SAVE); if (s) { const g = JSON.parse(s); if (g && g.v === 2) { G = g; return true; } } } catch (e) { /* ignore */ } return false; }
+const P = (id) => G.players.find((p) => p.id === id);
+
+/* ---------- Mood / strength ---------- */
+function moodOf(p) {
+  if (p.inj > 0) return { mood: 'hurt', label: 'Blessé', col: '#DF9287', bg: '#F2D6D3', fg: '#6B2A22' };
+  if (p.moral < 40) return { mood: 'hurt', label: 'Frustré', col: '#DF9287', bg: '#F2D6D3', fg: '#6B2A22' };
+  if (p.fat > 72) return { mood: 'tired', label: 'Épuisé', col: '#F0C253', bg: '#F3E0B0', fg: '#6B4A12' };
+  if (p.moral >= 80) return { mood: 'laugh', label: 'Inspiré', col: '#86AD78', bg: '#D7E2CF', fg: '#263E23' };
+  if (p.moral >= 66) return { mood: 'happy', label: 'Content', col: '#86AD78', bg: '#D7E2CF', fg: '#263E23' };
+  return { mood: p.pos === 'ATT' || p.id === G.captain ? 'focus' : 'neutral', label: 'Stable', col: '#438BC0', bg: '#CFE3E8', fg: '#1F4A5A' };
+}
+const lineOf = (pos) => pos === 'GB' ? 'gk' : pos === 'DEF' ? 'def' : pos === 'MIL' ? 'mid' : 'att';
+function score(p, line) {
+  const s = p.st;
+  return line === 'gk' ? s.gk || 30 : line === 'def' ? 0.55 * s.def + 0.25 * s.phy + 0.2 * s.spd : line === 'mid' ? 0.45 * s.tec + 0.2 * s.phy + 0.2 * s.spd + 0.15 * (s.def + s.att) / 2 : 0.5 * s.att + 0.3 * s.tec + 0.2 * s.spd;
+}
+const perf = (p) => (0.7 + 0.3 * p.moral / 100) * (1 - p.fat / 260);
+const ovr = (p) => Math.round(score(p, lineOf(p.pos)));
+function slots() { const f = FM[G.formation]; return ['GB'].concat(Array(f[0]).fill('DEF'), Array(f[1]).fill('MIL'), Array(f[2]).fill('ATT')); }
+function teamStr(team, fz) {
+  const sl = slots(), out = { gk: 0, def: 0, mid: 0, att: 0 }, cnt = { gk: 0, def: 0, mid: 0, att: 0 }, bon = { gk: 0, def: 0, mid: 0, att: 0 };
+  G.lineup.forEach((id, i) => {
+    const p = P(id), line = lineOf(sl[i]); if (!p) return;
+    let v = score(p, line);
+    if (p.pos !== sl[i]) v *= 0.85;
+    if (G.roles[p.id] && G.roles[p.id] === bestRole(p)) v += 4;
+    v *= perf(p) * (fz || 1);
+    out[line] += v; cnt[line]++;
+    const t = TAL[p.tal];
+    if (t && t.ok(p)) bon[t.line] += t.b;
+    else if (p.tal === 'contre' && p.moral < 40) bon.att -= 6;
+  });
+  ['gk', 'def', 'mid', 'att'].forEach((l) => { const n = cnt[l] || 1; out[l] = l === 'gk' ? out[l] + bon[l] : out[l] / n * (0.82 + 0.09 * n) + bon[l] * (fz || 1); });
+  const cf = 0.97 + 0.06 * G.coh / 100;
+  out.att *= (1 + 0.06 * (team.m - 1)) * cf; out.def *= (1 - 0.05 * (team.m - 1)) * cf; out.mid *= (1 + 0.04 * (team.p - 1)) * cf;
+  return out;
+}
+function bestRole(p) { return { kofi: 'Libéro', rafa: 'Stoppeur', jb: 'Relanceur', mateo: 'Latéral', ibra: 'Stoppeur', yanis: 'Meneur', samir: 'Meneur', tomas: 'Récupérateur', leo: 'Finisseur', diego: 'Appel en profondeur' }[p.id]; }
+function fitLineup() {
+  const sl = slots(), old = {}, used = {};
+  (G.lineup || []).forEach((id) => { const p = P(id); if (p && !p.inj) (old[p.pos] = old[p.pos] || []).push(id); });
+  const res = [];
+  sl.forEach((pos) => {
+    let id = old[pos] && old[pos].shift();
+    if (!id) {
+      const c = G.players.filter((p) => !p.inj && !used[p.id] && p.pos === pos && !(res.indexOf(p.id) >= 0)).sort((a, b) => ovr(b) - ovr(a));
+      id = c[0] && c[0].id;
+    }
+    if (!id) { const c = G.players.filter((p) => !p.inj && res.indexOf(p.id) < 0).sort((a, b) => ovr(b) - ovr(a)); id = c[0] && c[0].id; }
+    res.push(id);
+  });
+  G.lineup = res;
+}
+const benchList = () => G.players.filter((p) => G.lineup.indexOf(p.id) < 0);
+function oppStr(oi, wk) {
+  const s = OPPS[oi].s + Math.floor((G.season - 1) * 1.5), j = () => rnd(-3, 3);
+  return { gk: s + 6 + j(), def: s + j(), mid: s + j(), att: s + j(), tempo: 1, names: G.oppNames[oi] };
+}
+
+/* ---------- Match sim ---------- */
+function names(M, userSide, line) {
+  if (userSide) {
+    const sl = slots(); const c = G.lineup.map((id, i) => ({ p: P(id), pos: sl[i] })).filter((x) => x.p);
+    const w = (x) => line === 'att' ? ({ ATT: 6, MIL: 2.5, DEF: 0.4, GB: 0 }[x.pos]) : line === 'def' ? ({ DEF: 6, MIL: 1.5, ATT: 0.3, GB: 0 }[x.pos]) : line === 'gk' ? (x.pos === 'GB' ? 1 : 0) : ({ MIL: 6, ATT: 2, DEF: 1, GB: 0 }[x.pos]);
+    const tot = c.reduce((a, x) => a + w(x), 0); let r = Math.random() * tot;
+    for (const x of c) { r -= w(x); if (r <= 0) return x.p; }
+    return c[0].p;
+  }
+  const n = M.O.names; return { name: line === 'gk' ? n[0] : pick(n.slice(1)), id: null };
+}
+function simBlock(M, silent) {
+  const fz = 1 - 0.12 * (M.b / 30);
+  const U = silent ? M.U : teamStr(M.team, fz), O = M.O;
+  M.U = U;
+  const posU = U.mid / (U.mid + O.mid);
+  const n = 1 + (Math.random() < 0.12 + 0.1 * M.team.t ? 1 : 0);
+  for (let k = 0; k < n; k++) {
+    const us = Math.random() < posU;
+    const X = us ? U : O, Y = us ? O : U;
+    const r = X.mid / (X.mid + Y.def * 0.95), reach = 0.2 + 0.55 * r;
+    M.ball = us ? 'U' : 'O';
+    if (Math.random() > reach) {
+      if (!silent && Math.random() < 0.4) { const d = names(M, !us, 'def'); M.feed.push({ t: M.min + "' " + d.name + ' ' + pick(['coupe la passe.', 'intercepte le ballon.', 'repousse l’attaque.']), c: '' }); }
+      continue;
+    }
+    const s = X.att / (X.att + Y.def * 0.9);
+    if (Math.random() > 0.4 + 0.35 * s) {
+      if (!silent && Math.random() < 0.5) { const a = names(M, us, 'att'); M.feed.push({ t: M.min + "' " + a.name + ' ' + pick(['perd son duel.', 'rate son contrôle.', 'est trop lent.']), c: '' }); }
+      continue;
+    }
+    const goalP = 0.12 + 0.28 * X.att / (X.att + Y.gk * 1.1);
+    const sh = names(M, us, 'att');
+    const roll = Math.random();
+    if (roll < goalP) {
+      M.sc[us ? 0 : 1]++;
+      if (us && sh.id) { sh.goals++; M.scorers.push(sh.id); }
+      if (!silent) M.feed.push({ t: M.min + "' BUT ! " + sh.name + ' ' + pick(['conclut une belle action.', 'trompe le gardien.', 'place le ballon dans le coin.', 'ne tremble pas.']) + ' ' + M.sc[0] + '-' + M.sc[1], c: us ? 'g' : 'o' });
+    } else if (!silent) {
+      if (roll < goalP + (1 - goalP) * 0.55) { const g = names(M, !us, 'gk'); M.feed.push({ t: M.min + "' " + g.name + ' ' + pick(['détourne le tir', 'réalise l’arrêt', 'sort le grand jeu']) + ' devant ' + sh.name + '.', c: '' }); }
+      else M.feed.push({ t: M.min + "' " + sh.name + ' ' + pick(['tire au-dessus.', 'frappe à côté.', 'touche le poteau !']), c: '' });
+    }
+  }
+}
+function oppIdx() { return G.sched[G.week - 1].opp; }
+function startMatch() {
+  const fx = G.sched[G.week - 1];
+  const note = [];
+  G.players.forEach((p) => {
+    if (p.promise) {
+      if (G.lineup.indexOf(p.id) < 0) { p.moral = clamp(p.moral - 12, 0, 100); note.push(p.name + ' est furieux : tu avais promis du temps de jeu.'); } else { p.moral = clamp(p.moral + 4, 0, 100); note.push(p.name + ' est content : promesse tenue.'); }
+      p.promise = false;
+    }
+  });
+  UI.note = note.join(' ');
+  const M = { fx, b: 0, min: 0, sc: [0, 0], feed: [], scorers: [], ball: 'M', speed: 1, done: false, half: false, team: Object.assign({}, G.team), O: oppStr(fx.opp), timer: null };
+  M.U = teamStr(M.team, 1);
+  UI.mt = M;
+  runMatch();
+}
+function runMatch() {
+  const M = UI.mt; clearInterval(M.timer);
+  if (M.skip) { while (M.b < 30 && !(M.b === 15 && !M.half && !M.skipHalf)) stepBlock(M); finishIfDone(M); render(); return; }
+  M.timer = setInterval(() => {
+    if (M.b === 15 && !M.half) { clearInterval(M.timer); M.half = true; M.pause = true; render(); return; }
+    stepBlock(M); finishIfDone(M); render();
+  }, M.speed === 3 ? 150 : 550);
+}
+function stepBlock(M) { M.b++; M.min = M.b * 3; M.O.mid; simBlock(M, false); }
+function finishIfDone(M) { if (M.b >= 30 && !M.done) { M.done = true; clearInterval(M.timer); M.ball = 'M'; M.feed.push({ t: 'Fin du match. ' + M.sc[0] + '-' + M.sc[1], c: 'g' }); applyResult(M); } }
+function oppTeamName(i) { return OPPS[i].name; }
+function applyResult(M) {
+  const fx = M.fx, res = M.sc[0] > M.sc[1] ? 'W' : M.sc[0] === M.sc[1] ? 'D' : 'L';
+  const lu = G.lineup.slice(), sum = [];
+  const L = G.league, on = oppTeamName(fx.opp);
+  const upd = (n, gf, ga) => { const t = L[n]; t.pl++; t.gf += gf; t.ga += ga; t.pts += gf > ga ? 3 : gf === ga ? 1 : 0; };
+  upd(ME, M.sc[0], M.sc[1]); upd(on, M.sc[1], M.sc[0]);
+  G.history.push({ week: G.week, opp: on, sc: M.sc.slice(), res, home: fx.home });
+  // other games
+  const rest = OPPS.map((o) => o.name).filter((n) => n !== on).sort(() => Math.random() - 0.5);
+  for (let i = 0; i + 1 < rest.length; i += 2) {
+    const a = OPPS.find((o) => o.name === rest[i]), b = OPPS.find((o) => o.name === rest[i + 1]);
+    const m = { b: 0, min: 0, sc: [0, 0], feed: [], scorers: [], team: { m: 1, p: 1, t: 1, w: 1 }, U: { gk: a.s + 6, def: a.s, mid: a.s, att: a.s }, O: { gk: b.s + 6, def: b.s, mid: b.s, att: b.s, names: ['x'] } };
+    for (let k = 1; k <= 30; k++) { m.b = k; m.min = k * 3; simBlock(m, true); }
+    upd(a.name, m.sc[0], m.sc[1]); upd(b.name, m.sc[1], m.sc[0]);
+  }
+  // morale and fatigue
+  const cost = 12 + 4 * M.team.p + 3 * M.team.t;
+  G.players.forEach((p) => {
+    const st = lu.indexOf(p.id) >= 0;
+    const before = p.moral;
+    if (st) {
+      p.moral += res === 'W' ? 5 : res === 'D' ? 1 : -5; p.fat += cost + (p.build > 1.2 ? 2 : 0); p.bench = 0;
+      const inj = 0.03 + p.fat / 1000 + 0.01 * M.team.p;
+      if (Math.random() < inj * (1 - 0.1)) { p.inj = 1 + Math.floor(Math.random() * 3); sum.push(p.name + ' se blesse (' + p.inj + ' sem.).'); }
+    } else if (!p.inj) {
+      p.bench++; p.moral -= 2 + (p.trait === 'fier' || p.trait === 'ambitieux' ? 3 : 0);
+    }
+    p.moral += M.scorers.filter((x) => x === p.id).length * 5;
+  });
+  const yan = P('yanis');
+  if (yan && lu.indexOf('yanis') >= 0 && yan.moral >= 70) { G.players.forEach((p) => { p.moral += 2; }); sum.push('Yanis fait monter le moral du groupe.'); }
+  // training
+  const tr = G.train, e = G.facil.entr;
+  if (tr === 'tactique') { G.coh += 6; G.players.forEach((p) => { p.fat += 4; }); }
+  if (tr === 'physique') G.players.forEach((p) => { if (p.fat < 60 && !p.inj) { p.st.phy = Math.min(95, p.st.phy + (Math.random() < 0.35 + 0.1 * e ? 1 : 0)); } p.fat += 10; });
+  if (tr === 'technique') G.players.forEach((p) => { if (!p.inj) { p.st.tec = Math.min(95, p.st.tec + (Math.random() < 0.3 + 0.1 * e ? 1 : 0)); p.st.att = Math.min(95, p.st.att + (Math.random() < 0.15 ? 1 : 0)); } p.fat += 6; });
+  if (tr === 'repos') G.players.forEach((p) => { p.fat -= 18; p.moral += 2; });
+  // recovery
+  G.players.forEach((p) => {
+    p.fat = clamp(p.fat - (16 + 2 * e), 0, 100);
+    p.moral += (60 - p.moral) * 0.1 + 0.8 * G.facil.vest;
+    p.moral = clamp(Math.round(p.moral), 0, 100); p.fat = Math.round(p.fat);
+    if (p.inj > 0 && !sum.some((x) => x.indexOf(p.name + ' se blesse') === 0)) p.inj--;
+  });
+  G.coh = clamp(G.coh + (res === 'W' ? 3 : res === 'L' ? -2 : 0) - G.players.filter((p) => p.moral < 40).length, 0, 100);
+  // finances
+  const gate = fx.home ? 900 + Math.round(G.supporters * 0.6) + 150 * G.facil.terrain : 300;
+  const inc = gate + 700 + (res === 'W' ? 300 : 0), wages = 1100;
+  G.budget += inc - wages; G.supporters = Math.max(300, G.supporters + (res === 'W' ? 30 : res === 'L' ? -20 : 5));
+  M.summary = { res, sum, net: inc - wages };
+  G.week++; G.energy = 3;
+  fitLineup();
+  if (G.week > 12) UI.season = true;
+  save();
+}
+
+/* ---------- UI helpers ---------- */
+const THEME = { home: ['#FFF0CD', '#2B1D14', 'Accueil'], eff: ['#86AD78', '#263E23', 'Effectif'], tac: ['#F0C253', '#493118', 'Tactique'], cal: ['#438BC0', '#FFFAF0', 'Calendrier'], club: ['#DF9287', '#462B25', 'Club'] };
+const ICON = {
+  cal: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  eff: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-5 3.500-6.500 6.500-6.500s6 1.500 6.500 6.500"/><circle cx="17" cy="9" r="2.800"/><path d="M17 14c2.500 0 4.500 1.500 5 5"/>',
+  home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+  tac: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 12h18"/><circle cx="12" cy="12" r="3"/>',
+  club: '<path d="M12 2.500l8 3v6.500c0 5-3.500 8.500-8 10-4.500-1.500-8-5-8-10V5.500z"/>'
+};
+const NAVO = ['cal', 'eff', 'home', 'tac', 'club'];
+function tok(p, extra) {
+  const m = moodOf(p);
+  return '<button class="tk' + (extra && extra.sel ? ' sel' : '') + '" ' + (extra && extra.a ? 'data-a="' + extra.a + '" data-v="' + p.id + '"' : '') + ' style="' + (extra && extra.pos || '') + '"><div class="h" style="border-color:' + m.col + '">' + chibi(p, 'head') + '</div><div class="n">' + p.name + '</div></button>';
+}
+function meter(l, v, c) { return '<div class="ml"><span>' + l + '</span><span class="muted">' + Math.round(v) + ' / 100</span></div><div class="meter"><i style="width:' + clamp(v, 0, 100) + '%;background:' + c + '"></i></div>'; }
+const moralCol = (v) => v > 60 ? '#86AD78' : v > 40 ? '#F0C253' : '#DF9287';
+const fatCol = (v) => v > 70 ? '#DF9287' : v > 45 ? '#F0C253' : '#86AD78';
+function pitchSvg() {
+  return '<svg viewBox="0 0 640 390" preserveAspectRatio="none"><g fill="none" stroke="#FFFDF8" stroke-width="2" opacity=".8"><rect x="10" y="10" width="620" height="370" rx="6"/><line x1="320" y1="10" x2="320" y2="380"/><circle cx="320" cy="195" r="48"/><rect x="10" y="120" width="96" height="150"/><rect x="534" y="120" width="96" height="150"/></g></svg>';
+}
+function tokenPositions() {
+  const f = FM[G.formation], ys = (k) => k === 1 ? [50] : k === 2 ? [30, 70] : [18, 50, 82];
+  const pos = [[8, 50]];
+  ys(f[0]).forEach((y) => pos.push([28, y])); ys(f[1]).forEach((y) => pos.push([52, y])); ys(f[2]).forEach((y) => pos.push([76, y]));
+  return pos;
+}
+function standings() {
+  return Object.keys(G.league).map((n) => Object.assign({ n }, G.league[n])).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf);
+}
+const myRank = () => standings().findIndex((t) => t.n === ME) + 1;
+
+/* ---------- Screens ---------- */
+function alertsList() {
+  const out = [];
+  G.players.forEach((p) => {
+    if (p.inj) out.push({ p, t: p.name + ' est blessé', x: p.inj + ' semaine(s) d’absence.', cta: 'Voir' });
+    else if (p.moral < 40) out.push({ p, t: p.name + ' est frustré', x: p.bench >= 2 ? p.bench + ' matchs sur le banc.' : 'Son moral est bas.', cta: 'Parler' });
+    else if (p.fat > 72) out.push({ p, t: p.name + ' est épuisé', x: 'À reposer avant le match.', cta: 'Voir' });
+    else if (p.moral >= 85) out.push({ p, t: p.name + ' est inspiré', x: 'Il tire le groupe vers le haut.', cta: 'Voir' });
+  });
+  return out.slice(0, 4);
+}
+function sHome() {
+  const fx = G.sched[G.week - 1] || G.sched[11], o = OPPS[fx.opp], pos = tokenPositions();
+  const toks = G.lineup.map((id, i) => { const p = P(id); return p ? tok(p, { pos: 'left:' + pos[i][0] + '%;top:' + pos[i][1] + '%', a: 'viewp', sel: false }) : ''; }).join('');
+  const bench = benchList().map((p) => '<div class="row" style="padding:3px 0;border-top:1.5px solid var(--line2)"><div class="h" style="width:30px;height:30px;border-radius:50%;overflow:hidden;border:3px solid ' + moodOf(p).col + ';background:var(--line2)">' + chibi(p, 'head') + '</div><div class="grow"><b>' + p.name + '</b> <span class="muted">' + p.pos + '</span></div><span class="tag" style="' + 'background:' + moodOf(p).bg + ';color:' + moodOf(p).fg + '">' + moodOf(p).label + '</span></div>').join('');
+  const al = alertsList().map((a) => '<div class="row" style="padding:4px 0;border-top:1.5px solid var(--line2)"><div style="width:30px;height:30px;flex:none;border-radius:50%;overflow:hidden;border:3px solid ' + moodOf(a.p).col + ';background:var(--line2)">' + chibi(a.p, 'head') + '</div><div class="grow"><b style="font-size:12px">' + a.t + '</b><div class="muted" style="font-size:11px">' + a.x + '</div></div><button class="btn sm" data-a="' + (a.cta === 'Parler' ? 'talk' : 'viewp') + '" data-v="' + a.p.id + '">' + a.cta + '</button></div>').join('') || '<div class="muted">Rien à signaler.</div>';
+  const form = G.history.slice(-5).map((h) => '<span class="tag" style="margin-right:3px;' + (h.res === 'W' ? 'background:#D7E2CF;color:#263E23' : h.res === 'D' ? 'background:#F3E0B0;color:#6B4A12' : 'background:#F2D6D3;color:#6B2A22') + '">' + h.res.replace('W', 'V').replace('L', 'D') + '</span>').join('') || '<span class="muted">Premier match</span>';
+  const st = standings().slice(0, 7).map((t, i) => '<tr class="' + (t.n === ME ? 'me' : '') + '"><td style="width:18px;text-align:left">' + (i + 1) + '</td><td>' + t.n + '</td><td>' + t.pts + '</td></tr>').join('');
+  return '<div class="g3"><div class="col"><div class="card" style="background:var(--brown);color:var(--cream)"><div style="font-size:10px;font-weight:800;letter-spacing:.04em">SEM. ' + Math.min(G.week, 12) + ' · ' + (fx.home ? 'DOMICILE' : 'EXTÉRIEUR') + '</div><div class="row" style="justify-content:space-around;margin:6px 0"><div style="text-align:center"><div style="width:38px;height:38px;border-radius:50%;background:#FFFDF8;color:var(--brown);font-weight:800;display:flex;align-items:center;justify-content:center;margin:auto">AN</div><div style="font-size:11px;font-weight:800">Nordville</div></div><b>VS</b><div style="text-align:center"><div style="width:38px;height:38px;border-radius:50%;background:#F0C253;color:var(--ink);font-weight:800;display:flex;align-items:center;justify-content:center;margin:auto">' + o.short + '</div><div style="font-size:11px;font-weight:800">' + o.name + '</div></div></div><button class="btn pri" style="width:100%" data-a="play">Jouer le match</button><button class="btn sm" style="width:100%;margin-top:5px" data-a="go" data-v="tac">Préparer l’équipe</button></div><div class="card grow" style="overflow:auto"><h3>Vestiaire</h3>' + al + '</div></div>' +
+    '<div class="col"><div class="pitch" style="flex:1;min-height:150px">' + pitchSvg() + toks + '</div><div class="card" style="padding:6px 9px"><div class="row"><b>Forme</b><span class="grow">' + form + '</span><span class="muted" style="font-size:11px">' + G.formation + '</span></div></div></div>' +
+    '<div class="col"><div class="card" style="overflow:auto;flex:none;max-height:42%"><h3>Banc</h3>' + bench + '</div><div class="card grow" style="overflow:auto"><h3>Classement</h3><table>' + st + '</table></div></div></div>';
+}
+function sEff() {
+  const flt = UI.flt;
+  const list = G.players.slice().sort((a, b) => a.build - b.build).filter((p) => flt === 'Tous' || p.pos === flt);
+  const cards = list.map((p) => { const m = moodOf(p); return '<div class="pc' + (p.id === UI.sel ? ' sel' : '') + '" data-a="selp" data-v="' + p.id + '"><div class="fig">' + chibi(p, 'full') + '</div><b style="font-size:12.5px;margin-top:3px">' + p.name + '</b><div class="muted" style="font-size:10px">' + p.pos + ' · N° ' + p.num + '</div><span class="tag" style="margin-top:2px;background:' + m.bg + ';color:' + m.fg + '">' + m.label + '</span></div>'; }).join('');
+  const fl = ['Tous', 'GB', 'DEF', 'MIL', 'ATT'].map((k) => '<button class="' + (k === flt ? 'on' : '') + '" data-a="flt" data-v="' + k + '">' + k + '</button>').join('');
+  const p = P(UI.sel) || G.players[0], m = moodOf(p), t = TAL[p.tal];
+  const details = '<div class="card" style="height:100%;overflow:auto"><div class="row"><div style="width:54px;height:54px;flex:none;border-radius:50%;overflow:hidden;border:3px solid ' + m.col + ';background:var(--line2)">' + chibi(p, 'head') + '</div><div><div style="font-size:17px;font-weight:800;line-height:1.1">' + p.name + (G.captain === p.id ? ' ©' : '') + '</div><div class="muted" style="font-size:11px">' + p.pos + ' · N° ' + p.num + ' · ' + p.age + ' ans · ' + TRAITS[p.trait] + '</div><span class="tag" style="' + bTone(p.build) + '">' + bLabel(p.build) + '</span> <span class="tag" style="background:' + m.bg + ';color:' + m.fg + '">' + m.label + '</span></div></div>' +
+    meter('Moral', p.moral, moralCol(p.moral)) + meter('Fatigue', p.fat, fatCol(p.fat)) +
+    '<div class="row" style="margin-top:6px;gap:4px;flex-wrap:wrap">' + [['Vit.', p.st.spd], ['Tech.', p.st.tec], ['Phys.', p.st.phy], [p.pos === 'GB' ? 'Arrêt' : 'Déf.', p.pos === 'GB' ? p.st.gk : p.st.def], ['Att.', p.st.att]].map((x) => '<span class="tag" style="background:var(--cream);border:1.5px solid var(--line)">' + x[0] + ' ' + x[1] + '</span>').join('') + '</div>' +
+    '<div style="background:var(--cream);border:1.5px solid var(--line);border-radius:10px;padding:6px 8px;margin-top:6px"><div style="font-size:10px;font-weight:800;color:#8A5A34">TALENT · ' + t.n + '</div><div style="font-size:11.5px;font-weight:600">' + t.t + '</div></div>' +
+    '<div style="background:var(--cream);border:1.5px solid var(--line);border-radius:10px;padding:6px 8px;margin-top:5px"><div style="font-size:10px;font-weight:800;color:#8A5A34">MOTIVATION</div><div style="font-size:11.5px;font-weight:600">' + p.want + '</div></div>' +
+    '<div class="row" style="margin-top:7px"><button class="btn pri grow" data-a="talk" data-v="' + p.id + '"' + (G.energy < 1 ? ' disabled' : '') + '>Lui parler (' + G.energy + ')</button><button class="btn" data-a="cap" data-v="' + p.id + '">' + (G.captain === p.id ? 'Capitaine' : 'Brassard') + '</button></div></div>';
+  return '<div style="display:grid;grid-template-columns:1fr 30%;gap:9px;height:100%"><div style="min-width:0;display:flex;flex-direction:column;min-height:0"><div class="fl">' + fl + '</div><div style="flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:7px;align-content:start;padding-bottom:4px">' + cards + '</div></div><div style="min-height:0">' + details + '</div></div>';
+}
+function sTac() {
+  const pos = tokenPositions(), sl = slots();
+  const toks = G.lineup.map((id, i) => { const p = P(id); return p ? tok(p, { pos: 'left:' + pos[i][0] + '%;top:' + pos[i][1] + '%', a: 'tsel', sel: UI.tsel === id }) : ''; }).join('');
+  const fm = Object.keys(FM).map((k) => '<button class="' + (k === G.formation ? 'on' : '') + '" data-a="form" data-v="' + k + '">' + k + '</button>').join('');
+  const bench = benchList().map((p) => '<button class="pc" style="flex-direction:row;gap:6px;padding:3px 6px;text-align:left" data-a="swap" data-v="' + p.id + '"><div style="width:30px;height:30px;flex:none;border-radius:50%;overflow:hidden;border:3px solid ' + moodOf(p).col + ';background:var(--line2)">' + chibi(p, 'head') + '</div><div style="min-width:0"><b style="font-size:11.5px">' + p.name + '</b><div class="muted" style="font-size:10px">' + p.pos + ' · ' + moodOf(p).label + '</div></div></button>').join('');
+  const defs = [['m', 'Mentalité', ['Défensive', 'Équilibrée', 'Offensive']], ['p', 'Pressing', ['Bas', 'Moyen', 'Haut']], ['t', 'Tempo', ['Posé', 'Normal', 'Rapide']], ['w', 'Largeur', ['Étroit', 'Normal', 'Large']]];
+  const rules = defs.map((d) => '<div style="margin-bottom:5px"><div style="font-size:10.5px;font-weight:800;color:#8A5A34">' + d[1] + '</div><div class="seg">' + d[2].map((o, i) => '<button class="' + (G.team[d[0]] === i ? 'on' : '') + '" data-a="rule" data-v="' + d[0] + i + '">' + o + '</button>').join('') + '</div></div>').join('');
+  let eff = 'Équilibre entre attaque et défense.';
+  const T = G.team;
+  if (T.p === 2 && T.t === 2) eff = 'Beaucoup d’occasions, mais l’équipe va s’épuiser.';
+  else if (T.m === 2 && T.p === 2) eff = 'Pression constante. La défense est exposée dans le dos.';
+  else if (T.m === 0 && T.p === 0) eff = 'Bloc bas solide. Peu de ballons pour les attaquants.';
+  else if (T.t === 0) eff = 'Jeu patient. Moins de fatigue, moins d’occasions.';
+  const sp = UI.tsel && P(UI.tsel);
+  let side;
+  if (sp) {
+    const m = moodOf(sp), cr = G.roles[sp.id] || ROLES[sp.pos][0], best = bestRole(sp);
+    side = '<div class="card" style="overflow:auto;height:100%"><div class="row"><div style="width:42px;height:42px;flex:none;border-radius:50%;overflow:hidden;border:3px solid ' + m.col + ';background:var(--line2)">' + chibi(sp, 'head') + '</div><div><b>' + sp.name + '</b><div class="muted" style="font-size:11px">' + sp.pos + ' · ' + m.label + '</div></div></div><div style="font-size:10.5px;font-weight:800;color:#8A5A34;margin:6px 0 3px">RÔLE</div>' + ROLES[sp.pos].map((r) => '<button class="btn sm" style="width:100%;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;' + (r === cr ? 'background:var(--acc);color:var(--accfg);box-shadow:0 2px 0 var(--ink)' : '') + '" data-a="role" data-v="' + r + '"><span>' + r + '</span><span style="font-size:10px">' + (r === best ? '★ idéal' : '') + '</span></button>').join('') + '<div style="font-size:11px;font-weight:700;background:var(--cream);border:1.5px solid var(--line);border-radius:10px;padding:5px 7px;margin-top:3px">' + (cr === best ? 'Bon choix : son talent brille ici.' : 'Son talent brille surtout en ' + best + '.') + '</div><div class="muted" style="font-size:10.5px;margin-top:5px">Touche un remplaçant pour l’échanger avec lui.</div></div>';
+  } else side = '<div class="card" style="height:100%"><h3>Consignes</h3>' + rules + '<div style="background:var(--cream);border:1.5px solid var(--line);border-radius:10px;padding:5px 7px;font-size:11px;font-weight:700">' + eff + '</div></div>';
+  return '<div style="display:grid;grid-template-columns:1fr 27%;gap:9px;height:100%"><div class="col"><div class="fl" style="margin:0">' + fm + '<span class="muted grow" style="align-self:center;font-size:11px;padding-left:4px">' + FNOTE[G.formation] + '</span></div><div class="pitch" style="flex:1;min-height:140px">' + pitchSvg() + toks + '</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">' + bench + '</div></div><div style="min-height:0;display:flex;flex-direction:column;gap:6px"><div style="flex:1;min-height:0;overflow:auto">' + side + '</div>' + (sp ? '<button class="btn sm" data-a="tclr">Consignes d’équipe</button>' : '') + '<button class="btn pri" data-a="play">Jouer le match</button></div></div>';
+}
+function sCal() {
+  const wk = G.sched.map((fx, i) => {
+    const w = i + 1, h = G.history.find((x) => x.week === w), cur = w === G.week;
+    const o = OPPS[fx.opp];
+    return '<div class="wk' + (cur ? ' cur' : '') + '" style="' + (h ? (h.res === 'W' ? 'background:#D7E2CF' : h.res === 'D' ? 'background:#F3E0B0' : 'background:#F2D6D3') : cur ? 'background:#CFE3E8' : '') + '"><div style="font-size:10px;font-weight:800;color:var(--muted)">SEM. ' + w + (fx.home ? ' · Dom.' : ' · Ext.') + '</div><b style="font-size:12px">' + o.name + '</b><div style="font-weight:800;font-size:13px">' + (h ? h.sc[0] + ' - ' + h.sc[1] : cur ? 'À jouer' : '·') + '</div></div>';
+  }).join('');
+  const tr = [['tactique', 'Tactique', 'Cohésion +6'], ['physique', 'Physique', 'Force, fatigue +'], ['technique', 'Technique', 'Technique +'], ['repos', 'Repos', 'Fatigue −18, moral +2']].map((t) => '<button class="btn" style="text-align:left;line-height:1.15;' + (G.train === t[0] ? 'background:var(--blue);color:#FFFAF0;box-shadow:0 3px 0 var(--ink)' : '') + '" data-a="train" data-v="' + t[0] + '"><b>' + t[1] + '</b><div style="font-size:10px;font-weight:700;opacity:.85">' + t[2] + '</div></button>').join('');
+  return '<div class="card" style="margin-bottom:8px"><h3>Entraînement de la semaine</h3><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">' + tr + '</div></div><div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px">' + wk + '</div>';
+}
+function sClub() {
+  const info = { terrain: ['Terrain', 'Plus de supporters et de recettes.', 2500], vest: ['Vestiaire', 'Le moral remonte plus vite.', 3000], entr: ['Centre d’entraînement', 'Progression et récupération.', 4000] };
+  const fac = Object.keys(info).map((k) => {
+    const L = G.facil[k], cost = info[k][2] * L, max = L >= 5, can = !max && G.budget >= cost;
+    return '<div class="card" style="background:var(--bg);border-color:var(--line)"><b>' + info[k][0] + '</b><div class="muted" style="font-size:11px;min-height:28px">' + info[k][1] + '</div><div class="row" style="gap:3px;margin:4px 0">' + [1, 2, 3, 4, 5].map((i) => '<span style="flex:1;height:9px;border-radius:5px;border:1.5px solid var(--ink);background:' + (i <= L ? 'var(--rose)' : 'var(--paper)') + '"></span>').join('') + '</div><button class="btn sm" style="width:100%;' + (can ? 'background:var(--rose);box-shadow:0 2px 0 var(--ink)' : '') + '" data-a="up" data-v="' + k + '"' + (can ? '' : ' disabled') + '>' + (max ? 'Niveau max' : 'Améliorer · ' + cost + ' $') + '</button></div>';
+  }).join('');
+  const rk = myRank();
+  const goals = [['Top 3 au classement', rk <= 3 ? 100 : Math.max(10, 100 - (rk - 3) * 25), 'Rang ' + rk, '#86AD78'], ['Moral moyen > 65', clamp(avgMoral() / 65 * 100, 0, 100), Math.round(avgMoral()) + ' / 65', '#F0C253'], ['Cohésion > 70', clamp(G.coh / 70 * 100, 0, 100), Math.round(G.coh) + ' / 70', '#438BC0']].map((g) => '<div style="margin-top:6px"><div class="ml" style="margin-top:0"><span>' + g[0] + '</span><span class="muted">' + g[2] + '</span></div><div class="meter"><i style="width:' + g[1] + '%;background:' + g[3] + '"></i></div></div>').join('');
+  return '<div style="display:grid;grid-template-columns:1fr 1fr 32%;gap:9px"><div class="col"><div class="card"><h3>Finances</h3><div style="font-size:22px;font-weight:800">' + G.budget.toLocaleString('fr-CA') + ' $</div><div class="muted" style="font-size:11px">Recettes : billets, sponsors, primes de victoire. Charges : salaires (1 100 $ par semaine).</div></div><div class="card"><h3>Objectifs du conseil</h3>' + goals + '</div></div>' +
+    '<div class="col">' + fac + '</div>' +
+    '<div class="col"><div class="card" style="background:var(--rose);color:#462B25"><div style="font-size:10px;font-weight:800">CONSEIL</div><div style="font-weight:800;margin-top:3px">« Terminer dans le top 3. Nous croyons en ce groupe. »</div></div><div class="card"><h3>Staff</h3><div style="font-size:11.5px;font-weight:700"><b>Nadia</b>, physio : moins de blessures.<br><b>Marc</b>, adjoint : repère les tensions.<br><b>Otis</b>, recruteur : bientôt.</div></div><div class="card"><div class="muted" style="font-size:11px">Saison ' + G.season + ' · ' + G.supporters + ' supporters</div><button class="btn sm" style="margin-top:5px;width:100%" data-a="reset">Recommencer à zéro</button></div></div></div>';
+}
+const avgMoral = () => G.players.reduce((a, p) => a + p.moral, 0) / G.players.length;
+
+/* ---------- Overlays ---------- */
+function ovMatch() {
+  const M = UI.mt, o = OPPS[M.fx.opp];
+  const feed = M.feed.slice(-(M.done ? 3 : 5)).reverse().map((f) => '<div class="' + f.c + '">' + f.t + '</div>').join('');
+  let ctl = '';
+  if (M.done) {
+    const r = M.summary;
+    const lbl = r.res === 'W' ? 'Victoire !' : r.res === 'D' ? 'Match nul' : 'Défaite';
+    ctl = '<div class="card" style="margin-top:6px"><div style="font-size:16px;font-weight:800">' + lbl + '</div><div style="font-size:12px;font-weight:700;margin:3px 0">' + (UI.note ? UI.note + ' ' : '') + r.sum.join(' ') + '</div><div class="muted" style="font-size:11px">Bilan financier : ' + (r.net >= 0 ? '+' : '') + r.net + ' $.</div><button class="btn pri" style="width:100%;margin-top:6px" data-a="mclose">Continuer</button></div>';
+  } else if (M.pause) {
+    ctl = '<div class="card" style="margin-top:6px"><b>Mi-temps. Change la mentalité ?</b><div class="seg" style="margin:6px 0">' + ['Défensive', 'Équilibrée', 'Offensive'].map((x, i) => '<button class="' + (M.team.m === i ? 'on' : '') + '" data-a="half" data-v="' + i + '">' + x + '</button>').join('') + '</div><button class="btn pri" style="width:100%" data-a="resume">Reprendre le match</button></div>';
+  } else {
+    ctl = '<div class="row" style="margin-top:6px;justify-content:center"><button class="btn sm' + (M.speed === 1 ? ' pri' : '') + '" data-a="speed" data-v="1">Normal</button><button class="btn sm' + (M.speed === 3 ? ' pri' : '') + '" data-a="speed" data-v="3">Rapide</button><button class="btn sm" data-a="skip">Passer</button></div>';
+  }
+  const bx = M.ball === 'U' ? 75 : M.ball === 'O' ? 25 : 50;
+  const mini = '<div class="pitch" style="height:' + (M.done ? 0 : 54) + 'px;margin-top:' + (M.done ? 0 : 6) + 'px;border-width:' + (M.done ? 0 : 2) + 'px">' + pitchSvg() + '<div class="ball" style="left:' + bx + '%"></div></div>';
+  return '<div class="ov"><div class="md"><div class="sb"><div class="t">' + ME + '</div><div class="s">' + M.sc[0] + '</div><div style="font-size:12px;font-weight:800;min-width:40px;text-align:center">' + (M.done ? 'Final' : M.min + '’') + '</div><div class="s">' + M.sc[1] + '</div><div class="t">' + o.name + '</div></div>' + mini + (M.done ? ctl : '') + '<div class="feed" style="margin-top:6px">' + (feed || '<div>Coup d’envoi.</div>') + '</div>' + (M.done ? '' : ctl) + '</div></div>';
+}
+function ovTalk() {
+  const p = P(UI.talk), m = moodOf(p);
+  return '<div class="ov"><div class="md" style="width:min(520px,100%)"><div class="row"><div style="width:56px;height:56px;flex:none;border-radius:50%;overflow:hidden;border:3px solid ' + m.col + ';background:var(--line2)">' + chibi(p, 'head') + '</div><div class="grow"><b style="font-size:16px">' + p.name + '</b> <span class="tag" style="background:' + m.bg + ';color:' + m.fg + '">' + m.label + '</span><div class="muted" style="font-size:11px">' + TRAITS[p.trait] + ' · Moral ' + p.moral + '</div></div><button class="btn sm" data-a="tclose">Fermer</button></div>' + (UI.talkMsg ? '<div class="card" style="margin-top:8px;background:var(--cream)"><b>' + UI.talkMsg + '</b></div>' : '<div class="muted" style="margin:8px 0 4px;font-weight:700">Comment lui parler ? Chaque joueur réagit différemment. Il te reste ' + G.energy + ' discussion(s) cette semaine.</div>') +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px"><button class="btn" data-a="tdo" data-v="enc"' + (G.energy < 1 ? ' disabled' : '') + '>Encourager</button><button class="btn" data-a="tdo" data-v="fer"' + (G.energy < 1 ? ' disabled' : '') + '>Être ferme</button><button class="btn" data-a="tdo" data-v="pro"' + (G.energy < 1 ? ' disabled' : '') + '>Promettre du temps de jeu</button></div></div></div>';
+}
+function ovSeason() {
+  const rk = myRank(), t = standings();
+  const verdict = rk <= 3 ? 'Objectif atteint. Le conseil est content.' : 'Objectif manqué. Le conseil reste patient.';
+  return '<div class="ov"><div class="md" style="width:min(520px,100%)"><h2 style="margin:0">Fin de la saison ' + G.season + '</h2><div style="font-size:15px;font-weight:800;margin:4px 0">Tu termines ' + rk + (rk === 1 ? 'er' : 'e') + '. ' + verdict + '</div><table>' + t.map((x, i) => '<tr class="' + (x.n === ME ? 'me' : '') + '"><td style="width:20px;text-align:left">' + (i + 1) + '</td><td>' + x.n + '</td><td>' + x.pts + ' pts</td></tr>').join('') + '</table><button class="btn pri" style="width:100%;margin-top:8px" data-a="newseason">Nouvelle saison</button></div></div>';
+}
+
+/* ---------- Render & actions ---------- */
+function render() {
+  if (!G) return;
+  const sc = document.querySelector('.scr'), top = sc ? sc.scrollTop : 0;
+  const th = THEME[UI.screen];
+  const chips = [['Moral', Math.round(avgMoral()) + ' / 100'], ['Cohésion', Math.round(G.coh) + ' / 100'], ['Budget', G.budget.toLocaleString('fr-CA') + ' $']].map((c) => '<div class="chip"><span>' + c[0] + '</span><b>' + c[1] + '</b></div>').join('');
+  const body = { home: sHome, eff: sEff, tac: sTac, cal: sCal, club: sClub }[UI.screen]();
+  const nav = NAVO.map((k) => '<button class="' + (UI.screen === k ? 'on' : '') + '" data-a="go" data-v="' + k + '" style="' + (UI.screen === k ? 'background:' + THEME[k][0] + ';color:' + THEME[k][1] : '') + '"><svg viewBox="0 0 24 24">' + ICON[k] + '</svg>' + THEME[k][2] + '</button>').join('');
+  document.getElementById('app').style.cssText = '--acc:' + th[0] + ';--accfg:' + th[1];
+  document.getElementById('app').innerHTML = '<div class="top"><div><h1>' + th[2] + '</h1><small>' + ME + ' · Saison ' + G.season + ' · Semaine ' + Math.min(G.week, 12) + '</small></div><div class="chips">' + chips + '</div></div><div class="scr">' + body + '</div><div class="nav">' + nav + '</div>' + (UI.mt ? ovMatch() : '') + (UI.talk ? ovTalk() : '') + (UI.season && !UI.mt ? ovSeason() : '');
+  const s2 = document.querySelector('.scr'); if (s2) s2.scrollTop = top;
+}
+const ACT = {
+  go: (v) => { UI.screen = v; UI.tsel = null; },
+  selp: (v) => { UI.sel = v; },
+  viewp: (v) => { UI.sel = v; UI.screen = 'eff'; },
+  flt: (v) => { UI.flt = v; },
+  cap: (v) => { G.captain = v; save(); },
+  form: (v) => { G.formation = v; fitLineup(); UI.tsel = null; save(); },
+  tsel: (v) => { UI.tsel = UI.tsel === v ? null : v; },
+  tclr: () => { UI.tsel = null; },
+  swap: (v) => { if (UI.tsel) { const i = G.lineup.indexOf(UI.tsel); if (i >= 0 && !P(v).inj) { G.lineup[i] = v; UI.tsel = v; save(); } else if (P(v).inj) { UI.tsel = UI.tsel; } } else { UI.tsel = v; } },
+  role: (v) => { if (UI.tsel) { G.roles[UI.tsel] = v; save(); } },
+  rule: (v) => { G.team[v[0]] = +v[1]; save(); },
+  train: (v) => { G.train = v; save(); },
+  up: (v) => { const c = { terrain: 2500, vest: 3000, entr: 4000 }[v] * G.facil[v]; if (G.budget >= c && G.facil[v] < 5) { G.budget -= c; G.facil[v]++; save(); } },
+  talk: (v) => { UI.talk = v; UI.talkMsg = ''; },
+  tclose: () => { UI.talk = null; UI.talkMsg = ''; },
+  tdo: (v) => {
+    const p = P(UI.talk); if (G.energy < 1) return;
+    const r = TALK[p.trait][v]; p.moral = clamp(p.moral + r[0], 0, 100); G.energy--;
+    if (v === 'pro') p.promise = true;
+    UI.talkMsg = r[1] + (r[0] >= 0 ? ' (moral +' + r[0] + ')' : ' (moral ' + r[0] + ')') + (v === 'pro' ? ' Fais-le jouer au prochain match.' : '');
+    save();
+  },
+  play: () => { if (G.week > 12) { UI.season = true; return; } UI.screen = UI.screen; startMatch(); },
+  speed: (v) => { UI.mt.speed = +v; runMatch(); },
+  skip: () => { const M = UI.mt; M.skip = true; M.skipHalf = true; clearInterval(M.timer); while (M.b < 30) stepBlock(M); finishIfDone(M); },
+  half: (v) => { UI.mt.team.m = +v; },
+  resume: () => { const M = UI.mt; M.pause = false; runMatch(); },
+  mclose: () => { UI.mt = null; UI.note = ''; },
+  newseason: () => { const keep = G; UI.season = false; newGame(keep); },
+  reset: () => { if (confirm('Tout recommencer à zéro ?')) { try { localStorage.removeItem(SAVE); } catch (e) { /* ignore */ } newGame(); UI.sel = 'rafa'; UI.screen = 'home'; } }
+};
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-a]'); if (!el) return;
+  const a = el.getAttribute('data-a'), v = el.getAttribute('data-v');
+  if (ACT[a]) { ACT[a](v); render(); }
+});
+if (!load()) newGame();
+if (!G.lineup || G.lineup.length !== slots().length) fitLineup();
+render();
+</script>
+</body>
+</html>
