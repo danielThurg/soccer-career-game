@@ -2,11 +2,16 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#4B3527">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Soccer Career</title>
+<title>Soccer Career — Ton club, ton histoire</title>
+<meta name="description" content="Prends les commandes de Nordville. Prépare ton équipe, motive tes joueurs et vise le titre en 7 contre 7.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<meta name="apple-mobile-web-app-title" content="Soccer Career">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -79,11 +84,48 @@ tr.me td{background:var(--cream)}
 .rot{display:none;position:fixed;inset:0;z-index:50;background:var(--brown);color:var(--cream);align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:20px;font-weight:800;font-size:16px}
 @media (orientation:portrait) and (max-width:700px){.rot.show{display:flex}}
 @media (max-height:420px){.pc .fig{width:50px;height:64px}}
+
+/* Game shell: generous desktop space, touch targets and a real portrait layout. */
+[hidden]{display:none!important}button:focus-visible,[data-a]:focus-visible{outline:3px solid var(--blue);outline-offset:4px}
+#app{max-width:1440px;margin:auto;background:var(--bg)}
+body{background:#d9c2a2}
+.top{height:66px;padding:8px 22px;gap:18px}.top h1{font-size:21px}.top small{font-size:11px;margin-top:5px}
+.chip{padding:6px 16px;min-width:82px;border-radius:13px}.chip b{font-size:16px}.chip span{font-size:10px}
+.scr{padding:18px 22px;background:radial-gradient(ellipse at top,#fff0cd88,transparent 65%)}
+.card{border-radius:18px;padding:14px;box-shadow:0 3px 0 #2b1d1414}.card h3{font-size:16px;margin-bottom:9px}
+.g3{grid-template-columns:minmax(210px,1fr) minmax(300px,1.65fr) minmax(210px,1fr);gap:16px}
+.col{gap:14px}.pitch{border-radius:20px;box-shadow:inset 0 0 24px #2b1d141a}.btn{min-height:44px;font-size:13px}.btn.sm{min-height:36px}.nav{height:calc(72px + env(safe-area-inset-bottom));gap:8px}.nav button{font-size:12px;gap:4px}.nav button svg{width:23px;height:23px}
+.menu-button{border:1.5px solid #2b1d1440;border-radius:12px;background:#fffdf899;min-height:40px;padding:0 12px;font-weight:800;cursor:pointer}
+.scr[data-screen="home"] .tk{--ts:46px}.scr[data-screen="home"] .tk .n{font-size:11px}
+.launcher{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:1fr 1fr;align-items:center;overflow:auto;gap:40px;padding:clamp(24px,6vw,96px);background:radial-gradient(ellipse at 70% 20%,#b5cfaa55,transparent 55%),#fff2d7}
+.launcher:before{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 7px,#4b352703 7px 8px)}
+.launch-copy{max-width:520px;z-index:1}.launch-kicker{font-size:11px;font-weight:800;letter-spacing:.22em;color:#6a7850;margin:0 0 22px;display:flex;align-items:center;gap:10px}.launch-kicker:before{content:'';width:26px;height:3px;background:#6a7850}
+.launch-title{font-size:clamp(52px,7vw,100px);font-weight:900;line-height:.92;letter-spacing:-.065em;margin:0;color:var(--brown)}.launch-title span{display:block;color:#658759;-webkit-text-stroke:1px var(--brown)}
+.launch-tag{font-size:clamp(19px,2.4vw,27px);font-weight:800;margin:24px 0 12px}.launch-desc{font-size:15px;color:var(--muted);line-height:1.7;margin:0 0 25px;max-width:360px}
+.launch-play{width:min(100%,340px);min-height:62px;border:2.5px solid var(--ink);border-radius:18px;background:var(--gold);box-shadow:0 5px 0 var(--ink);font-size:19px;font-weight:900;display:flex;align-items:center;justify-content:space-between;padding:0 23px;cursor:pointer}.launch-play:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.launch-save{font-size:12px;color:var(--muted);margin:15px 0 24px}.launch-options{display:flex;gap:10px;flex-wrap:wrap}.launch-options button{border:1.5px solid #bca584;background:#fffdf888;border-radius:12px;min-height:42px;padding:8px 14px;cursor:pointer;font-weight:800;font-size:12px}
+.launch-art{position:relative;aspect-ratio:1;max-width:540px;width:100%;justify-self:center;transform:rotate(-4deg);border:3px solid var(--brown);border-radius:42px;background:repeating-linear-gradient(90deg,#7fa077 0 14%,#89aa80 14% 28%);box-shadow:9px 10px 0 #4b3527;overflow:hidden}
+.launch-lines{position:absolute;inset:8%;border:2px solid #fffbdf8c;border-radius:3px}.launch-lines:before{content:'';position:absolute;left:0;right:0;top:50%;height:2px;background:#fffbdf8c}.launch-lines:after{content:'';position:absolute;left:35%;top:35%;width:30%;height:30%;border:2px solid #fffbdf8c;border-radius:50%}
+.launch-players{position:absolute;inset:12% 8% 3%;display:flex;align-items:flex-end;justify-content:center}.launch-player{width:36%;height:90%;filter:drop-shadow(0 8px 0 #2b1d1429)}.launch-player:nth-child(2){height:105%;margin:0 -6%;z-index:1}.launch-player svg{width:100%;height:100%}
+.launch-badge{position:absolute;top:18px;left:18px;border:2px solid var(--brown);border-radius:30px;background:var(--cream);padding:7px 15px;font-size:12px;font-weight:900;transform:rotate(4deg)}.launch-caption{z-index:2;position:absolute;bottom:20px;left:50%;transform:translateX(-50%) rotate(4deg);white-space:nowrap;border:2px solid var(--ink);background:var(--paper);padding:9px 18px;border-radius:12px;font-weight:900;box-shadow:0 3px 0 var(--ink)}
+.launch-help{margin-top:18px;background:var(--paper);border:1.5px solid var(--line);border-radius:15px;padding:16px;font-size:13px;line-height:1.7;max-width:420px}.launch-help p{margin:0 0 8px}.launch-help p:last-child{margin:0}.launch-help strong{color:var(--brown)}
+.launch-footer{font-size:10px;letter-spacing:.14em;color:#8a6b4e;margin-top:30px}
+.rot{display:none!important}.md{box-shadow:0 10px 0 #2b1d1433;border-radius:22px;padding:18px}.sb{padding:14px}.sb .s{font-size:36px}.feed div{padding:8px 12px}
+@media(min-width:1000px) and (min-height:620px){.scr .pc .fig{width:75px;height:100px}.scr .pc{padding:12px 6px}.scr .tk{--ts:48px}.scr table{font-size:13px}.scr td,.scr th{padding:8px 5px}}
+@media(max-width:760px){.launcher{grid-template-columns:1fr;gap:28px;padding:30px 24px;text-align:center;align-content:start}.launch-copy{order:2;max-width:none}.launch-art{order:1;max-width:260px;border-radius:26px;box-shadow:5px 6px 0 var(--brown)}.launch-kicker{justify-content:center;font-size:10px;margin-bottom:14px}.launch-title{font-size:54px}.launch-desc{margin:0 auto 20px;font-size:13px}.launch-tag{font-size:20px;margin-top:16px}.launch-play{margin:auto;min-height:56px}.launch-save{margin-bottom:16px}.launch-options{justify-content:center}.launch-footer{margin-top:20px}.launch-help{margin:18px auto 0;text-align:left}.launch-caption{font-size:11px;bottom:10px;padding:6px 12px}.launch-badge{font-size:10px;top:10px;left:10px;padding:5px 10px}}
+@media(max-width:700px) and (orientation:portrait){.top{height:auto;min-height:100px;flex-wrap:wrap;gap:8px;padding:10px 14px}.top>div:first-child{flex:1}.top h1{font-size:19px}.chips{flex-basis:100%;order:3;justify-content:stretch;gap:6px}.chip{flex:1;min-width:0;padding:5px 10px}.chip b{font-size:13px}.scr{padding:12px}.g3{height:auto;grid-template-columns:1fr;gap:12px}.g3>.col:nth-child(2){grid-row:2;min-height:310px}.g3>.col{min-height:0}.g3 .card{max-height:none!important;overflow:visible!important}.scr[data-screen="home"] .g3>.col:first-child{display:contents}.scr[data-screen="home"] .g3>.col:first-child>.card:first-child{grid-row:1}.scr[data-screen="home"] .g3>.col:first-child>.card:nth-child(2){grid-row:3}.scr[data-screen="home"] .g3>.col:last-child{display:grid;grid-template-columns:1fr}.scr[data-screen="eff"]>div,.scr[data-screen="tac"]>div{display:flex!important;flex-direction:column;height:auto!important;gap:14px!important}.scr[data-screen="eff"]>div>div:first-child{min-height:330px}.scr[data-screen="tac"] .pitch{min-height:340px!important;flex:none!important}.scr[data-screen="cal"]>div{height:auto!important}.scr .fl{flex-wrap:wrap}.scr .tk{--ts:36px}.scr .tk .n{font-size:9px}.nav{height:calc(66px + env(safe-area-inset-bottom));gap:2px;padding-left:3px;padding-right:3px}.nav button{font-size:10px;min-width:0;max-width:none}.nav button svg{width:21px;height:21px}.md{max-height:calc(100dvh - 24px);padding:12px}.sb{gap:8px;padding:10px 6px}.sb .t{min-width:0;flex:1;font-size:11px}.sb .s{font-size:27px}.ov{padding:12px}}
+@media(max-width:700px) and (orientation:portrait){.scr[data-screen="club"]>div{grid-template-columns:1fr!important;gap:14px!important}.scr[data-screen="cal"]>div:nth-child(2){grid-template-columns:repeat(3,minmax(0,1fr))!important}.scr[data-screen="cal"] .card>div{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-height:500px) and (orientation:landscape){.launcher{grid-template-columns:1fr 1fr;padding:22px 7%;gap:30px;text-align:left}.launch-copy{order:0}.launch-art{order:0;max-width:300px}.launch-kicker{justify-content:flex-start;margin-bottom:12px}.launch-title{font-size:48px}.launch-tag{font-size:18px;margin:14px 0 8px}.launch-desc{font-size:12px;line-height:1.4;margin:0 0 14px}.launch-play{min-height:46px;font-size:16px}.launch-save{margin:10px 0}.launch-options{justify-content:flex-start;gap:6px}.launch-options button{min-height:34px;padding:5px 9px;font-size:10px}.launch-footer{display:none}.top{height:46px;padding:4px 12px}.top h1{font-size:16px}.top small{font-size:10px;margin-top:2px}.chip{padding:3px 8px}.chip b{font-size:12px}.scr{padding:8px}.g3{grid-template-columns:27% 1fr 27%;gap:8px}.card{padding:8px}.card h3{font-size:13px}.col{gap:8px}.nav{height:calc(50px + env(safe-area-inset-bottom))}.nav button{font-size:10px;gap:1px}.nav button svg{width:18px;height:18px}.btn{min-height:36px;font-size:12px}.btn.sm{min-height:32px}.scr[data-screen="home"] .tk{--ts:32px}.scr[data-screen="home"] .tk .n{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
 </style>
 </head>
 <body>
 <div id="app"></div>
-<div id="rot" class="rot show"><div style="font-size:40px">↻</div><div>Tourne ton téléphone en mode horizontal</div><button class="btn" onclick="document.getElementById('rot').classList.remove('show')">Continuer quand même</button></div>
+<main id="launcher" class="launcher" aria-label="Menu principal">
+ <section class="launch-copy"><p class="launch-kicker">LE FOOT, À TA FAÇON · 7 CONTRE 7</p><h1 class="launch-title">SOCCER<span>CAREER</span></h1><p class="launch-tag">Ton club. Ton histoire.</p><p class="launch-desc">Prépare ton équipe, révèle ses talents et mène Nordville jusqu’au titre.</p><button class="launch-play" id="launch-play"><span id="launch-label">Entrer dans le club</span><span aria-hidden="true">→</span></button><p class="launch-save" id="launch-save"></p><div class="launch-options"><button id="launch-how" aria-expanded="false">Comment jouer</button><button id="launch-install" aria-expanded="false">Installer le jeu</button><button id="launch-fullscreen">Plein écran</button></div><div id="launch-help" class="launch-help" hidden></div><p class="launch-footer">NORDVILLE · UNE ÉQUIPE, MILLE POSSIBILITÉS</p></section>
+ <div class="launch-art" aria-hidden="true"><div class="launch-lines"></div><div class="launch-badge">★ NORDVILLE ATHLETIC</div><div class="launch-players" id="launch-players"></div><div class="launch-caption">À toi de jouer, coach.</div></div>
+</main>
 <script>
 'use strict';
 const INK = '#2B1D14';
@@ -585,10 +627,11 @@ function render() {
   const body = { home: sHome, eff: sEff, tac: sTac, cal: sCal, club: sClub }[UI.screen]();
   const nav = NAVO.map((k) => '<button class="' + (UI.screen === k ? 'on' : '') + '" data-a="go" data-v="' + k + '" style="' + (UI.screen === k ? 'background:' + THEME[k][0] + ';color:' + THEME[k][1] : '') + '"><svg viewBox="0 0 24 24">' + ICON[k] + '</svg>' + THEME[k][2] + '</button>').join('');
   document.getElementById('app').style.cssText = '--acc:' + th[0] + ';--accfg:' + th[1];
-  document.getElementById('app').innerHTML = '<div class="top"><div><h1>' + th[2] + '</h1><small>' + ME + ' · Saison ' + G.season + ' · Semaine ' + Math.min(G.week, 12) + '</small></div><div class="chips">' + chips + '</div></div><div class="scr">' + body + '</div><div class="nav">' + nav + '</div>' + (UI.mt ? ovMatch() : '') + (UI.talk ? ovTalk() : '') + (UI.season && !UI.mt ? ovSeason() : '');
+  document.getElementById('app').innerHTML = '<header class="top"><div><h1>' + th[2] + '</h1><small>' + ME + ' · Saison ' + G.season + ' · Semaine ' + Math.min(G.week, 12) + '</small></div><div class="chips">' + chips + '</div><button class="menu-button" data-a="menu" aria-label="Menu principal">☰ Menu</button></header><main class="scr" data-screen="' + UI.screen + '">' + body + '</main><nav class="nav" aria-label="Gestion du club">' + nav + '</nav>' + (UI.mt ? ovMatch() : '') + (UI.talk ? ovTalk() : '') + (UI.season && !UI.mt ? ovSeason() : '');
   const s2 = document.querySelector('.scr'); if (s2) s2.scrollTop = top;
 }
 const ACT = {
+  menu: () => { if (!UI.mt) showLauncher(); },
   go: (v) => { UI.screen = v; UI.tsel = null; },
   selp: (v) => { UI.sel = v; },
   viewp: (v) => { UI.sel = v; UI.screen = 'eff'; },
@@ -625,9 +668,34 @@ document.addEventListener('click', (e) => {
   const a = el.getAttribute('data-a'), v = el.getAttribute('data-v');
   if (ACT[a]) { ACT[a](v); render(); }
 });
-if (!load()) newGame();
+const hadSavedCareer = load();
+if (!hadSavedCareer) newGame();
 if (!G.lineup || G.lineup.length !== slots().length) fitLineup();
 render();
+let installPrompt = null;
+const launcher = document.getElementById('launcher');
+const app = document.getElementById('app');
+function showLauncher() {
+  document.getElementById('launch-label').textContent = hadSavedCareer || G.week > 1 ? 'Reprendre ma carrière' : 'Entrer dans le club';
+  document.getElementById('launch-save').textContent = 'Saison ' + G.season + ' · Semaine ' + Math.min(G.week,12) + ' · Sauvegarde sur cet appareil';
+  document.getElementById('launch-players').innerHTML = ['rafa','leo','yanis'].map(id => '<div class="launch-player">'+chibi(P(id),'full')+'</div>').join('');
+  launcher.hidden = false; app.hidden = true;
+}
+document.getElementById('launch-play').addEventListener('click', () => { launcher.hidden = true; app.hidden = false; render(); document.querySelector('.menu-button').focus(); });
+function launchHelp(kind) {
+  const box = document.getElementById('launch-help');
+  const same = box.dataset.kind === kind && !box.hidden;
+  box.hidden = same; box.dataset.kind = kind;
+  document.getElementById('launch-how').setAttribute('aria-expanded',String(!same && kind === 'how'));
+  document.getElementById('launch-install').setAttribute('aria-expanded',String(!same && kind === 'install'));
+  box.innerHTML = kind === 'how' ? '<p><strong>1. Prépare ton équipe</strong><br>Choisis tes 7 titulaires et ta formation dans Tactique.</p><p><strong>2. Fais grandir ton club</strong><br>Entraîne tes joueurs et parle-leur pour garder le moral.</p><p><strong>3. Joue le prochain match</strong><br>Les joueurs jouent seuls. À la mi-temps, ajuste tes consignes.</p>' : '<p><strong>iPhone / iPad</strong><br>Ouvre ce lien dans Safari → Partager → Sur l’écran d’accueil.</p><p><strong>Android</strong><br>Dans Chrome, ouvre le menu ⋮ → Installer l’application ou Ajouter à l’écran d’accueil.</p><p>Ta carrière reste enregistrée dans ce navigateur. Utilise le même lien pour la retrouver.</p>';
+}
+document.getElementById('launch-how').addEventListener('click',()=>launchHelp('how'));
+window.addEventListener('beforeinstallprompt', e=>{e.preventDefault();installPrompt=e;});
+document.getElementById('launch-install').addEventListener('click',async()=>{if(installPrompt){await installPrompt.prompt();installPrompt=null;}else launchHelp('install');});
+document.getElementById('launch-fullscreen').addEventListener('click',async()=>{try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else if(document.fullscreenElement)await document.exitFullscreen();else{launchHelp('install');}}catch{launchHelp('install');}});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+showLauncher();
 </script>
 </body>
 </html>

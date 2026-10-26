@@ -38,3 +38,9 @@ Le jeu fonctionne tout seul, sans serveur. La sauvegarde est dans le navigateur.
 
 Ce qui est jouable : 5 écrans, 12 matchs par saison, match simulé par zones avec mi-temps tactique,
 moral, fatigue, blessures, discussions avec les joueurs, entraînement, finances et installations.
+
+## Accès et publication
+
+Le jeu dispose maintenant d’un menu principal, d’une interface mobile en portrait et en paysage, et d’une installation sur l’écran d’accueil. La clé de sauvegarde `scg-save-v2` est conservée. Les sauvegardes restent propres au navigateur et à l’origine du lien.
+
+`worker.mjs` sert la version autonome sur Cloudflare Workers, avec les icônes, le manifeste et le cache hors ligne. Pour publier une modification : `node scripts/build-worker.mjs` puis `npx wrangler deploy`. Le déploiement exécute aussi automatiquement la génération.

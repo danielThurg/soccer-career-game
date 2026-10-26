@@ -1,0 +1,12 @@
+{
+  "name": "soccer-career",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-26",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "build": {
+    "command": "node scripts/build-worker.mjs"
+  }
+}
