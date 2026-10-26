@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Calendrier</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Nunito',system-ui,sans-serif}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;box-sizing:border-box;background:#FFF7EC;color:#2B1D14;display:flex;flex-direction:column;font-family:'Nunito',system-ui,sans-serif">
+
+<div style="height:68px;flex:none;box-sizing:border-box;background:#438BC0;border-bottom:2px solid #2B1D14;padding:0 24px;display:flex;align-items:center;gap:16px;color:#FFFAF0">
+<div style="min-width:220px">
+<div style="font-size:12px;font-weight:800;opacity:0.9">Saison 2 · Division 4</div>
+<div style="font-size:24px;font-weight:800;line-height:1.1">Calendrier</div>
+</div>
+<div style="flex:1;display:flex;gap:8px;justify-content:center;align-items:center">
+<button type="button" onClick="{{prev}}" aria-label="Mois précédent" style="width:44px;height:44px;border-radius:12px;border:2px solid #2B1D14;background:#FFFDF8;color:#2B1D14;font-size:18px;font-weight:800;cursor:pointer">‹</button>
+<div style="min-width:180px;text-align:center;font-size:20px;font-weight:800">{{monthLabel}}</div>
+<button type="button" onClick="{{next}}" aria-label="Mois suivant" style="width:44px;height:44px;border-radius:12px;border:2px solid #2B1D14;background:#FFFDF8;color:#2B1D14;font-size:18px;font-weight:800;cursor:pointer">›</button>
+</div>
+<div style="min-width:220px;text-align:right;font-size:13px;font-weight:800">Semaine 7 sur 14</div>
+</div>
+
+<div style="flex:1;min-height:0;padding:14px 24px 0;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px">
+
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;min-height:0">
+<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px">
+<sc-for list="{{heads}}" as="h" hint-placeholder-count="7">
+<div style="text-align:center;font-size:12px;font-weight:800;color:#8A5A34">{{h}}</div>
+</sc-for>
+</div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:6px">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="35">
+<button type="button" onClick="{{d.pick}}" style="{{d.style}}">
+<span style="font-size:12px;font-weight:800">{{d.n}}</span>
+<span style="{{d.tagStyle}}">{{d.tag}}</span>
+</button>
+</sc-for>
+</div>
+<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px;font-weight:700;color:#7A5A3A;padding-top:2px">
+<span>■ <span style="color:#438BC0">Match</span></span>
+<span>■ <span style="color:#86AD78">Entraînement</span></span>
+<span>■ <span style="color:#DF9287">Repos</span></span>
+<span>■ <span style="color:#B8872E">Événement</span></span>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+<div style="background:#438BC0;color:#FFFAF0;border:2px solid #2B1D14;border-radius:16px;padding:12px 14px">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.04em">{{day.kicker}}</div>
+<div style="font-size:20px;font-weight:800;line-height:1.15;margin-top:2px">{{day.title}}</div>
+<div style="font-size:13px;font-weight:600;line-height:1.3;margin-top:4px">{{day.text}}</div>
+<a href="TactiqueH.dc.html" style="display:flex;align-items:center;justify-content:center;min-height:44px;margin-top:10px;border-radius:12px;border:2px solid #2B1D14;background:#FFFDF8;color:#2B1D14;font-size:14px;font-weight:800;text-decoration:none;box-sizing:border-box">{{day.cta}}</a>
+</div>
+<div style="flex:1;min-height:0;background:#FFFDF8;border:2px solid #2B1D14;border-radius:16px;padding:12px 12px 6px">
+<div style="font-size:16px;font-weight:800;padding:0 4px 4px">Prochains matchs</div>
+<sc-for list="{{fixtures}}" as="m" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-top:1.5px solid #EAD3B0">
+<div style="width:46px;font-size:12px;font-weight:800;color:#8A5A34">{{m.date}}</div>
+<div style="flex:1;font-size:13px;font-weight:800">{{m.vs}}</div>
+<span style="{{m.tagStyle}}">{{m.tag}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+
+<nav style="height:64px;flex:none;box-sizing:border-box;background:#4B3527;border-top:2px solid #2B1D14;padding:6px 24px;display:flex;align-items:center;justify-content:center;gap:10px"><a href="CalendrierH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:#438BC0;color:#FFFAF0;border:1.5px solid #FFEFD0;box-shadow:0 3px 0 #301E16"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10 L21 10"/><path d="M8 3 L8 7"/><path d="M16 3 L16 7"/></svg><span>Calendrier</span></a><a href="EffectifH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20 C3 15 6 13.5 9 13.5 C12 13.5 15 15 15.5 20"/><circle cx="17" cy="9" r="2.8"/><path d="M17 14 C19.5 14 21.5 15.5 22 19"/></svg><span>Effectif</span></a><a href="HomeH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 L12 3 L21 11"/><path d="M5 10 L5 20 L19 20 L19 10"/></svg><span>Accueil</span></a><a href="TactiqueH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 12 L21 12"/><circle cx="12" cy="12" r="3"/></svg><span>Tactique</span></a><a href="ClubH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 L20 5.5 L20 12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 L4 5.5 Z"/></svg><span>Club</span></a></nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.state || {};
+const MONTHS = ['Octobre 2026', 'Novembre 2026'];
+const mi = st.m || 0;
+const selDay = st.d || 3;
+const first = [4, 0][mi];
+const count = [31, 30][mi];
+const matches = mi === 0 ? { 3: 'Faucons', 10: 'Rivière', 17: 'Union Sud', 24: 'Étoile V.', 31: 'Faucons' } : { 7: 'Rivière', 14: 'Nordville B', 21: 'Union Sud', 28: 'Étoile V.' };
+const events = mi === 0 ? { 16: 'Réunion' } : { 12: 'Mercato', 26: 'Fête club' };
+const rests = mi === 0 ? { 7: 1, 14: 1, 21: 1, 28: 1 } : { 4: 1, 11: 1, 18: 1, 25: 1 };
+const cells = [];
+for (let i = 0; i < first; i++) cells.push(0);
+for (let n = 1; n <= count; n++) cells.push(n);
+while (cells.length % 7 !== 0) cells.push(0);
+const days = cells.map((n) => {
+if (!n) return { n: '', tag: '', pick: () => {}, tagStyle: '', style: 'border:0;background:transparent;min-height:0' };
+let kind = 'train', tag = 'Entr.', bg = '#D7E2CF', fg = '#263E23';
+if (matches[n]) { kind = 'match'; tag = 'vs ' + matches[n]; bg = '#438BC0'; fg = '#FFFAF0'; }
+else if (events[n]) { kind = 'event'; tag = events[n]; bg = '#F3E0B0'; fg = '#6B4A12'; }
+else if (rests[n]) { kind = 'rest'; tag = 'Repos'; bg = '#F2D6D3'; fg = '#6B2A22'; }
+const isSel = n === selDay;
+return {
+n: n, tag: tag,
+pick: () => this.setState({ d: n }),
+style: 'display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;min-height:0;padding:5px 7px;border-radius:10px;cursor:pointer;font-family:inherit;text-align:left;box-sizing:border-box;background:' + bg + ';color:' + fg + ';border:' + (isSel ? '3px solid #2B1D14' : '1.5px solid #2B1D14') + (isSel ? ';box-shadow:0 3px 0 #2B1D14' : ''),
+tagStyle: 'font-size:10px;font-weight:800;line-height:1.1;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis'
+};
+});
+let day;
+if (matches[selDay]) day = { kicker: 'JOUR DE MATCH · 15 H', title: 'AS Nordville vs ' + matches[selDay], text: 'La veille, la fatigue de Samir sera à surveiller. Compose ton onze et fixe tes consignes.', cta: 'Préparer le match' };
+else if (events[selDay]) day = { kicker: 'ÉVÉNEMENT', title: events[selDay], text: 'Un rendez-vous du club. Ton choix peut changer l’ambiance du vestiaire.', cta: 'Voir les détails' };
+else if (rests[selDay]) day = { kicker: 'REPOS', title: 'Journée libre', text: 'La fatigue baisse. Bonne occasion de parler à un joueur frustré.', cta: 'Aller à la tactique' };
+else day = { kicker: 'ENTRAÎNEMENT', title: 'Séance d’équipe', text: 'Choisis le thème : tactique, physique ou technique. Les joueurs fatigués progressent moins.', cta: 'Voir la tactique' };
+const fixtures = [
+{ date: 'Sam. 31', vs: 'Les Faucons', tag: 'Domicile', tagStyle: 'font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;background:#CFE3E8;color:#1F4A5A' },
+{ date: 'Sam. 7', vs: 'FC Rivière', tag: 'Extérieur', tagStyle: 'font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;background:#F3E0B0;color:#6B4A12' },
+{ date: 'Sam. 14', vs: 'Nordville B', tag: 'Derby', tagStyle: 'font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;background:#F2D6D3;color:#6B2A22' },
+{ date: 'Sam. 21', vs: 'Union Sud', tag: 'Domicile', tagStyle: 'font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;background:#CFE3E8;color:#1F4A5A' }
+];
+return {
+monthLabel: MONTHS[mi], heads: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+prev: () => this.setState({ m: 0, d: 3 }), next: () => this.setState({ m: 1, d: 7 }),
+days, day, fixtures
+};
+}
+}
+</script>
+</body>
+</html>

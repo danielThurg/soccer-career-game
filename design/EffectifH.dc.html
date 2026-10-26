@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Effectif</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Nunito',system-ui,sans-serif}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;box-sizing:border-box;background:#FFF7EC;color:#2B1D14;display:flex;flex-direction:column;font-family:'Nunito',system-ui,sans-serif">
+
+<div style="height:68px;flex:none;box-sizing:border-box;background:#86AD78;border-bottom:2px solid #2B1D14;padding:0 24px;display:flex;align-items:center;gap:16px;color:#263E23">
+<div style="min-width:220px">
+<div style="font-size:12px;font-weight:800;opacity:0.8">AS Nordville · Saison 2</div>
+<div style="font-size:24px;font-weight:800;line-height:1.1">Effectif</div>
+</div>
+<div style="flex:1;display:flex;gap:10px;justify-content:center">
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+<div style="min-width:150px;background:#FFFDF8;border:1.5px solid #2B1D14;border-radius:12px;padding:6px 12px">
+<div style="font-size:11px;font-weight:700;color:#5E7A5A">{{c.label}}</div>
+<div style="font-size:16px;font-weight:800;line-height:1.15;color:#2B1D14">{{c.value}}</div>
+</div>
+</sc-for>
+</div>
+<div style="font-size:13px;font-weight:800;min-width:150px;text-align:right">10 joueurs · 7 en jeu</div>
+</div>
+
+<div style="flex:1;min-height:0;padding:14px 24px 0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px">
+
+<div style="display:flex;flex-direction:column;gap:10px;min-height:0">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<div style="display:flex;gap:6px">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+<button type="button" onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+<div style="font-size:12px;font-weight:700;color:#7A5A3A">Du plus mince au plus costaud</div>
+</div>
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:10px;padding-bottom:2px">
+<sc-for list="{{cards}}" as="p" hint-placeholder-count="10">
+<button type="button" onClick="{{p.pick}}" style="{{p.cardStyle}}">
+<div style="width:96px;height:132px;flex:none;border-radius:10px;background:#F3E0B0;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding-top:4px"><dc-import name="Chibi" item="{{p.item}}" hint-size="96px,128px"></dc-import></div>
+<div style="font-size:15px;font-weight:800;line-height:1.1;margin-top:5px">{{p.name}}</div>
+<div style="font-size:11px;font-weight:700;color:#7A5A3A">{{p.role}} · N° {{p.num}}</div>
+<div style="width:100%;display:flex;align-items:center;gap:6px;margin-top:4px">
+<span style="{{p.moodStyle}}">{{p.mood}}</span>
+<span style="flex:1;height:6px;border-radius:3px;background:#F3E0B0;border:1px solid #2B1D14;overflow:hidden"><span style="{{p.fatStyle}}"></span></span>
+</div>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px;min-height:0">
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;flex:1;min-height:0">
+<div style="display:flex;gap:10px;align-items:center">
+<div style="{{sel.headStyle}}"><dc-import name="Chibi" item="{{sel.item}}" view="head" hint-size="64px,68px"></dc-import></div>
+<div style="min-width:0">
+<div style="font-size:20px;font-weight:800;line-height:1.1">{{sel.name}}</div>
+<div style="font-size:12px;font-weight:700;color:#7A5A3A">{{sel.role}} · N° {{sel.num}} · {{sel.age}} ans</div>
+<span style="{{sel.tagStyle}}">{{sel.build}}</span>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<sc-for list="{{sel.meters}}" as="m" hint-placeholder-count="3">
+<div>
+<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800"><span>{{m.label}}</span><span style="color:#7A5A3A">{{m.v}}</span></div>
+<div style="height:8px;border-radius:4px;background:#F3E0B0;border:1.5px solid #2B1D14;overflow:hidden;margin-top:2px"><div style="{{m.style}}"></div></div>
+</div>
+</sc-for>
+</div>
+<div style="background:#FFF0CD;border:1.5px solid #DDB98E;border-radius:12px;padding:8px 10px">
+<div style="font-size:11px;font-weight:800;color:#8A5A34">TALENT · {{sel.talent}}</div>
+<div style="font-size:12px;font-weight:600;line-height:1.3;margin-top:2px">{{sel.talentText}}</div>
+</div>
+<div style="background:#FFF0CD;border:1.5px solid #DDB98E;border-radius:12px;padding:8px 10px">
+<div style="font-size:11px;font-weight:800;color:#8A5A34">MOTIVATION</div>
+<div style="font-size:12px;font-weight:600;line-height:1.3;margin-top:2px">{{sel.motiv}}</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;gap:8px">
+<button type="button" style="flex:1;min-height:44px;border-radius:12px;border:2px solid #2B1D14;background:#86AD78;color:#263E23;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 #2B1D14">Lui parler</button>
+<a href="CardH.dc.html" style="flex:1;min-height:44px;border-radius:12px;border:2px solid #2B1D14;background:#FFFDF8;color:#2B1D14;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;text-decoration:none;box-sizing:border-box">Fiche</a>
+</div>
+</div>
+</div>
+
+</div>
+
+<nav style="height:64px;flex:none;box-sizing:border-box;background:#4B3527;border-top:2px solid #2B1D14;padding:6px 24px;display:flex;align-items:center;justify-content:center;gap:10px"><a href="CalendrierH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10 L21 10"/><path d="M8 3 L8 7"/><path d="M16 3 L16 7"/></svg><span>Calendrier</span></a><a href="EffectifH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:#86AD78;color:#263E23;border:1.5px solid #FFEFD0;box-shadow:0 3px 0 #301E16"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20 C3 15 6 13.5 9 13.5 C12 13.5 15 15 15.5 20"/><circle cx="17" cy="9" r="2.8"/><path d="M17 14 C19.5 14 21.5 15.5 22 19"/></svg><span>Effectif</span></a><a href="HomeH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 L12 3 L21 11"/><path d="M5 10 L5 20 L19 20 L19 10"/></svg><span>Accueil</span></a><a href="TactiqueH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 12 L21 12"/><circle cx="12" cy="12" r="3"/></svg><span>Tactique</span></a><a href="ClubH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 L20 5.5 L20 12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 L4 5.5 Z"/></svg><span>Club</span></a></nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.state || {};
+const selName = st.sel || 'Rafa';
+const flt = st.pos || 'Tous';
+const base = { kit1: '#C46A55', kit2: '#FFF0CD', kitStyle: 'stripes' };
+const mk = (o) => Object.assign({}, base, o);
+const L = [
+mk({ name: 'Mateo', role: 'Défenseur', pos: 'DEF', age: 19, number: 3, skin: '#F4DCC8', hairColor: '#D9B25A', hair: 'fringe', freckles: true, build: 0.8, eyeColor: '#5B86B8', eyeSize: 1.15, mood: 'happy', moral: 74, fat: 22, forme: 70, talent: 'Sprint de feu', tt: 'Gagne les courses de vitesse. Brille quand il se sent confiant.', mot: 'Veut signer son premier contrat pro.' }),
+mk({ name: 'JB', role: 'Défenseur', pos: 'DEF', age: 22, number: 5, skin: '#F1D1B8', hairColor: '#B5502A', hair: 'curly', freckles: true, build: 0.82, earSize: 1.35, eyeColor: '#4F8A6E', eyeSize: 1.1, mood: 'neutral', moral: 61, fat: 35, forme: 64, talent: 'Lecture du jeu', tt: 'Anticipe les passes adverses. Perd son talent quand il est épuisé.', mot: 'Veut jouer tous les matchs.' }),
+mk({ name: 'Samir', role: 'Milieu', pos: 'MIL', age: 27, number: 6, skin: '#C49A6C', hairColor: '#1C1410', hair: 'long', beard: 'goatee', build: 0.92, eyeColor: '#7A6A3A', eyeSize: 0.9, mood: 'tired', moral: 48, fat: 81, forme: 52, talent: 'Passe laser', tt: 'Trouve l’attaquant seul. Demande un moral au-dessus de 55.', mot: 'Rêve du brassard de capitaine.' }),
+mk({ name: 'Diego', role: 'Attaquant', pos: 'ATT', age: 24, number: 11, skin: '#D8B08A', hairColor: '#14100E', hair: 'mohawk', beard: 'stubble', scarCheek: true, build: 0.95, eyeColor: '#3B2A1E', eyeSize: 0.7, mood: 'hurt', injury: 'cut', moral: 31, fat: 40, forme: 45, talent: 'Feu de contre', tt: 'Mortel en contre-attaque. Se bloque quand il est frustré.', mot: 'Veut être titulaire, sinon il part.' }),
+mk({ name: 'Léo', role: 'Attaquant', pos: 'ATT', age: 21, number: 9, skin: '#7A4A2D', hairColor: '#0F0A08', hair: 'afro', band: true, scarBrow: true, build: 1.0, eyeColor: '#2B1A10', mood: 'focus', moral: 72, fat: 28, forme: 78, talent: 'Finisseur froid', tt: 'Marque sous pression. Plus fort en finale.', mot: 'Veut le titre de meilleur buteur.' }),
+mk({ name: 'Rafa', role: 'Défenseur', pos: 'DEF', age: 31, number: 4, skin: '#B97C52', hairColor: '#1A1410', hair: 'slick', gray: true, beard: 'stubble', build: 1.12, eyeColor: '#3B2A1E', eyeSize: 0.9, captain: true, mood: 'focus', moral: 70, fat: 30, forme: 74, talent: 'Chef de défense', tt: 'Les défenseurs autour de lui jouent mieux. Il perd ce don s’il perd le brassard.', mot: 'Veut finir sa carrière avec un titre.' }),
+mk({ name: 'Yanis', role: 'Milieu', pos: 'MIL', age: 25, number: 8, skin: '#D9A878', hairColor: '#1C1410', hair: 'curly', beard: 'stache', ring: true, build: 1.18, eyeColor: '#5A3A1E', eyeSize: 1.05, mood: 'laugh', moral: 88, fat: 18, forme: 80, talent: 'Moteur d’équipe', tt: 'Quand il est inspiré, le moral du groupe monte.', mot: 'Veut que le vestiaire reste uni.' }),
+mk({ name: 'Tomás', role: 'Milieu', pos: 'MIL', age: 26, number: 10, skin: '#E3BC98', hairColor: '#3A2414', hair: 'buzz', build: 1.28, eyeColor: '#4A3A28', mood: 'neutral', moral: 62, fat: 44, forme: 66, talent: 'Mur de milieu', tt: 'Récupère presque tous les ballons au centre.', mot: 'Veut un rôle de leader.' }),
+mk({ name: 'Kofi', role: 'Gardien', pos: 'GB', age: 29, number: 1, skin: '#6E4228', hairColor: '#0F0A08', hair: 'bald', beard: 'full', beardColor: '#26211D', build: 1.3, eyeColor: '#3A2414', eyeSize: 1.05, kit1: '#5E7A5A', kit2: '#2F4A2E', kitStyle: 'plain', gloves: true, mood: 'happy', moral: 76, fat: 15, forme: 72, talent: 'Arrêt miracle', tt: 'Sauve un tir sur dix en situation perdue.', mot: 'Veut ne pas encaisser à domicile.' }),
+mk({ name: 'Ibra', role: 'Défenseur', pos: 'DEF', age: 33, number: 2, skin: '#5A3520', hairColor: '#0F0A08', hair: 'bald', beard: 'goatee', build: 1.4, eyeColor: '#2B1A10', mood: 'happy', moral: 66, fat: 50, forme: 60, talent: 'Mur humain', tt: 'Presque impossible à dribbler. Lent à revenir.', mot: 'Veut jouer jusqu’à 36 ans.' })
+];
+const label = (b) => b < 0.9 ? 'Mince' : b < 1.08 ? 'Athlétique' : b < 1.25 ? 'Trapu' : 'Costaud';
+const tone = (b) => b < 0.9 ? 'background:#CFE3E8;color:#1F4A5A' : b < 1.08 ? 'background:#D7E2CF;color:#263E23' : b < 1.25 ? 'background:#F3E0B0;color:#6B4A12' : 'background:#F2D6D3;color:#6B2A22';
+const MW = { happy: ['Content', '#263E23', '#86AD78', '#D7E2CF'], laugh: ['Inspiré', '#263E23', '#86AD78', '#D7E2CF'], neutral: ['Stable', '#1F4A5A', '#438BC0', '#CFE3E8'], focus: ['Concentré', '#1F4A5A', '#438BC0', '#CFE3E8'], tired: ['Épuisé', '#6B4A12', '#F0C253', '#F3E0B0'], hurt: ['Frustré', '#6B2A22', '#DF9287', '#F2D6D3'] };
+const sorted = L.slice().sort((a, b) => a.build - b.build);
+const shown = sorted.filter((p) => flt === 'Tous' || p.pos === flt);
+const cards = shown.map((p) => ({
+item: p, name: p.name, role: p.role, num: p.number, mood: MW[p.mood][0],
+pick: () => this.setState({ sel: p.name }),
+cardStyle: 'display:flex;flex-direction:column;align-items:center;min-height:0;box-sizing:border-box;padding:8px 8px 8px;border-radius:14px;background:#FFFDF8;cursor:pointer;font-family:inherit;color:#2B1D14;text-align:center;border:' + (p.name === selName ? '3px solid ' + MW[p.mood][2] : '2px solid #2B1D14') + (p.name === selName ? ';box-shadow:0 4px 0 #2B1D14' : ''),
+moodStyle: 'font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;white-space:nowrap;background:' + MW[p.mood][3] + ';color:' + MW[p.mood][1],
+fatStyle: 'display:block;height:100%;width:' + p.fat + '%;background:' + (p.fat > 70 ? '#DF9287' : p.fat > 45 ? '#F0C253' : '#86AD78')
+}));
+const fl = ['Tous', 'GB', 'DEF', 'MIL', 'ATT'];
+const filters = fl.map((k) => ({
+label: k,
+pick: () => this.setState({ pos: k }),
+style: k === flt
+? 'min-height:40px;padding:0 14px;border-radius:12px;border:2px solid #2B1D14;background:#86AD78;color:#263E23;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 #2B1D14'
+: 'min-height:40px;padding:0 14px;border-radius:12px;border:2px solid #DDB98E;background:#FFFDF8;color:#4B3527;font-size:13px;font-weight:800;cursor:pointer'
+}));
+const s = L.find((p) => p.name === selName) || L[5];
+const bar = (c) => 'height:100%;background:' + c;
+const sel = {
+item: s, name: s.name, role: s.role, num: s.number, age: s.age, build: label(s.build),
+tagStyle: 'display:inline-block;font-size:11px;font-weight:800;padding:2px 10px;border-radius:999px;margin-top:3px;' + tone(s.build),
+headStyle: 'width:64px;height:64px;flex:none;box-sizing:border-box;border-radius:50%;overflow:hidden;background:#F3E0B0;border:3px solid ' + MW[s.mood][2],
+talent: s.talent, talentText: s.tt, motiv: s.mot,
+meters: [
+{ label: 'Moral', v: s.moral + ' / 100', style: bar(s.moral > 60 ? '#86AD78' : s.moral > 40 ? '#F0C253' : '#DF9287') + ';width:' + s.moral + '%' },
+{ label: 'Fatigue', v: s.fat + ' / 100', style: bar(s.fat > 70 ? '#DF9287' : s.fat > 45 ? '#F0C253' : '#86AD78') + ';width:' + s.fat + '%' },
+{ label: 'Forme', v: s.forme + ' / 100', style: bar('#438BC0') + ';width:' + s.forme + '%' }
+]
+};
+const chips = [
+{ label: 'Moral moyen', value: '64 / 100 · Stable' },
+{ label: 'Cohésion', value: '54 / 100 · Fragile' },
+{ label: 'Blessés', value: '1 · Diego' }
+];
+return { chips, filters, cards, sel };
+}
+}
+</script>
+</body>
+</html>

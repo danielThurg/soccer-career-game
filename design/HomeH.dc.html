@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Accueil horizontal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Nunito',system-ui,sans-serif}
+button{font-family:inherit}
+a{color:inherit}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;box-sizing:border-box;background:#FFF7EC;color:#2B1D14;display:flex;flex-direction:column;font-family:'Nunito',system-ui,sans-serif">
+
+<div style="height:68px;flex:none;box-sizing:border-box;background:#FFF0CD;border-bottom:2px solid #2B1D14;padding:0 24px;display:flex;align-items:center;gap:16px">
+<svg width="36" height="42" viewBox="0 0 44 50" aria-hidden="true"><path d="M22 2 L40 8 L40 26 C40 38 32 45 22 48 C12 45 4 38 4 26 L4 8 Z" fill="#4B3527" stroke="#2B1D14" stroke-width="2.5" stroke-linejoin="round"/><path d="M22 2 L22 48" stroke="#FFFFFF" stroke-width="5"/><path d="M13 20 L31 20" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/></svg>
+<div style="min-width:190px">
+<div style="font-size:12px;font-weight:800;color:#7A5A3A">Saison 2 · Division 4 · Semaine 7</div>
+<div style="font-size:22px;font-weight:800;line-height:1.1">AS Nordville</div>
+</div>
+<div style="flex:1;display:flex;gap:10px;justify-content:center">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+<div style="min-width:150px;background:#FFF7EC;border-radius:14px;padding:6px 12px;display:flex;align-items:center;gap:10px">
+<div>
+<div style="font-size:11px;font-weight:700;color:#7A5A3A">{{s.label}}</div>
+<div style="font-size:17px;font-weight:800;line-height:1.15">{{s.value}}</div>
+</div>
+<span style="font-size:12px;font-weight:800;color:{{s.color}}">{{s.word}}</span>
+</div>
+</sc-for>
+</div>
+<button type="button" aria-label="Notifications, 3 nouvelles" style="position:relative;width:46px;height:46px;border-radius:50%;border:1.5px solid #DDB98E;background:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2B1D14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 17 L6 11 A6 6 0 0 1 18 11 L18 17 L20 19 L4 19 Z"/><path d="M10 22 L14 22"/></svg>
+<span style="position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;border-radius:10px;background:#B23A3A;color:#FFFFFF;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #FFFFFF">3</span>
+</button>
+</div>
+
+<div style="flex:1;min-height:0;padding:16px 24px 0;display:grid;grid-template-columns:280px minmax(0,1fr) 280px;gap:16px">
+
+<div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+<div style="background:#4B3527;color:#FFFFFF;border-radius:20px;padding:14px 16px">
+<div style="font-size:11px;font-weight:800;letter-spacing:0.04em">PROCHAIN MATCH · SAM. 15 H · DOMICILE</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+<div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:96px">
+<div style="width:46px;height:46px;border-radius:50%;background:#FFFFFF;color:#4B3527;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center">AN</div>
+<div style="font-size:13px;font-weight:800;text-align:center">AS Nordville</div>
+</div>
+<div style="font-size:18px;font-weight:800">VS</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:96px">
+<div style="width:46px;height:46px;border-radius:50%;background:#F0C253;color:#2B1D14;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center">LF</div>
+<div style="font-size:13px;font-weight:800;text-align:center">Les Faucons</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:12px;font-weight:700">
+<span>Forme des Faucons</span>
+<span style="display:flex;gap:4px">
+<sc-for list="{{form}}" as="r" hint-placeholder-count="5">
+<span style="{{r.style}}">{{r.t}}</span>
+</sc-for>
+</span>
+</div>
+<button type="button" style="width:100%;min-height:44px;margin-top:10px;border-radius:12px;border:0;background:#FFFFFF;color:#2B1D14;font-size:15px;font-weight:800;cursor:pointer">Préparer le match</button>
+</div>
+
+<div style="flex:1;min-height:0;background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 12px 4px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 4px">
+<span style="font-size:16px;font-weight:800">Vestiaire</span>
+<span style="font-size:12px;font-weight:700;color:#7A5A3A">3 situations</span>
+</div>
+<sc-for list="{{alerts}}" as="a" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-top:1.5px solid #EAD3B0">
+<div style="{{a.headStyle}}"><dc-import name="Chibi" item="{{a.item}}" view="head" hint-size="42px,46px"></dc-import></div>
+<div style="flex:1;min-width:0">
+<div style="font-size:13px;font-weight:800">{{a.title}}</div>
+<div style="font-size:12px;font-weight:600;color:#7A5A3A;line-height:1.25;margin-top:1px">{{a.text}}</div>
+</div>
+<button type="button" style="flex:none;min-height:44px;padding:0 10px;border-radius:12px;border:1.5px solid #4B3527;background:#FFFFFF;color:#4B3527;font-size:12px;font-weight:800;cursor:pointer">{{a.cta}}</button>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px;min-height:0">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<div style="display:flex;gap:6px">
+<sc-for list="{{formations}}" as="f" hint-placeholder-count="4">
+<button type="button" onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+<div style="font-size:13px;font-weight:700;color:#7A5A3A;text-align:right;line-height:1.3;max-width:300px">{{note}}</div>
+</div>
+<div style="position:relative;height:390px;flex:none;border-radius:20px;overflow:hidden;background:repeating-linear-gradient(90deg,#7FA077 0px,#7FA077 53px,#89AA80 53px,#89AA80 106px)">
+<svg viewBox="0 0 640 390" width="640" height="390" style="position:absolute;left:0;top:0" aria-hidden="true">
+<rect x="10" y="10" width="620" height="370" rx="6" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+<line x1="320" y1="10" x2="320" y2="380" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+<circle cx="320" cy="195" r="48" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+<rect x="10" y="120" width="96" height="150" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+<rect x="534" y="120" width="96" height="150" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+<rect x="10" y="160" width="38" height="70" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+<rect x="592" y="160" width="38" height="70" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+</svg>
+<div style="position:absolute;right:12px;top:12px;display:flex;align-items:center;gap:6px;background:rgba(38,33,92,0.85);color:#FFFFFF;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:800">
+<span>Attaque</span>
+<svg width="14" height="12" viewBox="0 0 14 12" aria-hidden="true"><path d="M1 6 L12 6 M8 2 L12 6 L8 10" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+<sc-for list="{{tokens}}" as="t" hint-placeholder-count="7">
+<div style="{{t.style}}">
+<div style="position:relative;width:56px;height:56px">
+<div style="{{t.headStyle}}"><dc-import name="Chibi" item="{{t.item}}" view="head" hint-size="50px,54px"></dc-import></div>
+<sc-if value="{{t.cap}}" hint-placeholder-val="{{false}}">
+<div style="position:absolute;right:-5px;top:-5px;width:22px;height:22px;border-radius:50%;background:#F0C253;color:#2B1D14;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #FFFFFF;box-sizing:border-box">C</div>
+</sc-if>
+</div>
+<div style="background:#2B1D14;color:#FFFFFF;font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap">{{t.name}}</div>
+</div>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+<sc-for list="{{bench}}" as="b" hint-placeholder-count="3">
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:16px;padding:8px 10px;display:flex;align-items:center;gap:10px">
+<div style="{{b.headStyle}}"><dc-import name="Chibi" item="{{b.item}}" view="head" hint-size="42px,46px"></dc-import></div>
+<div style="min-width:0">
+<div style="font-size:14px;font-weight:800">{{b.name}} <span style="font-size:12px;font-weight:700;color:#7A5A3A">· {{b.role}}</span></div>
+<div style="font-size:12px;font-weight:800;color:{{b.color}}">{{b.word}} · banc</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 12px 12px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px">
+<span style="font-size:16px;font-weight:800">Cette semaine</span>
+<span style="font-size:12px;font-weight:700;color:#7A5A3A">Entraînement</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px">
+<sc-for list="{{week}}" as="d" hint-placeholder-count="6">
+<div style="{{d.style}}">
+<span style="font-size:12px;font-weight:800;width:30px">{{d.d}}</span>
+<span style="font-size:12px;font-weight:800">{{d.t}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="flex:1;min-height:0;background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 12px 6px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 4px">
+<span style="font-size:16px;font-weight:800">Classement</span>
+<span style="font-size:12px;font-weight:700;color:#7A5A3A">Division 4</span>
+</div>
+<sc-for list="{{table}}" as="r" hint-placeholder-count="5">
+<div style="{{r.style}}">
+<span style="width:20px;font-size:13px;font-weight:800">{{r.pos}}</span>
+<span style="flex:1;font-size:13px;font-weight:800">{{r.club}}</span>
+<span style="width:46px;text-align:right;font-size:13px;font-weight:800">{{r.pts}} pts</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+</div>
+
+<nav style="height:64px;flex:none;box-sizing:border-box;background:#4B3527;border-top:2px solid #2B1D14;padding:6px 24px;display:flex;align-items:center;justify-content:center;gap:10px"><a href="CalendrierH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10 L21 10"/><path d="M8 3 L8 7"/><path d="M16 3 L16 7"/></svg><span>Calendrier</span></a><a href="EffectifH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20 C3 15 6 13.5 9 13.5 C12 13.5 15 15 15.5 20"/><circle cx="17" cy="9" r="2.8"/><path d="M17 14 C19.5 14 21.5 15.5 22 19"/></svg><span>Effectif</span></a><a href="HomeH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:#FFF0CD;color:#493128;border:1.5px solid #FFEFD0;box-shadow:0 3px 0 #301E16"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 L12 3 L21 11"/><path d="M5 10 L5 20 L19 20 L19 10"/></svg><span>Accueil</span></a><a href="TactiqueH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 12 L21 12"/><circle cx="12" cy="12" r="3"/></svg><span>Tactique</span></a><a href="ClubH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 L20 5.5 L20 12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 L4 5.5 Z"/></svg><span>Club</span></a></nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+renderVals() {
+const cur = (this.state && this.state.f) ? this.state.f : '1-3-2-1';
+const base = { kit1: '#C46A55', kit2: '#FFF0CD', kitStyle: 'stripes' };
+const mk = (o) => Object.assign({}, base, o);
+const R = {
+kofi: mk({ name: 'Kofi', role: 'Gardien', number: 1, skin: '#6E4228', hairColor: '#0F0A08', hair: 'bald', beard: 'full', beardColor: '#26211D', build: 1.3, eyeColor: '#3A2414', eyeSize: 1.05, kit1: '#5E7A5A', kit2: '#263E23', kitStyle: 'plain', gloves: true, mood: 'happy' }),
+rafa: mk({ name: 'Rafa', role: 'Défenseur', number: 4, skin: '#B97C52', hairColor: '#1A1410', hair: 'slick', gray: true, beard: 'stubble', build: 1.12, eyeColor: '#3B2A1E', eyeSize: 0.9, captain: true, mood: 'focus' }),
+jb: mk({ name: 'JB', role: 'Défenseur', number: 5, skin: '#F1D1B8', hairColor: '#B5502A', hair: 'curly', freckles: true, build: 0.82, earSize: 1.35, eyeColor: '#4F8A6E', eyeSize: 1.1, mood: 'neutral' }),
+mateo: mk({ name: 'Mateo', role: 'Défenseur', number: 3, skin: '#F4DCC8', hairColor: '#D9B25A', hair: 'fringe', freckles: true, build: 0.8, eyeColor: '#5B86B8', eyeSize: 1.15, mood: 'happy' }),
+ibra: mk({ name: 'Ibra', role: 'Défenseur', number: 2, skin: '#5A3520', hairColor: '#0F0A08', hair: 'bald', beard: 'goatee', build: 1.4, eyeColor: '#2B1A10', mood: 'happy' }),
+yanis: mk({ name: 'Yanis', role: 'Milieu', number: 8, skin: '#D9A878', hairColor: '#1C1410', hair: 'curly', beard: 'stache', ring: true, build: 1.18, eyeColor: '#5A3A1E', eyeSize: 1.05, mood: 'laugh' }),
+samir: mk({ name: 'Samir', role: 'Milieu', number: 6, skin: '#C49A6C', hairColor: '#1C1410', hair: 'long', beard: 'goatee', build: 0.92, eyeColor: '#7A6A3A', eyeSize: 0.9, mood: 'tired' }),
+tomas: mk({ name: 'Tomás', role: 'Milieu', number: 10, skin: '#E3BC98', hairColor: '#3A2414', hair: 'buzz', build: 1.28, eyeColor: '#4A3A28', mood: 'neutral' }),
+leo: mk({ name: 'Léo', role: 'Attaquant', number: 9, skin: '#7A4A2D', hairColor: '#0F0A08', hair: 'afro', band: true, scarBrow: true, build: 1.0, eyeColor: '#2B1A10', mood: 'focus' }),
+diego: mk({ name: 'Diego', role: 'Attaquant', number: 11, skin: '#D8B08A', hairColor: '#14100E', hair: 'mohawk', beard: 'stubble', scarCheek: true, build: 0.95, eyeColor: '#3B2A1E', eyeSize: 0.7, mood: 'hurt', injury: 'cut' })
+};
+const FM = { '1-3-2-1': [3, 2, 1], '1-2-3-1': [2, 3, 1], '1-3-1-2': [3, 1, 2], '1-2-2-2': [2, 2, 2] };
+const NOTE = {
+'1-3-2-1': 'Équilibré : solide derrière, une seule pointe.',
+'1-2-3-1': 'Milieu dense : plus de passes, moins de protection.',
+'1-3-1-2': 'Défense en béton, deux attaquants en contre.',
+'1-2-2-2': 'Très offensif : la défense paie le prix.'
+};
+const MW = { happy: ['Content', '#5E7A5A', '#86AD78'], laugh: ['Inspiré', '#5E7A5A', '#86AD78'], neutral: ['Stable', '#493128', '#438BC0'], focus: ['Concentré', '#493128', '#438BC0'], tired: ['Épuisé', '#6B4A12', '#F0C253'], hurt: ['Frustré', '#B23A3A', '#DF9287'], angry: ['Furieux', '#B23A3A', '#DF9287'] };
+const f = FM[cur];
+const defs = [R.rafa, R.jb, R.mateo, R.ibra];
+const mids = [R.yanis, R.samir, R.tomas];
+const atts = [R.leo, R.diego];
+const on = [R.kofi].concat(defs.slice(0, f[0]), mids.slice(0, f[1]), atts.slice(0, f[2]));
+const ys = (k) => k === 1 ? [50] : k === 2 ? [30, 70] : [18, 50, 82];
+const tokens = [];
+const place = (arr, x) => {
+const y = ys(arr.length);
+arr.forEach((p, i) => {
+tokens.push({
+item: p, name: p.name, cap: !!p.captain,
+style: 'position:absolute;left:' + x + '%;top:' + y[i] + '%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px',
+headStyle: 'width:56px;height:56px;box-sizing:border-box;border-radius:50%;overflow:hidden;background:#F3E0B0;border:3px solid ' + MW[p.mood][2]
+});
+});
+};
+place([R.kofi], 8);
+place(defs.slice(0, f[0]), 28);
+place(mids.slice(0, f[1]), 52);
+place(atts.slice(0, f[2]), 76);
+const all = [R.kofi, R.rafa, R.jb, R.mateo, R.ibra, R.yanis, R.samir, R.tomas, R.leo, R.diego];
+const bench = all.filter((p) => on.indexOf(p) < 0).map((p) => ({
+item: p, name: p.name, role: p.role, word: MW[p.mood][0], color: MW[p.mood][1],
+headStyle: 'width:46px;height:46px;flex:none;box-sizing:border-box;border-radius:50%;overflow:hidden;background:#F3E0B0;border:3px solid ' + MW[p.mood][2]
+}));
+const formations = Object.keys(FM).map((k) => ({
+label: k,
+pick: () => this.setState({ f: k }),
+style: k === cur
+? 'min-height:44px;padding:0 14px;border-radius:12px;border:2px solid #4B3527;background:#4B3527;color:#FFFFFF;font-size:14px;font-weight:800;cursor:pointer'
+: 'min-height:44px;padding:0 14px;border-radius:12px;border:2px solid #DDB98E;background:#FFFFFF;color:#2B1D14;font-size:14px;font-weight:800;cursor:pointer'
+}));
+const form = ['V', 'V', 'N', 'D', 'V'].map((t) => ({
+t: t,
+style: 'width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;' + (t === 'V' ? 'background:#D7E2CF;color:#263E23' : t === 'N' ? 'background:#F3E0B0;color:#6B4A12' : 'background:#F2D6D3;color:#6B2A22')
+}));
+const stats = [
+{ label: 'Moral', value: '68 / 100', word: 'Stable', color: '#493128' },
+{ label: 'Cohésion', value: '54 / 100', word: 'Fragile', color: '#6B4A12' },
+{ label: 'Forme', value: '77 / 100', word: 'Bonne', color: '#5E7A5A' },
+{ label: 'Budget', value: '12 400 $', word: '', color: '#2B1D14' }
+];
+const head42 = (p) => 'width:42px;height:42px;box-sizing:border-box;flex:none;border-radius:50%;overflow:hidden;background:#F3E0B0;border:3px solid ' + MW[p.mood][2];
+const alerts = [
+{ item: R.diego, headStyle: head42(R.diego), title: 'Diego est frustré', text: 'Trois matchs sur le banc.', cta: 'Lui parler' },
+{ item: R.samir, headStyle: head42(R.samir), title: 'Samir est jaloux', text: 'Il veut le brassard de Rafa.', cta: 'Parler' },
+{ item: R.yanis, headStyle: head42(R.yanis), title: 'Yanis est inspiré', text: 'Il fait monter le moral du groupe.', cta: 'Féliciter' }
+];
+const week = [
+['Lun', 'Tactique', true], ['Mar', 'Physique', false], ['Mer', 'Repos', false], ['Jeu', 'Technique', false], ['Ven', 'Veille', false], ['Sam', 'Match', false]
+].map((d) => ({
+d: d[0], t: d[1],
+style: 'display:flex;align-items:center;gap:4px;border-radius:10px;padding:8px 10px;min-height:20px;' + (d[2] ? 'background:#4B3527;color:#FFFFFF' : (d[0] === 'Sam' ? 'background:#F3E0B0;color:#6B4A12' : 'background:#FFF7EC;color:#2B1D14'))
+}));
+const table = [
+[1, 'Les Faucons', 15], [2, 'FC Rivière', 13], [3, 'AS Nordville', 11], [4, 'Union Sud', 9], [5, 'Étoile Verte', 7]
+].map((r) => ({
+pos: r[0], club: r[1], pts: r[2],
+style: 'display:flex;align-items:center;gap:6px;padding:9px 8px;border-radius:10px;' + (r[1] === 'AS Nordville' ? 'background:#FFF0CD;color:#493128' : 'border-top:1.5px solid #EAD3B0')
+}));
+return { stats, form, formations, tokens, note: NOTE[cur], bench, alerts, week, table };
+}
+}
+</script>
+</body>
+</html>

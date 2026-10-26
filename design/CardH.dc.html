@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche joueur horizontale</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Nunito',system-ui,sans-serif}
+button{font-family:inherit}
+a{color:inherit}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;box-sizing:border-box;background:#FFF7EC;color:#2B1D14;padding:16px 20px 16px;display:flex;flex-direction:column;gap:12px;font-family:'Nunito',system-ui,sans-serif">
+
+<div style="flex:none;display:flex;align-items:center;gap:12px">
+<a href="HomeH.dc.html" style="min-height:44px;min-width:44px;border-radius:50%;border:1.5px solid #DDB98E;background:#FFFFFF;display:flex;align-items:center;justify-content:center;text-decoration:none" aria-label="Retour à l'accueil">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2B1D14" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5 L8 12 L15 19"/></svg>
+</a>
+<div style="flex:1;font-size:15px;font-weight:800;color:#7A5A3A">AS Nordville · Effectif · Fiche joueur</div>
+<div style="display:flex;gap:8px">
+<button type="button" style="min-height:44px;padding:0 18px;border-radius:14px;border:0;background:#4B3527;color:#FFFFFF;font-size:14px;font-weight:800;cursor:pointer">Lui parler</button>
+<button type="button" style="min-height:44px;padding:0 18px;border-radius:14px;border:1.5px solid #4B3527;background:#FFFFFF;color:#4B3527;font-size:14px;font-weight:800;cursor:pointer">Le reposer</button>
+<button type="button" style="min-height:44px;padding:0 18px;border-radius:14px;border:1.5px solid #4B3527;background:#FFFFFF;color:#4B3527;font-size:14px;font-weight:800;cursor:pointer">Prolonger</button>
+<button type="button" style="min-height:44px;padding:0 18px;border-radius:14px;border:1.5px solid #DDB98E;background:#FFFFFF;color:#B23A3A;font-size:14px;font-weight:800;cursor:pointer">Mettre en vente</button>
+</div>
+</div>
+
+<div style="flex:1;min-height:0;display:grid;grid-template-columns:340px minmax(0,1fr) minmax(0,1fr);gap:14px">
+
+<div style="position:relative;background:#F3E0B0;border-radius:26px;overflow:hidden;display:flex;flex-direction:column">
+<div style="position:absolute;left:0;right:0;top:6px;text-align:center;font-size:230px;font-weight:800;line-height:1;color:#CBC7EE" aria-hidden="true">4</div>
+<div style="position:absolute;left:14px;top:14px;display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+<span style="background:#F0C253;color:#2B1D14;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px">Capitaine</span>
+<span style="background:#2B1D14;color:#FFFFFF;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px">Défenseur</span>
+</div>
+<div style="position:absolute;right:14px;top:14px;background:#FFFFFF;color:#2B1D14;font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px">{{buildLabel}}</div>
+<div style="position:relative;display:flex;justify-content:center;padding-top:16px">
+<div style="width:232px"><dc-import name="Chibi" item="{{rafa}}" build="{{build}}" hint-size="232px,352px"></dc-import></div>
+</div>
+<div style="position:relative;margin-top:auto;background:#FFFFFF;margin:auto 10px 10px;border-radius:18px;padding:12px 14px">
+<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+<span style="font-size:28px;font-weight:800;line-height:1.1">Rafa</span>
+<span style="font-size:13px;font-weight:700;color:#7A5A3A">29 ans · N° 4</span>
+</div>
+<div style="display:flex;gap:6px;margin-top:6px">
+<span style="font-size:12px;font-weight:800;padding:3px 11px;border-radius:999px;background:#FFF0CD;color:#493128">Leader</span>
+<span style="font-size:12px;font-weight:800;padding:3px 11px;border-radius:999px;background:#FFF0CD;color:#493128">Exigeant</span>
+</div>
+<div style="font-size:13px;font-weight:600;color:#7A5A3A;line-height:1.35;margin-top:6px">Capitaine depuis trois saisons. Il porte l'équipe, parfois trop.</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 16px;display:flex;flex-direction:column;gap:9px">
+<div style="font-size:16px;font-weight:800">État du joueur</div>
+<sc-for list="{{meters}}" as="m" hint-placeholder-count="3">
+<div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:800">
+<span>{{m.label}}</span>
+<span style="color:{{m.color}}">{{m.word}} · {{m.value}}</span>
+</div>
+<div style="height:8px;border-radius:4px;background:#EAD3B0;margin-top:4px;overflow:hidden"><div style="{{m.barStyle}}"></div></div>
+</div>
+</sc-for>
+<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#5E7A5A">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5E7A5A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5 L11 15.5 L16.5 9"/></svg>
+<span>Aucune blessure · Disponible</span>
+</div>
+</div>
+
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 12px 12px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px">
+<span style="font-size:16px;font-weight:800">Corpulence</span>
+<span style="font-size:12px;font-weight:700;color:#7A5A3A">Touche pour comparer</span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px">
+<sc-for list="{{builds}}" as="o" hint-placeholder-count="4">
+<button type="button" onClick="{{o.pick}}" style="{{o.style}}">
+<div style="width:58px;pointer-events:none"><dc-import name="Chibi" item="{{rafa}}" build="{{o.build}}" hint-size="58px,88px"></dc-import></div>
+<span style="font-size:13px;font-weight:800">{{o.label}}</span>
+</button>
+</sc-for>
+</div>
+<div style="margin:8px 4px 0;background:#FFF7EC;border-radius:12px;padding:8px 12px;font-size:13px;font-weight:600;color:#7A5A3A;line-height:1.35">{{buildText}}</div>
+</div>
+
+<div style="flex:1;min-height:0;background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 16px;display:flex;flex-direction:column;gap:8px">
+<div style="font-size:16px;font-weight:800">Stats du moment</div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+<div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:800">
+<span>{{s.label}}</span>
+<span>{{s.value}} <span style="font-size:12px;color:{{s.dColor}}">{{s.delta}}</span></span>
+</div>
+<div style="height:8px;border-radius:4px;background:#EAD3B0;margin-top:4px;overflow:hidden"><div style="{{s.barStyle}}"></div></div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+<div style="background:#4B3527;color:#FFFFFF;border-radius:20px;padding:12px 16px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+<span style="font-size:12px;font-weight:800;letter-spacing:0.04em">TALENT SPÉCIAL</span>
+<span style="font-size:12px;font-weight:800;background:#FFFFFF;color:#2B1D14;padding:3px 11px;border-radius:999px">Actif</span>
+</div>
+<div style="font-size:19px;font-weight:800;margin-top:4px">Chef de défense</div>
+<div style="font-size:13px;font-weight:600;line-height:1.35;margin-top:3px">Bonus défensif pour tous les joueurs autour de lui. Il faut un moral d'au moins 50.</div>
+</div>
+
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 16px">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="font-size:16px;font-weight:800">Motivation</span>
+<span style="font-size:13px;font-weight:800;color:#5E7A5A">Très haute · 85</span>
+</div>
+<div style="font-size:14px;font-weight:700;margin-top:4px">Objectif : garder le brassard</div>
+<div style="font-size:13px;font-weight:600;color:#7A5A3A;line-height:1.35;margin-top:2px">Trois défaites de suite et sa motivation chute.</div>
+</div>
+
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 12px 4px">
+<div style="font-size:16px;font-weight:800;padding:0 4px 4px">Relations dans le vestiaire</div>
+<sc-for list="{{relations}}" as="r" hint-placeholder-count="2">
+<div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-top:1.5px solid #EAD3B0">
+<div style="{{r.headStyle}}"><dc-import name="Chibi" item="{{r.item}}" view="head" hint-size="42px,46px"></dc-import></div>
+<div style="flex:1;min-width:0">
+<div style="font-size:14px;font-weight:800">{{r.name}}</div>
+<div style="font-size:12px;font-weight:600;color:#7A5A3A;line-height:1.3;margin-top:1px">{{r.text}}</div>
+</div>
+<span style="{{r.tagStyle}}">{{r.tag}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="flex:1;min-height:0;background:#FFFDF8;border:2px solid #2B1D14;border-radius:20px;padding:12px 16px;display:flex;flex-direction:column">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<span style="font-size:16px;font-weight:800">Forme récente</span>
+<span style="font-size:12px;font-weight:700;color:#7A5A3A">5 derniers matchs</span>
+</div>
+<div style="flex:1;min-height:0;display:flex;align-items:flex-end;gap:10px;margin-top:6px">
+<sc-for list="{{ratings}}" as="r" hint-placeholder-count="5">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px">
+<span style="font-size:13px;font-weight:800">{{r.note}}</span>
+<div style="{{r.style}}"></div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:16px;border-top:1.5px solid #EAD3B0;margin-top:8px;padding-top:8px;font-size:13px;font-weight:800">
+<span>Contrat : saison 4</span>
+<span>450 $/sem.</span>
+<span>Valeur : 8 200 $</span>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+renderVals() {
+const cur = (this.state && this.state.b) ? this.state.b : 1.18;
+const kit = { kit1: '#C46A55', kit2: '#FFF0CD', kitStyle: 'stripes' };
+const rafa = Object.assign({}, kit, { name: 'Rafa', number: 4, skin: '#B97C52', hairColor: '#1A1410', hair: 'slick', gray: true, beard: 'stubble', eyeColor: '#3B2A1E', eyeSize: 0.9, captain: true, mood: 'focus' });
+const samir = Object.assign({}, kit, { name: 'Samir', number: 6, skin: '#C49A6C', hairColor: '#1C1410', hair: 'long', beard: 'goatee', build: 0.92, eyeColor: '#7A6A3A', eyeSize: 0.9, mood: 'tired' });
+const yanis = Object.assign({}, kit, { name: 'Yanis', number: 8, skin: '#D9A878', hairColor: '#1C1410', hair: 'curly', beard: 'stache', ring: true, build: 1.18, eyeColor: '#5A3A1E', eyeSize: 1.05, mood: 'laugh' });
+const B = [
+{ v: 0.8, label: 'Mince', delta: [10, 2, -14, 0], text: 'Rapide et agile, mais il perd les duels physiques. Idéal pour courir derrière les attaquants.' },
+{ v: 1.0, label: 'Athlétique', delta: [0, 0, 0, 0], text: 'Équilibré partout. Aucun point fort, aucun point faible.' },
+{ v: 1.18, label: 'Trapu', delta: [-7, 0, 8, 0], text: 'Solide dans les duels et difficile à bousculer. Un peu plus lent sur les longues courses.' },
+{ v: 1.38, label: 'Costaud', delta: [-15, -4, 14, 0], text: 'Un mur sur le terrain, mais lent et moins à l\'aise avec le ballon. Fatigue plus vite en fin de match.' }
+];
+let sel = B[2];
+B.forEach((o) => { if (Math.abs(o.v - cur) < 0.001) { sel = o; } });
+const builds = B.map((o) => ({
+build: o.v,
+label: o.label,
+pick: () => this.setState({ b: o.v }),
+style: (o === sel)
+? 'display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px 6px;min-height:44px;border-radius:14px;border:2px solid #4B3527;background:#FFF0CD;color:#493128;cursor:pointer'
+: 'display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px 6px;min-height:44px;border-radius:14px;border:2px solid #DDB98E;background:#FFFFFF;color:#2B1D14;cursor:pointer'
+}));
+const bar = (v, c) => 'height:8px;width:' + Math.max(0, Math.min(100, v)) + '%;background:' + c + ';border-radius:4px';
+const meters = [
+{ label: 'Moral', word: 'Concentré', value: 58, color: '#493128', barStyle: bar(58, '#4B3527') },
+{ label: 'Fatigue', word: 'Correct', value: '35 %', color: '#6B4A12', barStyle: bar(35, '#BA7517') },
+{ label: 'Motivation', word: 'Très haute', value: 85, color: '#5E7A5A', barStyle: bar(85, '#86AD78') }
+];
+const base = [66, 62, 70, 90];
+const names = ['Vitesse', 'Technique', 'Physique', 'Mental'];
+const stats = names.map((n, i) => {
+const d = sel.delta[i];
+const v = base[i] + d;
+return {
+label: n, value: v,
+delta: d === 0 ? '' : (d > 0 ? '+' + d : String(d)),
+dColor: d > 0 ? '#5E7A5A' : '#B23A3A',
+barStyle: bar(v, d < 0 ? '#BA7517' : '#4B3527')
+};
+});
+const head42 = (p) => 'width:42px;height:42px;box-sizing:border-box;flex:none;border-radius:50%;overflow:hidden;background:#F3E0B0;border:3px solid ' + (p.mood === 'tired' ? '#F0C253' : '#86AD78');
+const relations = [
+{ item: samir, headStyle: head42(samir), name: 'Samir', text: 'Veut son brassard. Ne lui parle presque plus.', tag: 'Rival', tagStyle: 'flex:none;font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px;background:#F2D6D3;color:#6B2A22' },
+{ item: yanis, headStyle: head42(yanis), name: 'Yanis', text: 'Le fait rire avant chaque match.', tag: 'Ami', tagStyle: 'flex:none;font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px;background:#D7E2CF;color:#263E23' }
+];
+const ratings = [6.5, 7.2, 5.8, 7.0, 7.5].map((r) => ({
+note: r.toFixed(1),
+style: 'width:100%;max-width:44px;border-radius:8px 8px 4px 4px;height:' + Math.round(r * 8) + 'px;background:' + (r >= 7 ? '#86AD78' : r >= 6 ? '#438BC0' : '#F0C253')
+}));
+return { rafa, build: cur, buildLabel: sel.label, buildText: sel.text, builds, meters, stats, relations, ratings };
+}
+}
+</script>
+</body>
+</html>

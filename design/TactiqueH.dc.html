@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tactique</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Nunito',system-ui,sans-serif}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:1280px;height:720px;box-sizing:border-box;background:#FFF7EC;color:#2B1D14;display:flex;flex-direction:column;font-family:'Nunito',system-ui,sans-serif">
+
+<div style="height:68px;flex:none;box-sizing:border-box;background:#F0C253;border-bottom:2px solid #2B1D14;padding:0 24px;display:flex;align-items:center;gap:16px;color:#493118">
+<div style="min-width:220px">
+<div style="font-size:12px;font-weight:800;opacity:0.8">Prochain match · Sam. 15 h · Les Faucons</div>
+<div style="font-size:24px;font-weight:800;line-height:1.1">Tactique</div>
+</div>
+<div style="flex:1;display:flex;gap:6px;justify-content:center">
+<sc-for list="{{formations}}" as="f" hint-placeholder-count="4">
+<button type="button" onClick="{{f.pick}}" style="{{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+<button type="button" style="min-height:44px;padding:0 18px;border-radius:12px;border:2px solid #2B1D14;background:#2B1D14;color:#FFF0CD;font-size:14px;font-weight:800;cursor:pointer">Valider</button>
+</div>
+
+<div style="flex:1;min-height:0;padding:14px 24px 0;display:grid;grid-template-columns:250px minmax(0,1fr) 300px;gap:16px">
+
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:0">
+<div style="font-size:16px;font-weight:800">Consignes d'équipe</div>
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="4">
+<div>
+<div style="font-size:12px;font-weight:800;color:#8A5A34;margin-bottom:3px">{{r.label}}</div>
+<div style="display:flex;gap:4px">
+<sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3">
+<button type="button" onClick="{{o.pick}}" style="{{o.style}}">{{o.t}}</button>
+</sc-for>
+</div>
+</div>
+</sc-for>
+<div style="flex:1"></div>
+<div style="background:#FFF0CD;border:1.5px solid #DDB98E;border-radius:12px;padding:8px 10px">
+<div style="font-size:11px;font-weight:800;color:#8A5A34">EFFET PRÉVU</div>
+<div style="font-size:12px;font-weight:700;line-height:1.3;margin-top:2px">{{effect}}</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:10px;min-height:0">
+<div style="position:relative;height:392px;flex:none;border-radius:16px;overflow:hidden;border:2px solid #2B1D14;background:repeating-linear-gradient(90deg,#7FA077 0px,#7FA077 54px,#89AA80 54px,#89AA80 108px)">
+<svg viewBox="0 0 640 390" width="100%" height="100%" preserveAspectRatio="none" style="position:absolute;left:0;top:0" aria-hidden="true">
+<rect x="10" y="10" width="620" height="370" rx="6" fill="none" stroke="#FFFDF8" stroke-width="2" opacity="0.8"/>
+<line x1="320" y1="10" x2="320" y2="380" stroke="#FFFDF8" stroke-width="2" opacity="0.8"/>
+<circle cx="320" cy="195" r="48" fill="none" stroke="#FFFDF8" stroke-width="2" opacity="0.8"/>
+<rect x="10" y="120" width="96" height="150" fill="none" stroke="#FFFDF8" stroke-width="2" opacity="0.8"/>
+<rect x="534" y="120" width="96" height="150" fill="none" stroke="#FFFDF8" stroke-width="2" opacity="0.8"/>
+</svg>
+<div style="position:absolute;right:12px;top:12px;display:flex;align-items:center;gap:6px;background:#2B1D14;color:#FFF0CD;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:800">
+<span>Attaque</span>
+<svg width="14" height="12" viewBox="0 0 14 12" aria-hidden="true"><path d="M1 6 L12 6 M8 2 L12 6 L8 10" stroke="#FFF0CD" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+<sc-for list="{{tokens}}" as="t" hint-placeholder-count="7">
+<button type="button" onClick="{{t.pick}}" style="{{t.style}}">
+<div style="position:relative;width:54px;height:54px">
+<div style="{{t.headStyle}}"><dc-import name="Chibi" item="{{t.item}}" view="head" hint-size="48px,52px"></dc-import></div>
+</div>
+<div style="{{t.pillStyle}}">{{t.name}}</div>
+</button>
+</sc-for>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+<sc-for list="{{bench}}" as="b" hint-placeholder-count="3">
+<div style="background:#FFFDF8;border:2px solid #DDB98E;border-radius:14px;padding:6px 10px;display:flex;align-items:center;gap:8px">
+<div style="{{b.headStyle}}"><dc-import name="Chibi" item="{{b.item}}" view="head" hint-size="38px,42px"></dc-import></div>
+<div style="min-width:0">
+<div style="font-size:13px;font-weight:800">{{b.name}} <span style="font-size:11px;font-weight:700;color:#8A5A34">· {{b.role}}</span></div>
+<div style="font-size:11px;font-weight:800;color:{{b.color}}">{{b.word}} · banc</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="background:#FFFDF8;border:2px solid #2B1D14;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0">
+<div style="display:flex;gap:10px;align-items:center">
+<div style="{{sel.headStyle}}"><dc-import name="Chibi" item="{{sel.item}}" view="head" hint-size="58px,62px"></dc-import></div>
+<div style="min-width:0">
+<div style="font-size:18px;font-weight:800;line-height:1.1">{{sel.name}}</div>
+<div style="font-size:12px;font-weight:700;color:#8A5A34">{{sel.line}}</div>
+<div style="{{sel.moodStyle}}">{{sel.mood}}</div>
+</div>
+</div>
+<div style="font-size:12px;font-weight:800;color:#8A5A34">RÔLE SUR LE TERRAIN</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<sc-for list="{{sel.roles}}" as="r" hint-placeholder-count="3">
+<button type="button" onClick="{{r.pick}}" style="{{r.style}}">
+<span>{{r.t}}</span>
+<span style="{{r.starStyle}}">{{r.star}}</span>
+</button>
+</sc-for>
+</div>
+<div style="background:#FFF0CD;border:1.5px solid #DDB98E;border-radius:12px;padding:8px 10px">
+<div style="font-size:11px;font-weight:800;color:#8A5A34">TALENT · {{sel.talent}}</div>
+<div style="font-size:12px;font-weight:700;line-height:1.3;margin-top:2px">{{sel.advice}}</div>
+</div>
+<div style="flex:1"></div>
+<div style="font-size:11px;font-weight:700;color:#8A5A34;line-height:1.3">Tu choisis. Pendant le match, les joueurs décident seuls.</div>
+</div>
+
+</div>
+
+<nav style="height:64px;flex:none;box-sizing:border-box;background:#4B3527;border-top:2px solid #2B1D14;padding:6px 24px;display:flex;align-items:center;justify-content:center;gap:10px"><a href="CalendrierH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10 L21 10"/><path d="M8 3 L8 7"/><path d="M16 3 L16 7"/></svg><span>Calendrier</span></a><a href="EffectifH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20 C3 15 6 13.5 9 13.5 C12 13.5 15 15 15.5 20"/><circle cx="17" cy="9" r="2.8"/><path d="M17 14 C19.5 14 21.5 15.5 22 19"/></svg><span>Effectif</span></a><a href="HomeH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 L12 3 L21 11"/><path d="M5 10 L5 20 L19 20 L19 10"/></svg><span>Accueil</span></a><a href="TactiqueH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:#F0C253;color:#493118;border:1.5px solid #FFEFD0;box-shadow:0 3px 0 #301E16"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 12 L21 12"/><circle cx="12" cy="12" r="3"/></svg><span>Tactique</span></a><a href="ClubH.dc.html" style="min-height:48px;min-width:132px;padding:0 16px;border-radius:12px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:800;box-sizing:border-box;background:transparent;color:#ECDCC7;border:1.5px solid transparent"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5 L20 5.5 L20 12 C20 17 16.5 20.5 12 22 C7.5 20.5 4 17 4 12 L4 5.5 Z"/></svg><span>Club</span></a></nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+renderVals() {
+const st = this.state || {};
+const cur = st.f || '1-3-2-1';
+const selName = st.sel || 'Rafa';
+const R = st.roles || {};
+const T = st.team || { m: 1, p: 1, t: 1, w: 1 };
+const base = { kit1: '#C46A55', kit2: '#FFF0CD', kitStyle: 'stripes' };
+const mk = (o) => Object.assign({}, base, o);
+const P = {
+Kofi: mk({ name: 'Kofi', role: 'Gardien', pos: 'GB', skin: '#6E4228', hairColor: '#0F0A08', hair: 'bald', beard: 'full', beardColor: '#26211D', build: 1.3, eyeColor: '#3A2414', eyeSize: 1.05, kit1: '#5E7A5A', kit2: '#2F4A2E', kitStyle: 'plain', gloves: true, mood: 'happy', talent: 'Arrêt miracle', best: 'Libéro' }),
+Rafa: mk({ name: 'Rafa', role: 'Défenseur', pos: 'DEF', skin: '#B97C52', hairColor: '#1A1410', hair: 'slick', gray: true, beard: 'stubble', build: 1.12, eyeColor: '#3B2A1E', eyeSize: 0.9, captain: true, mood: 'focus', talent: 'Chef de défense', best: 'Stoppeur' }),
+JB: mk({ name: 'JB', role: 'Défenseur', pos: 'DEF', skin: '#F1D1B8', hairColor: '#B5502A', hair: 'curly', freckles: true, build: 0.82, earSize: 1.35, eyeColor: '#4F8A6E', eyeSize: 1.1, mood: 'neutral', talent: 'Lecture du jeu', best: 'Relanceur' }),
+Mateo: mk({ name: 'Mateo', role: 'Défenseur', pos: 'DEF', skin: '#F4DCC8', hairColor: '#D9B25A', hair: 'fringe', freckles: true, build: 0.8, eyeColor: '#5B86B8', eyeSize: 1.15, mood: 'happy', talent: 'Sprint de feu', best: 'Latéral' }),
+Ibra: mk({ name: 'Ibra', role: 'Défenseur', pos: 'DEF', skin: '#5A3520', hairColor: '#0F0A08', hair: 'bald', beard: 'goatee', build: 1.4, eyeColor: '#2B1A10', mood: 'happy', talent: 'Mur humain', best: 'Stoppeur' }),
+Yanis: mk({ name: 'Yanis', role: 'Milieu', pos: 'MIL', skin: '#D9A878', hairColor: '#1C1410', hair: 'curly', beard: 'stache', ring: true, build: 1.18, eyeColor: '#5A3A1E', eyeSize: 1.05, mood: 'laugh', talent: 'Moteur d’équipe', best: 'Meneur' }),
+Samir: mk({ name: 'Samir', role: 'Milieu', pos: 'MIL', skin: '#C49A6C', hairColor: '#1C1410', hair: 'long', beard: 'goatee', build: 0.92, eyeColor: '#7A6A3A', eyeSize: 0.9, mood: 'tired', talent: 'Passe laser', best: 'Meneur' }),
+Tomás: mk({ name: 'Tomás', role: 'Milieu', pos: 'MIL', skin: '#E3BC98', hairColor: '#3A2414', hair: 'buzz', build: 1.28, eyeColor: '#4A3A28', mood: 'neutral', talent: 'Mur de milieu', best: 'Récupérateur' }),
+Léo: mk({ name: 'Léo', role: 'Attaquant', pos: 'ATT', skin: '#7A4A2D', hairColor: '#0F0A08', hair: 'afro', band: true, scarBrow: true, build: 1.0, eyeColor: '#2B1A10', mood: 'focus', talent: 'Finisseur froid', best: 'Finisseur' }),
+Diego: mk({ name: 'Diego', role: 'Attaquant', pos: 'ATT', skin: '#D8B08A', hairColor: '#14100E', hair: 'mohawk', beard: 'stubble', scarCheek: true, build: 0.95, eyeColor: '#3B2A1E', eyeSize: 0.7, mood: 'hurt', injury: 'cut', talent: 'Feu de contre', best: 'Appel en profondeur' })
+};
+const ROLES = { GB: ['Gardien classique', 'Libéro'], DEF: ['Stoppeur', 'Relanceur', 'Latéral'], MIL: ['Récupérateur', 'Meneur', 'Ailier'], ATT: ['Finisseur', 'Pivot', 'Appel en profondeur'] };
+const FM = { '1-3-2-1': [3, 2, 1], '1-2-3-1': [2, 3, 1], '1-3-1-2': [3, 1, 2], '1-2-2-2': [2, 2, 2] };
+const MW = { happy: ['Content', '#86AD78', '#D7E2CF', '#263E23'], laugh: ['Inspiré', '#86AD78', '#D7E2CF', '#263E23'], neutral: ['Stable', '#438BC0', '#CFE3E8', '#1F4A5A'], focus: ['Concentré', '#438BC0', '#CFE3E8', '#1F4A5A'], tired: ['Épuisé', '#F0C253', '#F3E0B0', '#6B4A12'], hurt: ['Frustré', '#DF9287', '#F2D6D3', '#6B2A22'] };
+const defs = [P.Rafa, P.JB, P.Mateo, P.Ibra];
+const mids = [P.Yanis, P.Samir, P.Tomás];
+const atts = [P.Léo, P.Diego];
+const f = FM[cur];
+const on = [P.Kofi].concat(defs.slice(0, f[0]), mids.slice(0, f[1]), atts.slice(0, f[2]));
+const roleOf = (p) => R[p.name] || ROLES[p.pos][0];
+const ys = (k) => k === 1 ? [50] : k === 2 ? [30, 70] : [18, 50, 82];
+const tokens = [];
+const place = (arr, x) => {
+const y = ys(arr.length);
+arr.forEach((p, i) => {
+const isSel = p.name === selName;
+tokens.push({
+item: p, name: p.name,
+pick: () => this.setState({ sel: p.name }),
+style: 'position:absolute;left:' + x + '%;top:' + y[i] + '%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;padding:0;cursor:pointer;font-family:inherit',
+headStyle: 'width:54px;height:54px;box-sizing:border-box;border-radius:50%;overflow:hidden;background:#F3E0B0;border:' + (isSel ? '4px solid #FFF0CD' : '3px solid ' + MW[p.mood][1]) + (isSel ? ';box-shadow:0 0 0 3px #2B1D14' : ''),
+pillStyle: 'background:' + (isSel ? '#F0C253' : '#2B1D14') + ';color:' + (isSel ? '#2B1D14' : '#FFF0CD') + ';font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;white-space:nowrap'
+});
+});
+};
+place([P.Kofi], 8);
+place(defs.slice(0, f[0]), 28);
+place(mids.slice(0, f[1]), 52);
+place(atts.slice(0, f[2]), 76);
+const all = Object.keys(P).map((k) => P[k]);
+const bench = all.filter((p) => on.indexOf(p) < 0).map((p) => ({
+item: p, name: p.name, role: p.role, word: MW[p.mood][0], color: MW[p.mood][3],
+headStyle: 'width:40px;height:40px;flex:none;box-sizing:border-box;border-radius:50%;overflow:hidden;background:#F3E0B0;border:3px solid ' + MW[p.mood][1]
+}));
+const formations = Object.keys(FM).map((k) => ({
+label: k,
+pick: () => this.setState({ f: k }),
+style: k === cur
+? 'min-height:44px;padding:0 14px;border-radius:12px;border:2px solid #2B1D14;background:#FFF0CD;color:#2B1D14;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 #2B1D14'
+: 'min-height:44px;padding:0 14px;border-radius:12px;border:2px solid #B8872E;background:#F4D47E;color:#493118;font-size:14px;font-weight:800;cursor:pointer'
+}));
+const defs2 = [
+{ key: 'm', label: 'Mentalité', opts: ['Défensive', 'Équilibrée', 'Offensive'] },
+{ key: 'p', label: 'Pressing', opts: ['Bas', 'Moyen', 'Haut'] },
+{ key: 't', label: 'Tempo', opts: ['Posé', 'Normal', 'Rapide'] },
+{ key: 'w', label: 'Largeur', opts: ['Étroit', 'Normal', 'Large'] }
+];
+const rules = defs2.map((d) => ({
+label: d.label,
+opts: d.opts.map((t, i) => ({
+t: t,
+pick: () => this.setState({ team: Object.assign({}, T, { [d.key]: i }) }),
+style: 'flex:1;min-height:36px;padding:0 2px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;' + (T[d.key] === i ? 'border:2px solid #2B1D14;background:#F0C253;color:#2B1D14;box-shadow:0 2px 0 #2B1D14' : 'border:2px solid #DDB98E;background:#FFFDF8;color:#4B3527')
+}))
+}));
+let effect = 'Équilibre entre attaque et défense. Fatigue normale en fin de match.';
+if (T.p === 2 && T.t === 2) effect = 'Beaucoup d’occasions, mais Samir sera épuisé dès la 40e minute.';
+else if (T.m === 2 && T.p === 2) effect = 'Pression constante. Les défenseurs se retrouvent exposés dans le dos.';
+else if (T.m === 0 && T.p === 0) effect = 'Bloc bas solide. Léo et Diego recevront peu de ballons.';
+else if (T.t === 0) effect = 'Jeu patient. Moins de fatigue, moins de contres.';
+else if (T.w === 2) effect = 'Jeu large. Les ailiers brillent, l’axe est plus ouvert.';
+const s = P[selName] || P.Rafa;
+const cr = roleOf(s);
+const sel = {
+item: s, name: s.name, line: s.role + ' · ' + cr, talent: s.talent,
+mood: MW[s.mood][0],
+moodStyle: 'display:inline-block;font-size:11px;font-weight:800;padding:2px 10px;border-radius:999px;margin-top:3px;background:' + MW[s.mood][2] + ';color:' + MW[s.mood][3],
+headStyle: 'width:58px;height:58px;flex:none;box-sizing:border-box;border-radius:50%;overflow:hidden;background:#F3E0B0;border:3px solid ' + MW[s.mood][1],
+advice: cr === s.best ? 'Bon choix : ' + s.talent + ' s’exprime à plein dans ce rôle.' : 'Son talent brille surtout en ' + s.best + '. Ici, il sera moins utile.',
+roles: ROLES[s.pos].map((t) => ({
+t: t, star: t === s.best ? '★ idéal' : '',
+pick: () => this.setState({ roles: Object.assign({}, R, { [s.name]: t }) }),
+style: 'min-height:40px;padding:0 12px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:800;cursor:pointer;' + (t === cr ? 'border:2px solid #2B1D14;background:#F0C253;color:#2B1D14;box-shadow:0 2px 0 #2B1D14' : 'border:2px solid #DDB98E;background:#FFFDF8;color:#4B3527'),
+starStyle: 'font-size:11px;font-weight:800;color:#8A5A34'
+}))
+};
+return { formations, rules, effect, tokens, bench, sel };
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Joueur chibi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<svg viewBox="{{vb}}" width="100%" role="img" style="display:block">
+<title>{{label}}</title>
+
+<ellipse cx="80" cy="241" rx="48" ry="5" fill="#2A1208" opacity="0.12" display="{{dBody}}"/>
+
+<circle cx="80" cy="64" r="66" fill="{{hairColor}}" stroke="#2A1208" stroke-width="3" display="{{dAfro}}"/>
+<path d="{{longBack}}" fill="{{hairColor}}" stroke="#2A1208" stroke-width="3" stroke-linejoin="round" display="{{dLong}}"/>
+
+<g display="{{dBody}}">
+<rect x="{{armLx}}" y="142" width="{{armW}}" height="34" rx="6" fill="{{skin}}" stroke="#2A1208" stroke-width="2.5"/>
+<rect x="{{armRx}}" y="142" width="{{armW}}" height="34" rx="6" fill="{{skin}}" stroke="#2A1208" stroke-width="2.5"/>
+<circle cx="{{handLx}}" cy="179" r="{{handR}}" fill="{{skin}}" stroke="#2A1208" stroke-width="2.5" display="{{dBare}}"/>
+<circle cx="{{handRx}}" cy="179" r="{{handR}}" fill="{{skin}}" stroke="#2A1208" stroke-width="2.5" display="{{dBare}}"/>
+<ellipse cx="{{handLx}}" cy="181" rx="{{gloveRx}}" ry="10" fill="#F0D9B5" stroke="#2A1208" stroke-width="2.5" display="{{dGloves}}"/>
+<ellipse cx="{{handRx}}" cy="181" rx="{{gloveRx}}" ry="10" fill="#F0D9B5" stroke="#2A1208" stroke-width="2.5" display="{{dGloves}}"/>
+
+<rect x="{{legLx}}" y="206" width="{{legW}}" height="20" rx="4" fill="{{skin}}" stroke="#2A1208" stroke-width="2.5"/>
+<rect x="{{legRx}}" y="206" width="{{legW}}" height="20" rx="4" fill="{{skin}}" stroke="#2A1208" stroke-width="2.5"/>
+<rect x="{{legLx}}" y="220" width="{{legW}}" height="14" rx="3" fill="{{kit1}}" stroke="#2A1208" stroke-width="2.5"/>
+<rect x="{{legRx}}" y="220" width="{{legW}}" height="14" rx="3" fill="{{kit1}}" stroke="#2A1208" stroke-width="2.5"/>
+<ellipse cx="{{legLc}}" cy="237" rx="{{bootRx}}" ry="6" fill="#26211D" stroke="#2A1208" stroke-width="2.5"/>
+<ellipse cx="{{legRc}}" cy="237" rx="{{bootRx}}" ry="6" fill="#26211D" stroke="#2A1208" stroke-width="2.5"/>
+
+<path d="{{jersey}}" fill="{{kit1}}"/>
+<g display="{{dStripes}}">
+<rect x="63" y="134" width="9" height="56" fill="{{kit2}}"/>
+<rect x="88" y="134" width="9" height="56" fill="{{kit2}}"/>
+<rect x="{{stripeLx}}" y="136" width="9" height="54" fill="{{kit2}}"/>
+<rect x="{{stripeRx}}" y="136" width="9" height="54" fill="{{kit2}}"/>
+</g>
+<g display="{{dHoops}}">
+<rect x="{{hoopX}}" y="150" width="{{hoopW}}" height="9" fill="{{kit2}}"/>
+<rect x="{{hoopX}}" y="168" width="{{hoopW}}" height="9" fill="{{kit2}}"/>
+</g>
+<path d="{{jersey}}" fill="none" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round"/>
+<rect x="64" y="150" width="32" height="28" rx="7" fill="{{kit1}}"/>
+<text x="80" y="171" text-anchor="middle" font-size="22" font-weight="800" font-family="Nunito, system-ui, sans-serif" fill="{{ink}}">{{numberText}}</text>
+<path d="M68 133 L80 147 L92 133" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="{{armLx}}" y="138" width="{{armW}}" height="15" rx="5" fill="{{kit1}}" stroke="#2A1208" stroke-width="2.5"/>
+<rect x="{{armRx}}" y="138" width="{{armW}}" height="15" rx="5" fill="{{kit1}}" stroke="#2A1208" stroke-width="2.5"/>
+<rect x="{{armLx}}" y="156" width="{{armW}}" height="8" rx="2" fill="#FAC775" stroke="#2A1208" stroke-width="1.5" display="{{dCaptain}}"/>
+<path d="{{shortsPath}}" fill="{{shortsC}}" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round"/>
+<rect x="70" y="112" width="20" height="24" fill="{{skinShade}}" display="none"/>
+</g>
+
+<rect x="70" y="112" width="20" height="24" fill="{{skinShade}}"/>
+
+<ellipse cx="{{earLx}}" cy="84" rx="{{earRx}}" ry="{{earRy}}" fill="{{skin}}" stroke="#2A1208" stroke-width="3"/>
+<ellipse cx="{{earRx2}}" cy="84" rx="{{earRx}}" ry="{{earRy}}" fill="{{skin}}" stroke="#2A1208" stroke-width="3"/>
+<circle cx="{{earLx}}" cy="{{ringY}}" r="4" fill="none" stroke="#E0B04A" stroke-width="2.5" display="{{dRing}}"/>
+
+<ellipse cx="80" cy="108" rx="{{jowlRx}}" ry="{{jowlRy}}" fill="{{skin}}" stroke="#2A1208" stroke-width="3" display="{{dJowl}}"/>
+<ellipse cx="80" cy="76" rx="{{R}}" ry="44" fill="{{skin}}" stroke="#2A1208" stroke-width="3"/>
+<ellipse cx="{{cheekX}}" cy="84" rx="{{cheekRx}}" ry="22" fill="{{skinShade}}" opacity="0.22"/>
+
+<g fill="{{frkColor}}" display="{{dFrk}}">
+<circle cx="56" cy="99" r="1.6"/><circle cx="64" cy="103" r="1.6"/><circle cx="50" cy="104" r="1.6"/><circle cx="70" cy="100" r="1.6"/><circle cx="60" cy="108" r="1.6"/>
+<circle cx="104" cy="99" r="1.6"/><circle cx="96" cy="103" r="1.6"/><circle cx="110" cy="104" r="1.6"/><circle cx="90" cy="100" r="1.6"/><circle cx="100" cy="108" r="1.6"/>
+</g>
+
+<path d="{{beardFull}}" fill="{{beardColor}}" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round" display="{{dBeardFull}}"/>
+<path d="M70 112 Q80 108 90 112 Q92 128 80 132 Q68 128 70 112Z" fill="{{beardColor}}" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round" display="{{dGoatee}}"/>
+<g fill="#2A1208" opacity="0.4" display="{{dStubble}}">
+<circle cx="58" cy="104" r="1.2"/><circle cx="64" cy="112" r="1.2"/><circle cx="70" cy="106" r="1.2"/><circle cx="72" cy="116" r="1.2"/><circle cx="80" cy="118" r="1.2"/><circle cx="88" cy="116" r="1.2"/><circle cx="90" cy="106" r="1.2"/><circle cx="96" cy="112" r="1.2"/><circle cx="102" cy="104" r="1.2"/><circle cx="62" cy="98" r="1.2"/><circle cx="98" cy="98" r="1.2"/><circle cx="76" cy="111" r="1.2"/><circle cx="84" cy="111" r="1.2"/><circle cx="54" cy="94" r="1.2"/><circle cx="106" cy="94" r="1.2"/><circle cx="68" cy="119" r="1.2"/><circle cx="92" cy="119" r="1.2"/>
+</g>
+
+<g display="{{dEyes}}">
+<ellipse cx="56" cy="86" rx="{{erx}}" ry="{{ery}}" fill="#1E120B"/>
+<ellipse cx="56" cy="87" rx="{{irx}}" ry="{{iry}}" fill="{{eyeColor}}"/>
+<ellipse cx="56" cy="87" rx="{{prx}}" ry="{{pry}}" fill="#0E0805"/>
+<circle cx="{{hlLx}}" cy="{{hlY}}" r="{{hlR}}" fill="#FFFFFF"/>
+<circle cx="{{hl2Lx}}" cy="{{hl2Y}}" r="{{hl2R}}" fill="#FFFFFF"/>
+<ellipse cx="104" cy="86" rx="{{erx}}" ry="{{ery}}" fill="#1E120B"/>
+<ellipse cx="104" cy="87" rx="{{irx}}" ry="{{iry}}" fill="{{eyeColor}}"/>
+<ellipse cx="104" cy="87" rx="{{prx}}" ry="{{pry}}" fill="#0E0805"/>
+<circle cx="{{hlRx}}" cy="{{hlY}}" r="{{hlR}}" fill="#FFFFFF"/>
+<circle cx="{{hl2Rx}}" cy="{{hl2Y}}" r="{{hl2R}}" fill="#FFFFFF"/>
+</g>
+<g display="{{dLaughEyes}}">
+<path d="M45 89 Q56 72 67 89" fill="none" stroke="#2A1208" stroke-width="4.5" stroke-linecap="round"/>
+<path d="M93 89 Q104 72 115 89" fill="none" stroke="#2A1208" stroke-width="4.5" stroke-linecap="round"/>
+</g>
+<g display="{{dLid}}">
+<rect x="43" y="72" width="26" height="{{lidH}}" fill="{{skin}}"/>
+<rect x="91" y="72" width="26" height="{{lidH}}" fill="{{skin}}"/>
+<line x1="44" y1="{{lidY}}" x2="68" y2="{{lidY}}" stroke="#2A1208" stroke-width="3" stroke-linecap="round"/>
+<line x1="92" y1="{{lidY}}" x2="116" y2="{{lidY}}" stroke="#2A1208" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g display="{{dBags}}">
+<path d="M47 100 Q56 105 65 100" fill="none" stroke="#7A5A78" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
+<path d="M95 100 Q104 105 113 100" fill="none" stroke="#7A5A78" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
+</g>
+<g display="{{dHurtEyes}}">
+<ellipse cx="56" cy="98" rx="8" ry="3" fill="#9CCBEF" opacity="0.85"/>
+<ellipse cx="104" cy="98" rx="8" ry="3" fill="#9CCBEF" opacity="0.85"/>
+<path d="M47 100 Q43 110 47 121" fill="none" stroke="#BFE0F7" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M47 123 C43 128 43 131 47 132 C51 131 51 128 47 123Z" fill="#BFE0F7"/>
+<path d="M113 100 Q117 109 114 118" fill="none" stroke="#BFE0F7" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+</g>
+
+<ellipse cx="{{blushLx}}" cy="101" rx="9" ry="6" fill="#E88A8A" opacity="{{blush}}"/>
+<ellipse cx="{{blushRx}}" cy="101" rx="9" ry="6" fill="#E88A8A" opacity="{{blush}}"/>
+<path d="M80 94 q-3 4 0 6" fill="none" stroke="{{skinShade}}" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M62 101 Q80 92 98 101 Q80 106 62 101Z" fill="{{beardColor}}" stroke="#2A1208" stroke-width="2" stroke-linejoin="round" display="{{dStache}}"/>
+
+<g display="{{dHappy}}">
+<path d="M68 105 Q80 121 92 105Z" fill="#4A1814" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round"/>
+<ellipse cx="80" cy="111" rx="5" ry="2.6" fill="#E88A8A"/>
+</g>
+<g display="{{dLaugh}}">
+<path d="M64 103 Q80 128 96 103Z" fill="#4A1814" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round"/>
+<ellipse cx="80" cy="111" rx="9" ry="4" fill="#E88A8A"/>
+</g>
+<path d="M72 109 L88 109" fill="none" stroke="{{lineCol}}" stroke-width="3.5" stroke-linecap="round" display="{{dNeutral}}"/>
+<path d="M69 110 Q80 112 91 106" fill="none" stroke="{{lineCol}}" stroke-width="3.5" stroke-linecap="round" display="{{dFocus}}"/>
+<path d="M68 110 q4 -4 8 0 t8 0 t8 0" fill="none" stroke="{{lineCol}}" stroke-width="3" stroke-linecap="round" display="{{dTired}}"/>
+<g display="{{dAngry}}">
+<path d="M65 113 Q80 100 95 113Z" fill="#F4EEE6" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M72 108 L72 113 M80 105 L80 113 M88 108 L88 113" stroke="#2A1208" stroke-width="1.6"/>
+</g>
+<path d="M69 113 Q74 106 80 113 Q86 106 91 113" fill="none" stroke="{{lineCol}}" stroke-width="3.5" stroke-linecap="round" display="{{dHurt}}"/>
+<path d="M132 50 C126 60 126 66 132 67 C138 66 138 60 132 50Z" fill="#9CCBEF" stroke="#6AA6D6" stroke-width="1.4" display="{{dTired}}"/>
+
+<path d="{{cap}}" fill="{{hairColor}}" stroke="#2A1208" stroke-width="3" stroke-linejoin="round" opacity="{{capOp}}" display="{{dCap}}"/>
+<path d="{{grayL}}" fill="#CFCFCF" display="{{dGray}}"/>
+<path d="{{grayR}}" fill="#CFCFCF" display="{{dGray}}"/>
+<path d="M42 44 Q80 24 120 42 M36 54 Q80 34 128 54" fill="none" stroke="{{hairHi}}" stroke-width="3" stroke-linecap="round" opacity="0.6" display="{{dSlick}}"/>
+<path d="M58 44 Q86 34 116 46 M50 56 Q76 54 100 56" fill="none" stroke="{{hairHi}}" stroke-width="3" stroke-linecap="round" opacity="0.7" display="{{dFringe}}"/>
+<path d="M80 32 L80 54" fill="none" stroke="#2A1208" stroke-width="2" opacity="0.6" display="{{dLong}}"/>
+<g display="{{dCurly}}">
+<circle cx="46" cy="46" r="21" fill="#2A1208"/><circle cx="64" cy="34" r="24" fill="#2A1208"/><circle cx="96" cy="34" r="24" fill="#2A1208"/><circle cx="114" cy="46" r="21" fill="#2A1208"/><circle cx="130" cy="64" r="15" fill="#2A1208"/><circle cx="30" cy="64" r="15" fill="#2A1208"/><circle cx="80" cy="38" r="24" fill="#2A1208"/>
+<circle cx="46" cy="46" r="19" fill="{{hairColor}}"/><circle cx="64" cy="34" r="22" fill="{{hairColor}}"/><circle cx="96" cy="34" r="22" fill="{{hairColor}}"/><circle cx="114" cy="46" r="19" fill="{{hairColor}}"/><circle cx="130" cy="64" r="13" fill="{{hairColor}}"/><circle cx="30" cy="64" r="13" fill="{{hairColor}}"/><circle cx="80" cy="38" r="22" fill="{{hairColor}}"/>
+<path d="M52 30 q6 -5 11 0 M88 24 q6 -5 11 0 M112 36 q5 -4 9 0" fill="none" stroke="{{hairHi}}" stroke-width="2.6" stroke-linecap="round" opacity="0.6"/>
+</g>
+<g display="{{dMohawk}}">
+<path d="M64 54 Q52 6 80 4 Q108 6 96 54Z" fill="{{hairColor}}" stroke="#2A1208" stroke-width="3" stroke-linejoin="round"/>
+<path d="M72 44 L70 16 M80 42 L80 10 M88 44 L90 16" fill="none" stroke="{{hairHi}}" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+</g>
+<ellipse cx="62" cy="48" rx="17" ry="7" fill="#FFFFFF" opacity="0.3" display="{{dBald}}"/>
+<g display="{{dBand}}">
+<path d="{{bandPath}}" fill="#FFFFFF" stroke="#2A1208" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="{{bandLine}}" fill="none" stroke="{{kit1}}" stroke-width="3.5"/>
+</g>
+
+<path d="{{browL}}" fill="none" stroke="{{browColor}}" stroke-width="6" stroke-linecap="round"/>
+<path d="{{browR}}" fill="none" stroke="{{browColor}}" stroke-width="6" stroke-linecap="round"/>
+<path d="M108 62 L116 80" fill="none" stroke="#E8B8A8" stroke-width="3.2" stroke-linecap="round" display="{{dScarBrow}}"/>
+<path d="M104 98 Q116 108 118 122" fill="none" stroke="#E8B8A8" stroke-width="3" stroke-linecap="round" display="{{dScarCheek}}"/>
+
+<ellipse cx="56" cy="90" rx="19" ry="18" fill="#6B3A6E" opacity="0.45" display="{{dInjEye}}"/>
+<g transform="rotate(-30 106 104)" display="{{dInjCut}}"><rect x="94" y="98" width="24" height="12" rx="3" fill="#F0D9B5" stroke="#C9A97A" stroke-width="1.5"/><rect x="102" y="98" width="8" height="12" fill="#E8C99A"/></g>
+<g transform="rotate(-10 80 96)" display="{{dInjNose}}"><rect x="67" y="90" width="26" height="11" rx="3" fill="#F0D9B5" stroke="#C9A97A" stroke-width="1.5"/></g>
+<g display="{{dInjHead}}">
+<path d="{{headBand}}" fill="#F4F1EA" stroke="#C9C5B8" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="108" cy="52" r="5" fill="#D85A5A"/>
+</g>
+</svg>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"build":{"editor":"range","default":1,"min":0.75,"max":1.45,"step":0.01,"unit":""},"mood":{"editor":"enum","default":"neutral","options":["happy","laugh","neutral","focus","tired","hurt","angry"]},"item":{"editor":null},"view":{"editor":null},"$preview":{"width":200,"height":300}}'>
+class Component extends DCLogic {
+renderVals() {
+const props = this.props;
+const base = props.item || {};
+const g = (k, d) => {
+const v = (props[k] !== undefined && props[k] !== null && props[k] !== '') ? props[k] : base[k];
+return (v === undefined || v === null || v === '') ? d : v;
+};
+const tb = (k) => { const v = g(k, false); return v === true || v === 'true'; };
+const num = (k, d) => { const v = parseFloat(g(k, d)); return isNaN(v) ? d : v; };
+const mix = (a, b, k) => {
+const f = (i) => { const x = parseInt(a.substr(i, 2), 16), y = parseInt(b.substr(i, 2), 16); return Math.round(x + (y - x) * k); };
+return '#' + [1, 3, 5].map((i) => ('0' + f(i).toString(16)).slice(-2)).join('');
+};
+const lum = (h) => 0.299 * parseInt(h.substr(1, 2), 16) + 0.587 * parseInt(h.substr(3, 2), 16) + 0.114 * parseInt(h.substr(5, 2), 16);
+const D = (c) => c ? 'inline' : 'none';
+const OL = '#2A1208';
+const b = num('build', 1), es = num('eyeSize', 1), ear = num('earSize', 1);
+const skin = g('skin', '#B97C52'), hc = g('hairColor', '#1A1410'), eyeCol = g('eyeColor', '#3B2A1E');
+const kit1 = g('kit1', '#534AB7'), kit2 = g('kit2', '#FFFFFF'), shortsC = g('shorts', kit2);
+const hair = g('hair', 'slick'), beard = g('beard', 'none'), mood = g('mood', 'neutral');
+const inj = g('injury', 'none'), kitStyle = g('kitStyle', 'stripes'), view = g('view', 'full');
+const bcol = g('beardColor', hc);
+const sh = mix(skin, OL, 0.3);
+const R = 50 + 14 * (b - 1), tw = 40 * b, armW = 13 + 6 * (b - 1), legW = 14 + 10 * (b - 1), legOff = tw * 0.45;
+const armLx = 80 - tw - armW + 3, armRx = 80 + tw - 3;
+const jowlRy = Math.max(0, (b - 1.1) * 60);
+const MD = { happy: [-1, -4, 0], laugh: [-2, -5, 0], neutral: [0, 0, 0], focus: [-2, 5, 0.3], angry: [-4, 9, 0.28], tired: [3, 1, 0.5], hurt: [6, -2, 0.1] };
+const md = MD[mood] || MD.neutral;
+const yb = 70, oo = md[0], io = md[1], lid = md[2];
+const lidH = Math.round(lid * 26);
+const brow = (side) => {
+const yo = yb + oo, yi = yb + io, ym = Math.min(yo, yi) - 3;
+return side === 'L' ? 'M41 ' + yo + ' Q55 ' + ym + ' 69 ' + yi : 'M119 ' + yo + ' Q105 ' + ym + ' 91 ' + yi;
+};
+const capLow = { buzz: 46, slick: 46, long: 46, fringe: 60, afro: 52, mohawk: 46, curly: 50 }[hair] || 50;
+const capOp = hair === 'buzz' ? 0.7 : hair === 'mohawk' ? 0.35 : 1;
+const cap = 'M' + (80 - R - 1) + ' 78 A' + (R + 1) + ' 46 0 0 1 ' + (80 + R + 1) + ' 78 Q80 ' + capLow + ' ' + (80 - R - 1) + ' 78 Z';
+const vbMap = { full: '0 0 160 244', bust: '0 8 160 190', head: '12 2 136 142' };
+const numberText = String(g('number', ''));
+const mw = { happy: 'content', laugh: 'inspiré', neutral: 'stable', focus: 'concentré', tired: 'épuisé', hurt: 'frustré', angry: 'furieux' }[mood] || '';
+const lineCol = beard === 'full' ? '#F4E9E0' : OL;
+const er = 9 * ear;
+const erx = 10 * es, ery = 12 * es;
+return {
+vb: vbMap[view] || vbMap.full,
+label: g('name', 'Joueur') + ', ' + mw,
+hairColor: hc, skin: skin, skinShade: sh, kit1: kit1, kit2: kit2, shortsC: shortsC, eyeColor: eyeCol, beardColor: bcol, lineCol: lineCol,
+ink: lum(kit1) > 150 ? '#26215C' : '#FFFFFF',
+numberText: numberText,
+hairHi: mix(hc, '#FFFFFF', 0.28),
+browColor: hair === 'bald' ? '#1A0F0A' : hc,
+R: R, earLx: 80 - R, earRx2: 80 + R, earRx: er, earRy: er + 1, ringY: 84 + er + 4,
+cheekX: 80 + R * 0.55, cheekRx: R * 0.26,
+jowlRx: R * 0.86, jowlRy: jowlRy,
+blushLx: 80 - R + 16, blushRx: 80 + R - 16,
+blush: (mood === 'happy' || mood === 'laugh') ? 0.65 : mood === 'tired' ? 0.2 : 0.4,
+frkColor: mix(skin, '#7A3A1A', 0.55),
+armW: armW, armLx: armLx, armRx: armRx,
+handLx: armLx + armW / 2, handRx: armRx + armW / 2, handR: armW / 2 + 2, gloveRx: armW / 2 + 5,
+legW: legW, legLc: 80 - legOff, legRc: 80 + legOff, legLx: 80 - legOff - legW / 2, legRx: 80 + legOff - legW / 2, bootRx: legW * 0.75 + 5,
+jersey: 'M' + (80 - tw) + ' 138 Q80 122 ' + (80 + tw) + ' 138 L' + (80 + tw + 3) + ' 188 Q80 194 ' + (80 - tw - 3) + ' 188 Z',
+shortsPath: 'M' + (80 - tw + 2) + ' 188 L' + (80 + tw - 2) + ' 188 L' + (80 + tw - 7) + ' 214 L84 214 L80 204 L76 214 L' + (80 - tw + 7) + ' 214 Z',
+stripeLx: 80 - 28 - 4.5, stripeRx: 80 + 28 - 4.5,
+hoopX: 80 - tw, hoopW: tw * 2,
+beardFull: 'M' + (80 - R + 3) + ' 88 C' + (80 - R) + ' 122 ' + (80 - R * 0.3) + ' 130 80 130 C' + (80 + R * 0.3) + ' 130 ' + (80 + R) + ' 122 ' + (80 + R - 3) + ' 88 C' + (80 + R * 0.75) + ' 104 ' + (80 + R * 0.4) + ' 102 80 102 C' + (80 - R * 0.4) + ' 102 ' + (80 - R * 0.75) + ' 104 ' + (80 - R + 3) + ' 88 Z',
+longBack: 'M' + (80 - R - 6) + ' 78 C' + (80 - R - 16) + ' 120 ' + (80 - R - 8) + ' 158 ' + (80 - R + 4) + ' 168 L' + (80 + R - 4) + ' 168 C' + (80 + R + 8) + ' 158 ' + (80 + R + 16) + ' 120 ' + (80 + R + 6) + ' 78 C' + (80 + R + 8) + ' 20 ' + (80 - R - 8) + ' 20 ' + (80 - R - 6) + ' 78 Z',
+cap: cap, capOp: capOp,
+grayL: 'M' + (80 - R) + ' 80 C' + (80 - R - 1) + ' 62 ' + (80 - R + 4) + ' 52 ' + (80 - R + 14) + ' 48 L' + (80 - R + 16) + ' 68 Z',
+grayR: 'M' + (80 + R) + ' 80 C' + (80 + R + 1) + ' 62 ' + (80 + R - 4) + ' 52 ' + (80 + R - 14) + ' 48 L' + (80 + R - 16) + ' 68 Z',
+bandPath: 'M' + (80 - R) + ' 62 Q80 44 ' + (80 + R) + ' 62 L' + (80 + R) + ' 74 Q80 56 ' + (80 - R) + ' 74 Z',
+bandLine: 'M' + (80 - R) + ' 68 Q80 50 ' + (80 + R) + ' 68',
+headBand: 'M' + (80 - R) + ' 58 Q80 38 ' + (80 + R) + ' 58 L' + (80 + R) + ' 70 Q80 50 ' + (80 - R) + ' 70 Z',
+browL: brow('L'), browR: brow('R'),
+erx: erx, ery: ery, irx: erx - 2, iry: ery - 2, prx: (erx - 2) * 0.5, pry: (ery - 2) * 0.55,
+hlLx: 56 + erx * 0.35, hlRx: 104 + erx * 0.35, hlY: 86 - ery * 0.4, hlR: erx * 0.4,
+hl2Lx: 56 - erx * 0.35, hl2Rx: 104 - erx * 0.35, hl2Y: 87 + ery * 0.45, hl2R: erx * 0.2,
+lidH: lidH, lidY: 72 + lidH,
+dBody: D(view !== 'head'),
+dBare: D(view !== 'head' && !tb('gloves')), dGloves: D(view !== 'head' && tb('gloves')),
+dStripes: D(kitStyle === 'stripes'), dHoops: D(kitStyle === 'hoops'),
+dCaptain: D(tb('captain')),
+dAfro: D(hair === 'afro'), dLong: D(hair === 'long'),
+dCap: D(hair !== 'bald' && hair !== 'none'),
+dGray: D(hair === 'slick' && tb('gray')),
+dSlick: D(hair === 'slick'), dFringe: D(hair === 'fringe'), dCurly: D(hair === 'curly'), dMohawk: D(hair === 'mohawk'), dBald: D(hair === 'bald'),
+dBand: D(tb('band')),
+dRing: D(tb('ring')), dJowl: D(jowlRy > 0.5), dFrk: D(tb('freckles')),
+dBeardFull: D(beard === 'full'), dGoatee: D(beard === 'goatee'), dStubble: D(beard === 'stubble'), dStache: D(beard === 'stache'),
+dEyes: D(mood !== 'laugh'), dLaughEyes: D(mood === 'laugh'),
+dLid: D(lid > 0 && mood !== 'laugh'),
+dBags: D(mood === 'tired' || mood === 'hurt'),
+dHurtEyes: D(mood === 'hurt'),
+dHappy: D(mood === 'happy'), dLaugh: D(mood === 'laugh'), dNeutral: D(mood === 'neutral'), dFocus: D(mood === 'focus'),
+dTired: D(mood === 'tired'), dAngry: D(mood === 'angry'), dHurt: D(mood === 'hurt'),
+dScarBrow: D(tb('scarBrow')), dScarCheek: D(tb('scarCheek') && inj !== 'cut'),
+dInjEye: D(inj === 'eye'), dInjCut: D(inj === 'cut'), dInjNose: D(inj === 'nose'), dInjHead: D(inj === 'head')
+};
+}
+}
+</script>
+</body>
+</html>
