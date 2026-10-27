@@ -87,7 +87,7 @@ function ovMatch() {
   } else if (UI.ht) {
     ctrl = '<div class="card"><b>Mi-temps ' + M.sc[0] + '-' + M.sc[1] + '</b> · Causerie<div class="col" style="gap:4px;margin-top:5px"><button class="chbtn" data-a="ht" data-i="enc">Encourager : le milieu monte d’un cran</button><button class="chbtn" data-a="ht" data-i="push">Exiger plus : attaque +4, défense −2</button><button class="chbtn" data-a="ht" data-i="safe">Se resserrer : défense +4, attaque −3</button></div></div>';
   } else {
-    ctrl = '<div class="row" style="gap:6px"><span class="muted" style="font-weight:800;font-size:11px">Vitesse</span><div class="seg" style="width:140px">' + [1, 2, 4].map((v) => '<button class="' + (UI.mspeed === v ? 'on' : '') + '" data-a="mspeed" data-i="' + v + '">×' + v + '</button>').join('') + '</div><button class="btn sm" data-a="skip" style="margin-left:auto">Passer ⏭</button></div>';
+    ctrl = '<div class="row" style="gap:6px"><span class="muted" style="font-weight:800;font-size:11px">Vitesse</span><div class="seg" style="width:140px">' + [1, 2, 4].map((v) => '<button class="' + (UI.mspeed === v ? 'on' : '') + '" data-a="mspeed" data-i="' + v + '">×' + v + '</button>').join('') + '</div><button class="btn sm" data-a="scn" style="margin-left:auto">🎬 ' + (UI.scn === false ? 'Off' : 'On') + '</button><button class="btn sm" data-a="skip">Passer ⏭</button></div>';
   }
   return '<div class="md" style="width:min(820px,100%);height:min(350px,100%);display:flex;gap:8px;padding:8px;overflow:hidden"><div style="flex:0 0 52%;position:relative;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:#000">' + bg + sb + '</div><div class="col" style="flex:1;min-width:0"><div class="card" style="flex:1;min-height:0;overflow:auto;padding:6px">' + feed + '</div>' + ctrl + '</div></div>';
 }
@@ -118,17 +118,43 @@ function handleStop(r) {
   if (r.stop === 'match') { UI.ov = 'pre'; }
   else if (r.stop === 'presser') { UI.ov = 'press'; UI.pq = 0; }
   else if (r.stop === 'msg') { UI.ov = 'msg'; UI.msgSel = r.m.id; }
-  else if (r.stop === 'season') { UI.ov = 'season'; }
+  else if (r.stop === 'season') {
+    UI.ov = 'season';
+    const h = G.lastRec, tr = [];
+    if (h && h.rank === 1) tr.push({ big: 'CHAMPIONS !', sub: T(ME).name + ' · ' + DIVS[h.div].n, cap: 'Titre de ' + DIVS[h.div].n + ' pour ' + T(ME).name + ' !' });
+    if (h && h.cup === 'Vainqueur') tr.push({ big: 'COUPE DU ROI !', sub: T(ME).name + ' · Vainqueur', cap: T(ME).name + ' remporte la Coupe du Roi !' });
+    if (tr.length && UI.scn !== false) { UI.ov = null; render(); (async () => { for (const c of tr) await Scenes.play('trophy', c); UI.ov = 'season'; render(); })(); return; }
+  }
   render();
 }
 function pauseSim() { UI.run = false; clearTimeout(LT); render(); }
+function sceneFor(e) {
+  if (e.t === 'pen') { const tk = e.us ? P(e.p) : null; return ['pen', { us: e.us, ok: e.ok, min: e.min, taker: e.us ? pv(tk) : oppTaker(e.p) }]; }
+  if (e.t === 'fk') { const tk = e.us ? P(e.p) : null; if (e.out === 'miss') return null; return ['fk', { us: e.us, out: e.out, min: e.min, taker: e.us ? pv(tk) : oppTaker(e.p) }]; }
+  if (e.t === 'red') { if (e.us && !P(e.p)) return null; return ['red', { us: e.us, min: e.min, p: e.us ? pv(P(e.p)) : null }]; }
+  return null;
+}
+function oppTaker(name) {
+  const ot = T(M.opp), i = Math.max(1, ot.names.indexOf(name));
+  const hs = (() => { let h = 2166136261; const s = ot.name + name + i; for (let k = 0; k < s.length; k++) { h ^= s.charCodeAt(k); h = Math.imul(h, 16777619); } return h >>> 0; })();
+  return { name: name, num: i + 1, build: 0.9 + ((hs >>> 2) & 15) / 40, look: { skin: SKIN[(hs >>> 3) % SKIN.length], hair: HAIR[(hs >>> 5) % HAIR.length], hc: HCOL[(hs >>> 7) % HCOL.length], beard: BEARD[(hs >>> 9) % BEARD.length], bc: HCOL[(hs >>> 7) % HCOL.length] }, kit: teamCol(M.opp), kitStyle: 'stripes', pos: 'MIL' };
+}
+function scnOn() { return UI.scn !== false && UI.mspeed < 4; }
 function liveTick() {
   if (!UI.live) return;
   if (M.b === 15 && !M.htDone) { M.htDone = true; UI.ht = true; renderOv(); return; }
   stepBlock();
-  if (M.done) { applyResult(); UI.live = false; }
-  renderOv();
-  if (!M.over) LT = setTimeout(liveTick, 430 / UI.mspeed);
+  const evs = M.ev.slice(M.evN || 0); M.evN = M.ev.length;
+  let sc = null;
+  if (scnOn()) for (const e of evs) { sc = sceneFor(e); if (sc) break; }
+  const after = () => {
+    if (!UI.live) return;
+    if (M.done) { applyResult(); UI.live = false; }
+    renderOv();
+    if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; }
+    if (!M.over) LT = setTimeout(liveTick, 430 / UI.mspeed);
+  };
+  if (sc) { Scenes.play(sc[0], sc[1]).then(after); } else { if (M.done) { applyResult(); UI.live = false; } renderOv(); if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; } if (!M.over) LT = setTimeout(liveTick, 430 / UI.mspeed); }
 }
 
 /* ---------- Actions ---------- */
@@ -155,7 +181,8 @@ const ACT = {
   edit() { UI.ov = null; UI.screen = 'tac'; render(); },
   kick() { startMatch(); UI.mspeed = UI.speed > 2 ? 2 : 1; UI.live = true; UI.ht = false; UI.ov = 'match'; renderOv(); LT = setTimeout(liveTick, 600); },
   mspeed(d) { UI.mspeed = +d.i; renderOv(); },
-  skip() { clearTimeout(LT); UI.live = false; UI.ht = false; if (!M.htDone) M.htDone = true; if (!M.htm) M.htm = { a: 0, d: 0, m: 0 }; while (!M.done) stepBlock(); applyResult(); renderOv(); },
+  scn() { UI.scn = UI.scn === false; try { localStorage.setItem('scg-scn', UI.scn === false ? '0' : '1'); } catch (e) {} renderOv(); },
+  skip() { Scenes.stop(); clearTimeout(LT); UI.live = false; UI.ht = false; if (!M.htDone) M.htDone = true; if (!M.htm) M.htm = { a: 0, d: 0, m: 0 }; while (!M.done) stepBlock(); applyResult(); renderOv(); },
   ht(d) { M.htm = d.i === 'enc' ? { a: 2, d: 1, m: 4 } : d.i === 'push' ? { a: 4, d: -2, m: 1 } : { a: -3, d: 4, m: 0 }; if (d.i === 'enc') G.lineup.map(P).forEach((p) => { if (p) p.moral = clamp(p.moral + 2, 0, 100); }); UI.ht = false; M.feed.push({ t: 'Reprise de la seconde période.', c: '' }); renderOv(); LT = setTimeout(liveTick, 500); },
   after() { UI.ov = null; UI.live = false; M = null; render(); runSim(); },
   newseason() { UI.ov = null; render(); },
@@ -195,6 +222,7 @@ document.addEventListener('change', (e) => {
 });
 
 /* ---------- Init ---------- */
+try { if (localStorage.getItem('scg-scn') === '0') UI.scn = false; } catch (e) {}
 const hadSavedCareer = load();
 if (!hadSavedCareer) newGame();
 if (G.match) { UI.ov = null; }

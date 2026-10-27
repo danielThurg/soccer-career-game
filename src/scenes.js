@@ -1,0 +1,430 @@
+/* ---------- Scènes cinématiques (penalty, coup franc, rouge, trophée, blessure) ---------- */
+const Scenes = (() => {
+'use strict';
+const CSS = "#scn #scFrame{position:relative;width:844px;height:390px;transform-origin:center center;flex:none;overflow:hidden;border-radius:10px;background:#000}\n#scn #scShk,#scn #scCam{position:absolute;left:0;top:0}\n#scn #scShk{width:844px;height:390px}\n#scn #scCam{transform-origin:0 0}\n#scn #scFx{position:absolute;inset:0;pointer-events:none;overflow:hidden}\n#scn .bar{position:absolute;left:0;right:0;height:0;background:#000;z-index:30;transition:height .5s ease}\n#scn .bar.t{top:0}#scn .bar.b{bottom:0}\n#scn .on .bar{height:34px}\n#scn .vig{position:absolute;inset:0;z-index:20;background:radial-gradient(ellipse at center,transparent 45%,rgba(20,8,0,.75) 100%);opacity:.55;transition:opacity .6s}\n#scn .vig.red{background:radial-gradient(ellipse at center,transparent 35%,rgba(190,30,30,.8) 100%)}\n#scn .vig.pulse{animation:schb 1s ease-in-out infinite}\n@keyframes schb{0%,100%{opacity:.45}18%{opacity:.85}30%{opacity:.5}46%{opacity:.8}}\n#scn .flash{position:absolute;inset:0;z-index:25;background:#fff;opacity:0}\n#scn .big{position:absolute;left:50%;top:40%;z-index:28;font-weight:800;font-size:62px;line-height:1;white-space:nowrap;color:var(--gold);-webkit-text-stroke:5px var(--ink);paint-order:stroke fill;text-shadow:0 6px 0 var(--ink);letter-spacing:.02em;transform:translate(-50%,-50%);animation:scslam .55s cubic-bezier(.2,1.4,.4,1) both}\n#scn .big.red{color:#E34B3F}#scn .big.sage{color:#9DC98C}#scn .big.dim{color:#C9C2BA;font-size:50px}\n@keyframes scslam{0%{transform:translate(-50%,-50%) scale(3.2) rotate(-6deg);opacity:0}30%{opacity:1}100%{transform:translate(-50%,-50%) scale(1) rotate(0)}}\n#scn .sub{position:absolute;left:50%;top:58%;z-index:28;transform:translateX(-50%);background:var(--ink);color:var(--cream);font-weight:800;font-size:14px;padding:3px 14px;border-radius:99px;white-space:nowrap;animation:scfadein .5s .35s both}\n@keyframes scfadein{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}\n#scn .cap{position:absolute;left:50%;bottom:44px;z-index:28;transform:translateX(-50%);max-width:88%;background:#FFFDF8;color:var(--ink);border:2px solid var(--ink);border-radius:12px;padding:5px 12px;font-weight:800;font-size:13px;text-align:center;animation:scfadein .5s both}\n#scn .fade{transition:opacity .5s}\n#scn .ch{position:absolute;left:0;top:0;transform-origin:50% 78%}\n#scn .ch svg{width:100%;height:100%;display:block;overflow:visible}\n#scn .ball{position:absolute;left:0;top:0;width:18px;height:18px;margin:-9px 0 0 -9px;z-index:900}\n#scn .crowd .cw0,#scn .crowd .cw1{animation:sccb 1.6s ease-in-out infinite}\n#scn .crowd .cw1{animation-delay:-.8s}\n#scn .crowd.hot .cw0,#scn .crowd.hot .cw1{animation:sccb .38s ease-in-out infinite}\n#scn .crowd.hot .cw1{animation-delay:-.19s}\n@keyframes sccb{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}\n#scn .dot{position:absolute;border-radius:50%;pointer-events:none}\n#scn .float{position:absolute;z-index:26;font-weight:800;color:#FFF0CD;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;font-size:20px;white-space:nowrap}\n#scn #ui{flex:none;display:flex;gap:6px;align-items:center;padding:6px 10px;background:#2B1D14;border-top:2px solid #4B3527;overflow-x:auto}\n#scn #ui button{flex:none;min-height:36px;padding:0 12px;border-radius:10px;border:2px solid #4B3527;background:#3A2A1E;color:var(--cream);font:800 12.5px 'Nunito',system-ui,sans-serif;cursor:pointer}\n#scn #ui button.on{background:var(--gold);color:var(--ink);border-color:var(--ink)}\n#scn #ui .sep{width:2px;height:22px;background:#4B3527;flex:none}\n#scn #ui .lbl{font-size:11px;font-weight:800;opacity:.7;flex:none}\n</style>\n#scn{--ink:#2B1D14;--brown:#4B3527;--cream:#FFF0CD;--gold:#F0C253;--rose:#DF9287;--sage:#86AD78;--blue:#438BC0;position:fixed;inset:0;z-index:80;background:#120C08;display:flex;align-items:center;justify-content:center;font-family:'Nunito',system-ui,sans-serif;color:#FFF0CD;-webkit-user-select:none;user-select:none}\n#scn[hidden]{display:none}\n#scn .scskip{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(8px,env(safe-area-inset-bottom));z-index:90;background:rgba(43,29,20,.8);color:#FFF0CD;border:2px solid #FFF0CD;border-radius:99px;padding:6px 16px;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer}";
+const W = 844, H = 390;
+let root = null, cam, shk, fxl, frame, SID = 0, TS = 1, WD = 844, curRes = null;
+const $s = (id) => root.querySelector('#' + id);
+
+const C = { x: 422, y: 195, s: 1 };
+class Cancel extends Error {}
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const rnd = (a, b) => a + Math.random() * (b - a);
+const ease = { io: (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, out: (t) => 1 - Math.pow(1 - t, 3), lin: (t) => t, in: (t) => t * t };
+const guard = (id, p) => p.then(() => { if (id !== SID) throw new Cancel(); }, () => { if (id !== SID) throw new Cancel(); });
+const fire = (p) => { p.catch(() => {}); return p; };
+function sleep(ms) { const id = SID; return new Promise((r) => setTimeout(r, ms * TS)).then(() => { if (id !== SID) throw new Cancel(); }); }
+function tween(ms, fn, e) {
+  const id = SID, f = e || ease.io;
+  return new Promise((res, rej) => {
+    const t0 = performance.now();
+    (function step(now) {
+      if (id !== SID) { rej(new Cancel()); return; }
+      const t = clamp((now - t0) / (ms * TS), 0, 1);
+      fn(f(t), t);
+      if (t < 1) requestAnimationFrame(step); else res();
+    })(t0);
+  });
+}
+function applyCam() { C.x = clamp(C.x, W / 2 / C.s, Math.max(W / 2 / C.s, WD - W / 2 / C.s)); C.y = clamp(C.y, H / 2 / C.s, H - H / 2 / C.s); cam.style.transform = 'translate(' + (W / 2 - C.x * C.s) + 'px,' + (H / 2 - C.y * C.s) + 'px) scale(' + C.s + ')'; }
+function setCam(x, y, s) { C.x = x; C.y = y; C.s = s; applyCam(); }
+function camTo(x, y, s, ms, e) { const a = { x: C.x, y: C.y, s: C.s }; return tween(ms, (t) => setCam(a.x + (x - a.x) * t, a.y + (y - a.y) * t, a.s + (s - a.s) * t), e); }
+function shake(px, ms) { return tween(ms, (t) => { const k = (1 - t) * px; shk.style.transform = 'translate(' + rnd(-k, k) + 'px,' + rnd(-k, k) + 'px)'; }, ease.lin).then(() => { shk.style.transform = ''; }); }
+function flash(color, ms, peak) { const f = $s('flash'); f.style.background = color || '#fff'; f.animate([{ opacity: peak || .85 }, { opacity: 0 }], { duration: (ms || 300) * TS, easing: 'ease-out' }); }
+function bars(on) { frame.classList.toggle('on', !!on); }
+function vig(mode) { const v = $s('vig'); v.className = 'vig' + (mode === 'red' ? ' red' : mode === 'pulse' ? ' pulse' : ''); v.style.opacity = mode === 'off' ? 0 : ''; }
+function big(txt, cls, ms) { const e = document.createElement('div'); e.className = 'big ' + (cls || ''); e.textContent = txt; fxl.appendChild(e); setTimeout(() => { e.style.transition = 'opacity .4s'; e.style.opacity = 0; setTimeout(() => e.remove(), 450); }, (ms || 1600) * TS); return e; }
+function sub(txt, ms) { const e = document.createElement('div'); e.className = 'sub'; e.textContent = txt; fxl.appendChild(e); setTimeout(() => { e.style.transition = 'opacity .4s'; e.style.opacity = 0; setTimeout(() => e.remove(), 450); }, (ms || 1800) * TS); }
+function cap(txt) { document.querySelectorAll('.cap').forEach((x) => x.remove()); const e = document.createElement('div'); e.className = 'cap'; e.textContent = txt; fxl.appendChild(e); }
+function floatTxt(txt, x, y, ms, dy) { const e = document.createElement('div'); e.className = 'float'; e.textContent = txt; e.style.left = x + 'px'; e.style.top = y + 'px'; cam.appendChild(e); e.animate([{ transform: 'translate(-50%,0)', opacity: 0 }, { transform: 'translate(-50%,' + ((dy || -24) / 2) + 'px)', opacity: 1, offset: .2 }, { transform: 'translate(-50%,' + (dy || -24) + 'px)', opacity: 0 }], { duration: (ms || 1400) * TS, fill: 'forwards' }); setTimeout(() => e.remove(), (ms || 1400) * TS + 50); }
+
+/* ---------- Characters ---------- */
+function char(p, o) {
+  const w = o.w || 80, h = w * 1.58, el = document.createElement('div');
+  el.className = 'ch'; el.style.width = w + 'px'; el.style.height = h + 'px'; el.style.left = (-w / 2) + 'px'; el.style.top = (-h) + 'px';
+  el.innerHTML = chibi(p, 'rig', o.mood || 'neutral');
+  el._p = p; el._w = w; el._s = { x: o.x, y: o.y, r: 0, sx: o.flip ? -1 : 1, sy: 1 };
+  el._anims = [];
+  el.style.transform = tf(el._s); el.style.zIndex = Math.round(o.y);
+  cam.appendChild(el);
+  return el;
+}
+const tf = (s) => 'translate(' + s.x + 'px,' + s.y + 'px) rotate(' + s.r + 'deg) scale(' + s.sx + ',' + s.sy + ')';
+function go(ch, to, ms, e) {
+  const id = SID, from = tf(ch._s); Object.assign(ch._s, to); const t = tf(ch._s);
+  if (to.y !== undefined) ch.style.zIndex = Math.round(Math.max(to.y, 0));
+  const a = ch.animate([{ transform: from }, { transform: t }], { duration: ms * TS, easing: e || 'ease-in-out', fill: 'forwards' });
+  return guard(id, a.finished.then(() => { ch.style.transform = t; a.cancel(); }));
+}
+function rot(ch, name, deg, ms, e) {
+  const el = ch.querySelector('.' + name); if (!el) return Promise.resolve();
+  const id = SID, from = el._r || 0; el._r = deg;
+  const a = el.animate([{ transform: 'rotate(' + from + 'deg)' }, { transform: 'rotate(' + deg + 'deg)' }], { duration: ms * TS, easing: e || 'ease-in-out', fill: 'forwards' });
+  return guard(id, a.finished);
+}
+function pose(ch, P, ms, e) { const m = { aL: 'armL', aR: 'armR', lL: 'legL', lR: 'legR', hd: 'head', tr: 'torso' }; return Promise.all(Object.keys(P).map((k) => rot(ch, m[k], P[k], ms, e))); }
+function cycle(ch, on, speed) {
+  (ch._anims || []).forEach((a) => a.cancel()); ch._anims = [];
+  if (!on) return;
+  const d = (speed || 260) * TS, sw = speed && speed > 300 ? 18 : 30;
+  const mk = (cls, a, b, delay) => { const el = ch.querySelector('.' + cls); const an = el.animate([{ transform: 'rotate(' + a + 'deg)' }, { transform: 'rotate(' + b + 'deg)' }], { duration: d, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out', delay: delay || 0 }); ch._anims.push(an); };
+  mk('legL', -sw, sw); mk('legR', sw, -sw); mk('armL', sw * .8, -sw * .8); mk('armR', sw * .8, -sw * .8);
+}
+function setMood(ch, mood) { const t = document.createElement('div'); t.innerHTML = chibi(ch._p, 'rig', mood); ch.querySelector('.head').innerHTML = t.querySelector('.head').innerHTML; }
+async function run(ch, to, ms, speed) { cycle(ch, true, speed); await go(ch, to, ms, 'linear'); cycle(ch, false); }
+async function hop(ch, amp, ms, n) { const y0 = ch._s.y; for (let i = 0; i < (n || 1); i++) { await go(ch, { y: y0 - amp }, ms / 2, 'ease-out'); await go(ch, { y: y0 }, ms / 2, 'ease-in'); } }
+
+/* ---------- Ball, goal, background ---------- */
+function ball(x, y) {
+  const e = document.createElement('div'); e.className = 'ball';
+  e.innerHTML = '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#fff" stroke="#2B1D14" stroke-width="1.8"/><path d="M10 5l4 3-1.5 5h-5L6 8z" fill="#2B1D14"/><path d="M10 5V1M14 8l4-2M12.5 13l2.500 4M7.500 13l-2.500 4M6 8L2 6" stroke="#2B1D14" stroke-width="1.2"/></svg>';
+  e._x = x; e._y = y; e._z = 1; setBall(e, x, y); cam.appendChild(e); return e;
+}
+function setBall(e, x, y, s, z) { e._x = x; e._y = y; e.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (s || 1) + ')'; if (z !== undefined) e.style.zIndex = z; }
+function arc(e, to, h, ms, e2, onFrame) {
+  const a = { x: e._x, y: e._y };
+  return tween(ms, (t) => { const x = a.x + (to.x - a.x) * t, y = a.y + (to.y - a.y) * t - 4 * h * t * (1 - t); setBall(e, x, y, 1, 900); if (onFrame) onFrame(x, y, t); }, e2 || ease.lin);
+}
+function trail(x, y) { const d = document.createElement('i'); d.className = 'dot'; d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:9px;height:9px;margin:-4px;background:rgba(255,255,255,.7);z-index:800'; cam.appendChild(d); d.animate([{ opacity: .8, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.2)' }], { duration: 450 * TS }); setTimeout(() => d.remove(), 500 * TS); }
+function goal(x, y, w, h) {
+  const g = document.createElement('div'); g.style.cssText = 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;z-index:' + (Math.round(y + h) - 5);
+  g.innerHTML = '<div class="net" style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.28) 0 2px,transparent 2px 9px),repeating-linear-gradient(-45deg,rgba(255,255,255,.28) 0 2px,transparent 2px 9px),rgba(20,30,20,.35);border:5px solid #FFFDF8;border-right:0;border-radius:4px 0 0 4px;transform-origin:100% 50%"></div>';
+  cam.appendChild(g); return g.firstChild;
+}
+const CROWD = ['#C46A55', '#438BC0', '#F0C253', '#FFF0CD', '#86AD78', '#DF9287', '#4B3527', '#2B1D14'];
+function build(wd, lines) {
+  WD = wd; cam.innerHTML = ''; cam.style.width = wd + 'px'; cam.style.height = H + 'px';
+  let rows = '';
+  for (let r = 0; r < 6; r++) { let c = ''; for (let x = -10 + (r % 2) * 7; x < wd + 10; x += 14) c += '<circle cx="' + x + '" cy="' + (88 + r * 17 + rnd(-2, 2)) + '" r="6.2" fill="' + CROWD[Math.floor(Math.random() * CROWD.length)] + '"/>'; rows += '<g class="cw' + (r % 2) + '">' + c + '</g>'; }
+  let ads = '';
+  const AD = ['BOULANGERIE DUBÉ', 'CLUB NORDVILLE', 'GUYTIDE GAMES', 'UNION SUD'];
+  for (let x = 0, i = 0; x < wd; x += 170, i++) ads += '<rect x="' + x + '" y="190" width="168" height="24" fill="' + ['#4B3527', '#438BC0', '#2B1D14', '#C46A55'][i % 4] + '"/><text x="' + (x + 84) + '" y="207" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="12" fill="#FFF0CD">' + AD[i % 4] + '</text>';
+  let st = ''; for (let x = 0, i = 0; x < wd; x += 70, i++) st += '<rect x="' + x + '" y="214" width="70" height="176" fill="' + (i % 2 ? '#5E8A57' : '#68955F') + '"/>';
+  cam.insertAdjacentHTML('afterbegin', '<svg class="crowdsvg" width="' + wd + '" height="' + H + '" style="position:absolute;left:0;top:0"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#141C2B"/><stop offset="1" stop-color="#34455C"/></linearGradient><radialGradient id="fl"><stop offset="0" stop-color="#FFF6D8" stop-opacity=".95"/><stop offset="1" stop-color="#FFF6D8" stop-opacity="0"/></radialGradient></defs><rect width="' + wd + '" height="215" fill="url(#sky)"/><rect y="70" width="' + wd + '" height="120" fill="#202B3B"/><g class="crowd" id="crowd">' + rows + '</g><rect y="70" width="' + wd + '" height="120" fill="#0B0F18" opacity=".38"/>' + ads + '<circle cx="70" cy="40" r="95" fill="url(#fl)"/><circle cx="' + (wd - 70) + '" cy="40" r="95" fill="url(#fl)"/>' + st + '<g stroke="#FFFDF8" stroke-width="2.5" fill="none" opacity=".75">' + (lines || '') + '</g></svg>');
+  const cr = cam.querySelector('.crowd'); if (cr) cr.parentNode.classList.add('crowdroot');
+}
+function crowdHot(on) { const c = $s('crowd'); if (c) c.classList.toggle('hot', on); }
+function confetti(n, x, y, spread, up) {
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement('i'); d.className = 'dot';
+    const col = ['#F0C253', '#DF9287', '#86AD78', '#438BC0', '#FFF0CD'][i % 5];
+    d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + rnd(5, 8) + 'px;height:' + rnd(8, 12) + 'px;border-radius:1px;background:' + col + ';z-index:950';
+    cam.appendChild(d);
+    const dx = rnd(-spread, spread), top = -rnd(up * .5, up), fall = rnd(120, 220);
+    d.animate([{ transform: 'translate(0,0) rotate(0)', opacity: 1 }, { transform: 'translate(' + dx * .6 + 'px,' + top + 'px) rotate(' + rnd(100, 300) + 'deg)', opacity: 1, offset: .4 }, { transform: 'translate(' + dx + 'px,' + fall + 'px) rotate(' + rnd(400, 800) + 'deg)', opacity: 0 }], { duration: rnd(1600, 2600) * TS, easing: 'ease-out', delay: rnd(0, 300) * TS });
+    setTimeout(() => d.remove(), 3200 * TS);
+  }
+}
+function firework(x, y, col) {
+  for (let i = 0; i < 18; i++) {
+    const a = i / 18 * Math.PI * 2, d = document.createElement('i'); d.className = 'dot'; const r = rnd(50, 85);
+    d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:5px;height:5px;margin:-2px;background:' + (col || '#F0C253') + ';box-shadow:0 0 8px ' + (col || '#F0C253') + ';z-index:20';
+    cam.appendChild(d);
+    d.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * r + 'px,' + (Math.sin(a) * r + 20) + 'px) scale(.4)', opacity: 0 }], { duration: 1100 * TS, easing: 'cubic-bezier(.1,.7,.3,1)' });
+    setTimeout(() => d.remove(), 1200 * TS);
+  }
+}
+function rippleNet(net) { net.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(1.18) scaleY(1.04)' }, { transform: 'scaleX(.96)' }, { transform: 'scaleX(1.06)' }, { transform: 'scaleX(1)' }], { duration: 900 * TS }); }
+
+/* ---------- Casting : vrais joueurs / maillots ---------- */
+const GKC = ['#8A8F98', '#4B4F57'];
+const strHash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+function oppCast() {
+  const ot = T(M.opp), col = teamCol(M.opp);
+  return ot.names.map((n, i) => {
+    const hs = strHash(ot.name + n + i);
+    const g = (k) => ((hs >>> k) & 255) / 255;
+    const L = { skin: SKIN[(hs >>> 3) % SKIN.length], hair: HAIR[(hs >>> 5) % HAIR.length], hc: HCOL[(hs >>> 7) % HCOL.length], beard: BEARD[(hs >>> 9) % BEARD.length] };
+    L.bc = L.hc;
+    return { name: n, num: i === 0 ? 1 : i + 1, build: 0.82 + g(2) * 0.55, look: L, kit: i === 0 ? GKC : col, kitStyle: i === 0 ? 'plain' : 'stripes', pos: i === 0 ? 'GB' : 'MIL' };
+  });
+}
+function ourCast() {
+  const l = G.lineup.map(P).filter(Boolean).map(pv);
+  return { gk: l.find((p) => p.pos === 'GB') || l[0], out: l.filter((p) => p.pos !== 'GB') };
+}
+const REF = { name: 'Arbitre', num: '', build: 1, look: { skin: '#E3BC98', hair: 'buzz', hc: '#6A625A' }, kit: ['#2B1D14', '#F0C253'], kitStyle: 'plain', pos: 'MIL' };
+const MED1 = { name: 'Nadia', num: '', build: 0.9, look: { skin: '#C49A6C', hair: 'long', hc: '#1C1410' }, kit: ['#FFFDF8', '#DF9287'], kitStyle: 'plain', pos: 'MIL' };
+const MED2 = { name: 'Marc', num: '', build: 1.1, look: { skin: '#E3BC98', hair: 'slick', hc: '#B8B8B8', gray: true }, kit: ['#FFFDF8', '#DF9287'], kitStyle: 'plain', pos: 'MIL' };
+const pick2 = (a, n, skipNames) => a.filter((x) => !skipNames || skipNames.indexOf(x.name) < 0).slice(0, n);
+const stand = (ch, mood) => { cycle(ch, false); if (mood) setMood(ch, mood); };
+const nm = () => T(M.opp).name;
+
+/* ---------- Scènes ---------- */
+const SCENES = {};
+// ctx : { us, ok, taker(player view|opp), min }
+SCENES.pen = async (c) => {
+  const o = oppCast(), u = ourCast(), save = !c.ok;
+  const shooter = c.us ? c.taker : c.taker;
+  const keeper = c.us ? o[0] : u.gk;
+  const atk = c.us ? u.out.filter((p) => p.name !== shooter.name) : o.slice(1).filter((p) => p.name !== shooter.name);
+  const dfn = c.us ? o.slice(1) : u.out;
+  build(844, '<rect x="560" y="226" width="284" height="150" /><rect x="740" y="262" width="104" height="78"/><circle cx="440" cy="342" r="3" fill="#fff"/>');
+  const net = goal(700, 148, 150, 152);
+  const kofi = char(keeper, { x: 772, y: 302, w: 104, mood: 'focus' });
+  const leo = char(shooter, { x: 170, y: 340, w: 98, mood: 'focus' });
+  const bys = [char(atk[0], { x: 80, y: 262, w: 54, mood: 'focus' }), char(atk[1], { x: 230, y: 256, w: 54, mood: 'focus' }), char(dfn[0], { x: 520, y: 258, w: 54, mood: 'focus' }), char(dfn[1], { x: 600, y: 254, w: 56, mood: 'focus' })];
+  const bl = ball(440, 340);
+  setCam(422, 200, 1); bars(true); vig('pulse');
+  fire(camTo(560, 236, 1.3, 2600));
+  big('PÉNALTY !', c.us ? '' : 'red', 1800); sub(c.min + '’ · ' + (c.us ? T(ME).name : nm()), 2000);
+  fire(pose(kofi, { aL: 55, aR: -55 }, 500));
+  fire((async () => { for (let i = 0; i < 3; i++) { await go(kofi, { x: 745 }, 380); await go(kofi, { x: 800 }, 380); } await go(kofi, { x: 772 }, 250); })());
+  await sleep(1900);
+  await run(leo, { x: 110 }, 700, 360);
+  await sleep(350);
+  await run(leo, { x: 405 }, 820, 230);
+  fire(pose(leo, { lR: 48, aL: 40, aR: -40 }, 120));
+  await sleep(130);
+  await pose(leo, { lR: -78 }, 90, 'ease-in');
+  flash('#fff', 140, .3); vig('off');
+  const tgt = save ? { x: 783, y: 232 } : { x: 800, y: 184 };
+  fire(camTo(640, 232, 1.45, 1100));
+  fire(arc(bl, tgt, 60, save ? 520 : 600, ease.out, (x, y, t) => { if (t % 0.1 < 0.05) trail(x, y); }));
+  const dirOK = save ? 1 : -1;
+  fire(go(kofi, { x: 772 + dirOK * 48, y: 262, r: dirOK * 72 }, save ? 520 : 620, 'ease-out'));
+  fire(pose(kofi, { aL: dirOK > 0 ? 175 : 40, aR: -175 }, 450));
+  fire(pose(leo, { lR: -10, aL: 0, aR: 0 }, 400));
+  await sleep(save ? 520 : 600);
+  const good = c.ok === c.us; // bonne nouvelle pour nous ?
+  if (!save) {
+    rippleNet(net); flash('#fff', 260, .9); shake(9, 500); crowdHot(true);
+    setBall(bl, 825, 215, 1, 5);
+    big(c.us ? 'BUUUT !' : 'BUT ADVERSE', c.us ? '' : 'red', 2300); if (c.us) confetti(34, 680, 120, 260, 120);
+    fire(camTo(520, 245, 1.05, 1400));
+    for (const b of bys.slice(0, 2)) { setMood(b, 'laugh'); fire(go(b, { x: b._s.x + 220, y: 330 }, 900)); cycle(b, true, 220); setTimeout(() => cycle(b, false), 900 * TS); }
+    setMood(leo, 'laugh'); setMood(kofi, 'pain');
+    cap(c.us ? shooter.name + ' transforme le penalty.' : shooter.name + ' (' + nm() + ') marque sur penalty.');
+    fire(go(kofi, { y: 302, r: -90, x: 735 }, 500));
+    cycle(leo, true, 200); await go(leo, { x: 470, y: 352, sx: 1.18, sy: 1.18 }, 1100, 'ease-out'); cycle(leo, false);
+    fire(pose(leo, { aL: 165, aR: -165 }, 250)); await go(leo, { r: -26 }, 450, 'ease-out');
+    await sleep(500); await hop(leo, 26, 420, 3);
+  } else {
+    setBall(bl, 782, 236, 1, 5); flash('#fff', 180, .5); shake(5, 300);
+    await arc(bl, { x: 724, y: 178 }, 50, 420, ease.out);
+    big('ARRÊTÉ !', c.us ? 'red' : 'sage', 2200); setMood(leo, 'pain'); setMood(kofi, 'happy'); crowdHot(true);
+    fire(pose(leo, { aL: 160, aR: -160 }, 400)); fire(go(leo, { r: 10, y: 340 }, 500));
+    fire(arc(bl, { x: kofi._s.x - 8, y: 264 }, 30, 500));
+    cap(c.us ? keeper.name + ' détourne le penalty de ' + shooter.name + '. ' + shooter.name + ' perd du moral.' : keeper.name + ' arrête le penalty de ' + shooter.name + ' !');
+    await sleep(1600); fire(go(kofi, { r: 0, y: 300 }, 700));
+    await sleep(900);
+  }
+  await sleep(900);
+};
+// ctx : { us, out:'goal'|'post', taker, min }
+SCENES.fk = async (c) => {
+  const o = oppCast(), u = ourCast(), post = c.out === 'post';
+  const sh = c.taker, keeper = c.us ? o[0] : u.gk;
+  const wallT = c.us ? o.slice(1) : u.out, mateT = (c.us ? u.out : o.slice(1)).filter((p) => p.name !== sh.name);
+  build(1300, '<rect x="1000" y="226" width="300" height="150"/><rect x="1160" y="262" width="140" height="78"/><circle cx="330" cy="344" r="3" fill="#fff"/>');
+  const net = goal(1160, 148, 140, 152);
+  const kofi = char(keeper, { x: 1200, y: 302, w: 104, mood: 'focus' });
+  const wall = [char(wallT[0], { x: 700, y: 330, w: 84, mood: 'focus' }), char(wallT[1], { x: 752, y: 334, w: 92, mood: 'focus' }), char(wallT[2], { x: 804, y: 330, w: 80, mood: 'focus' })];
+  const sam = char(sh, { x: 200, y: 346, w: 94, mood: 'focus' });
+  char(mateT[0], { x: 900, y: 262, w: 56, mood: 'focus' }); char(mateT[1], { x: 1010, y: 258, w: 58, mood: 'focus' });
+  const bl = ball(330, 346);
+  setCam(480, 220, 1.05); bars(true); vig('pulse');
+  fire(camTo(520, 232, 1.18, 2800));
+  big('COUP FRANC !', c.us ? '' : 'red', 1900); sub(c.min + '’ · à 22 mètres', 2100);
+  wall.forEach((w) => fire(pose(w, { aL: -28, aR: 28 }, 400)));
+  fire(go(wall[0], { x: 690 }, 800)); fire(go(wall[2], { x: 816 }, 800));
+  fire(pose(kofi, { aL: 50, aR: -50 }, 500));
+  await sleep(2100);
+  await run(sam, { x: 110 }, 600, 380);
+  await sleep(350);
+  await run(sam, { x: 295 }, 700, 230);
+  fire(pose(sam, { lR: 50 }, 110)); await sleep(120);
+  await pose(sam, { lR: -80 }, 90, 'ease-in'); flash('#fff', 140, .3); vig('off');
+  const P0 = { x: 330, y: 346 }, P1 = { x: 800, y: 20 }, P2 = post ? { x: 1215, y: 150 } : { x: 1262, y: 196 };
+  fire(pose(sam, { lR: -8 }, 400));
+  wall.forEach((w) => fire(go(w, { y: w._s.y - 46 }, 260, 'ease-out')));
+  setTimeout(() => wall.forEach((w) => fire(go(w, { y: w._s.y + 46 }, 300, 'ease-in'))), 330 * TS);
+  fire(go(kofi, { x: 1200 + (post ? 24 : -30), y: 258, r: post ? 55 : -62 }, 900, 'ease-out'));
+  fire(pose(kofi, { aL: 175, aR: -175 }, 700));
+  await tween(1500, (t) => {
+    const x = (1 - t) * (1 - t) * P0.x + 2 * (1 - t) * t * P1.x + t * t * P2.x, y = (1 - t) * (1 - t) * P0.y + 2 * (1 - t) * t * P1.y + t * t * P2.y;
+    setBall(bl, x, y, 1, 900); if (Math.random() < .5) trail(x, y);
+    setCam(clamp(x - 60, 520, 880), 225, 1.18 + .2 * t);
+  }, ease.out);
+  if (post) {
+    flash('#fff', 300, .8); shake(12, 600); big('BARRE !', 'red', 1700);
+    floatTxt('CLANG', 1190, 130, 1200, -30);
+    fire(arc(bl, { x: 1040, y: 330 }, 120, 900, ease.out));
+    setMood(sam, 'pain'); fire(pose(sam, { aL: 165, aR: -165 }, 400));
+    cap(sh.name + ' touche la barre.');
+    await sleep(1800);
+  } else {
+    rippleNet(net); flash('#fff', 280, .9); shake(9, 500); crowdHot(true); setBall(bl, 1285, 205, 1, 5);
+    big(c.us ? 'BUUUT !' : 'BUT ADVERSE', c.us ? '' : 'red', 2300); if (c.us) confetti(36, 1210, 130, 280, 120);
+    setMood(sam, 'laugh'); fire(pose(sam, { aL: 165, aR: -165 }, 300)); fire(camTo(560, 235, 1.1, 1500));
+    cycle(sam, true, 200); await go(sam, { x: 420, y: 352, sx: 1.15, sy: 1.15 }, 1100, 'ease-out'); cycle(sam, false);
+    cap(c.us ? 'Coup franc magistral de ' + sh.name + '.' : sh.name + ' (' + nm() + ') ajuste un coup franc.');
+    await hop(sam, 26, 420, 3);
+  }
+  await sleep(700);
+};
+// ctx : { us (le fautif est chez nous), p (joueur ou {name}), min }
+SCENES.red = async (c) => {
+  const o = oppCast(), u = ourCast();
+  const off = c.us ? c.p : o[1 + Math.floor(Math.random() * 6)];
+  const vic = c.us ? o[2] : u.out[Math.floor(Math.random() * u.out.length)];
+  const mate = c.us ? u.out.filter((p) => p.name !== off.name)[0] : o.filter((p, i) => i > 0 && p.name !== off.name)[0];
+  build(844, '<line x1="422" y1="214" x2="422" y2="390"/><circle cx="422" cy="316" r="52"/>');
+  const sil = char(vic, { x: 90, y: 334, w: 88, mood: 'happy' });
+  const ibra = char(off, { x: 520, y: 338, w: 118, mood: 'focus' });
+  const rafa = char(mate, { x: 700, y: 336, w: 92, mood: 'neutral' });
+  const ref = char(REF, { x: 930, y: 322, w: 92, mood: 'neutral' });
+  const bl = ball(130, 346);
+  setCam(422, 215, 1); bars(true);
+  big('TACLE DANGEREUX', 'red', 1400);
+  fire((async () => { cycle(sil, true, 220); await go(sil, { x: 360 }, 1500, 'linear'); })());
+  fire(tween(1500, (t) => setBall(bl, 130 + 300 * t, 346 - Math.abs(Math.sin(t * 18)) * 12, 1, 600), ease.lin));
+  await sleep(1150);
+  fire(go(ibra, { x: 400, r: 78, y: 346 }, 420, 'ease-in'));
+  fire(pose(ibra, { lL: -10, lR: -35, aL: 100, aR: -100 }, 350));
+  await sleep(420); shake(10, 400); flash('#fff', 120, .35);
+  cycle(sil, false); setMood(sil, 'pain'); setMood(ibra, 'shock');
+  fire(arc(bl, { x: 640, y: 360 }, 80, 900, ease.out));
+  fire(go(sil, { x: 420, y: 300, r: 140 }, 380, 'ease-out')); await sleep(380);
+  await go(sil, { x: 450, y: 352, r: 98 }, 360, 'ease-in'); shake(6, 250);
+  floatTxt('PHRRRIT !', 430, 190, 1500, -30);
+  fire(camTo(520, 235, 1.22, 1200));
+  fire(go(ibra, { r: 0, x: 395, y: 340 }, 700)); fire(pose(ibra, { lL: 0, lR: 0, aL: 40, aR: -40 }, 500));
+  setMood(ibra, 'angry');
+  await run(ref, { x: 560 }, 1100, 240);
+  fire(go(rafa, { x: 480, y: 340 }, 800)); fire(pose(rafa, { aL: 70, aR: -70 }, 500)); setMood(rafa, 'angry');
+  await sleep(400);
+  await pose(ref, { aR: -172 }, 260, 'ease-out');
+  const card = document.createElement('div'); card.style.cssText = 'position:absolute;width:20px;height:30px;background:#E34B3F;border:2px solid #2B1D14;border-radius:3px;z-index:990;left:0;top:0;transform:translate(' + (ref._s.x + 22) + 'px,' + (ref._s.y - 190) + 'px) scale(0)';
+  cam.appendChild(card); card.animate([{ transform: 'translate(' + (ref._s.x + 22) + 'px,' + (ref._s.y - 190) + 'px) scale(0)' }, { transform: 'translate(' + (ref._s.x + 22) + 'px,' + (ref._s.y - 200) + 'px) scale(1.7)' }], { duration: 250 * TS, fill: 'forwards', easing: 'cubic-bezier(.2,1.6,.4,1)' });
+  flash('#E34B3F', 600, .55); vig('red'); shake(8, 500);
+  big('CARTON ROUGE !', 'red', 2400); crowdHot(false); floatTxt('BOUUUH', 150, 120, 2200, -20); floatTxt('BOUUUH', 700, 140, 2200, -20);
+  fire(camTo(480, 225, 1.1, 1500));
+  await sleep(1500);
+  vig('off'); card.remove(); fire(pose(ref, { aR: 0, aL: 100 }, 400));
+  setMood(ibra, 'hurt'); fire(pose(ibra, { aL: 5, aR: -5, hd: 20 }, 500));
+  cap(c.us ? off.name + ' est exclu. Suspendu au prochain match, on termine à 6.' : off.name + ' (' + nm() + ') est exclu. L’adversaire joue à 6 !');
+  fire(camTo(300, 235, 1.0, 2600));
+  cycle(ibra, true, 520); await go(ibra, { x: -90 }, 3200, 'linear'); cycle(ibra, false);
+};
+// ctx : { big, sub, cap, cup }
+SCENES.trophy = async (c) => {
+  const u = ourCast(), capP = pv(P(G.captain) || u.out[0]);
+  const mates = u.out.concat([u.gk]).filter((p) => p.name !== capP.name).slice(0, 6);
+  build(844, '');
+  const xs = [[120, 336], [230, 342], [330, 338], [520, 338], [620, 342], [730, 336]];
+  const raf = char(capP, { x: 422, y: 346, w: 112, mood: 'happy' });
+  const team = mates.map((p, i) => char(p, { x: i < 3 ? -120 : 960, y: xs[i][1], w: 84 + (i % 2) * 6, mood: 'laugh' }));
+  const tro = document.createElement('div'); tro.style.cssText = 'position:absolute;left:0;top:0;z-index:960;width:64px;height:84px;transform:translate(422px,300px) scale(0)';
+  tro.innerHTML = '<svg viewBox="0 0 64 84" width="64" height="84"><g stroke="#2B1D14" stroke-width="3" stroke-linejoin="round"><path d="M12 8h40v16c0 14-8 24-20 26-12-2-20-12-20-26z" fill="#F0C253"/><path d="M12 14H3c0 14 6 22 15 24M52 14h9c0 14-6 22-15 24" fill="none"/><rect x="27" y="48" width="10" height="14" fill="#E2B34A"/><rect x="16" y="62" width="32" height="12" rx="3" fill="#F0C253"/><rect x="12" y="74" width="40" height="8" rx="2" fill="#B8872E"/></g><path d="M20 14v16" stroke="#FFF6D8" stroke-width="4" stroke-linecap="round"/></svg>';
+  cam.appendChild(tro);
+  const rays = document.createElement('div'); rays.style.cssText = 'position:absolute;left:0;top:0;width:360px;height:360px;margin:-180px;z-index:10;opacity:0;background:repeating-conic-gradient(rgba(255,230,140,.4) 0 8deg,transparent 8deg 24deg);border-radius:50%;-webkit-mask:radial-gradient(circle,#000 20%,transparent 70%);mask:radial-gradient(circle,#000 20%,transparent 70%)';
+  cam.appendChild(rays);
+  setCam(422, 200, 1); bars(true); crowdHot(true); vig('off');
+  big(c.big || 'CHAMPIONS !', '', 2000); sub(c.sub || T(ME).name, 2300);
+  firework(180, 90, '#F0C253'); setTimeout(() => firework(640, 70, '#DF9287'), 400 * TS); setTimeout(() => firework(420, 50, '#438BC0'), 800 * TS);
+  team.forEach((t, i) => { cycle(t, true, 240); fire(go(t, { x: xs[i][0] }, 1400 + i * 120, 'ease-out').then(() => { cycle(t, false); setMood(t, 'laugh'); })); });
+  await sleep(1700);
+  confetti(40, 20, 330, 300, 240); confetti(40, 824, 330, 300, 240);
+  tro.style.transform = 'translate(422px,330px) scale(1)';
+  tro.animate([{ transform: 'translate(422px,360px) scale(.2)' }, { transform: 'translate(422px,286px) scale(1)' }], { duration: 600 * TS, fill: 'forwards', easing: 'ease-out' });
+  fire(pose(raf, { aL: 55, aR: -55 }, 500));
+  await sleep(900);
+  fire(camTo(422, 240, 1.45, 2600));
+  await Promise.all([pose(raf, { aL: 168, aR: -168 }, 500, 'ease-out'), (async () => { await sleep(120); tro.animate([{ transform: 'translate(422px,286px) scale(1)' }, { transform: 'translate(422px,168px) scale(1.25)' }], { duration: 650 * TS, fill: 'forwards', easing: 'ease-out' }); })()]);
+  rays.style.left = '422px'; rays.style.top = '150px'; rays.style.opacity = 1; rays.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(360deg)' }], { duration: 12000 * TS, iterations: Infinity });
+  flash('#FFF6D8', 500, .7); confetti(60, 422, 160, 340, 200); firework(300, 100, '#86AD78'); setTimeout(() => firework(560, 90, '#F0C253'), 300 * TS);
+  cap(c.cap || '');
+  for (let k = 0; k < 3; k++) { team.forEach((t) => fire(pose(t, { aL: 160, aR: -160 }, 200))); await Promise.all(team.map((t, i) => (async () => { await sleep(i * 60); await hop(t, 30, 380, 1); })())); }
+  await sleep(900);
+};
+// ctx : { p (joueur blessé), days }
+SCENES.injury = async (c) => {
+  const o = oppCast(), u = ourCast();
+  const inj = pv(c.p), mt = u.out.filter((p) => p.name !== inj.name);
+  build(844, '<line x1="422" y1="214" x2="422" y2="390"/><circle cx="422" cy="316" r="52"/>');
+  const mat = char(inj, { x: 90, y: 338, w: 90, mood: 'focus' });
+  const cos = char(o[3], { x: 600, y: 342, w: 112, mood: 'focus' });
+  const mates = [char(mt[0], { x: 700, y: 262, w: 56 }), char(mt[1], { x: 780, y: 258, w: 56 }), char(mt[2], { x: 150, y: 258, w: 54 })];
+  const ref = char(REF, { x: 930, y: 330, w: 92 });
+  const m1 = char(MED1, { x: -120, y: 344, w: 84 }), m2 = char(MED2, { x: -190, y: 346, w: 92 });
+  const bl = ball(130, 350);
+  const stret = document.createElement('div'); stret.style.cssText = 'position:absolute;left:0;top:0;width:140px;height:28px;z-index:480;transform:translate(-220px,356px)';
+  stret.innerHTML = '<svg viewBox="0 0 140 28" width="140" height="28"><g stroke="#2B1D14" stroke-width="3" stroke-linejoin="round"><rect x="4" y="4" width="132" height="12" rx="5" fill="#438BC0"/><rect x="14" y="16" width="5" height="10" fill="#8A5A34"/><rect x="121" y="16" width="5" height="10" fill="#8A5A34"/></g></svg>';
+  cam.appendChild(stret);
+  setCam(422, 215, 1); bars(true);
+  fire(tween(1700, (t) => setBall(bl, 130 + 260 * t, 350 - Math.abs(Math.sin(t * 18)) * 12, 1, 600), ease.lin));
+  cycle(mat, true, 220); fire(go(mat, { x: 400 }, 1700, 'linear'));
+  fire(pose(cos, { aL: 25, aR: -25 }, 400)); cos._s.x = 600;
+  await sleep(1200);
+  cycle(cos, false); fire(go(cos, { x: 450, r: 82 }, 380, 'ease-in')); fire(pose(cos, { lR: -30, aL: 100, aR: -100 }, 300));
+  await sleep(430);
+  cycle(mat, false); shake(14, 500); flash('#fff', 140, .5);
+  big('FAUTE DURE !', 'red', 1400);
+  setMood(mat, 'pain'); setMood(cos, 'shock');
+  fire(arc(bl, { x: 520, y: 366 }, 60, 700, ease.out));
+  fire(go(mat, { x: 440, y: 290, r: -150 }, 420, 'ease-out')); await sleep(420);
+  await go(mat, { x: 430, y: 356, r: -92 }, 380, 'ease-in'); shake(6, 250);
+  fire(pose(mat, { aL: 10, aR: -20, lL: 35, lR: 10 }, 400));
+  fire(go(cos, { r: 0 }, 600)); fire(pose(cos, { aL: 80, aR: -80, lR: 0 }, 400));
+  floatTxt('PHRRRIT !', 430, 200, 1500, -30);
+  await run(ref, { x: 520 }, 900, 240);
+  fire(pose(ref, { aL: 110, aR: -110 }, 400));
+  await sleep(500);
+  const cu = document.createElement('div'); cu.style.cssText = 'position:absolute;inset:0;z-index:22;background:radial-gradient(circle at 50% 45%,#5A2A20,#1A0D08 80%);opacity:0;display:flex;align-items:center;justify-content:center';
+  cu.innerHTML = '<div style="width:260px;height:280px;margin-top:20px">' + chibi(inj, 'bust', 'pain') + '</div><div style="position:absolute;left:0;right:0;bottom:48px;text-align:center;font-weight:800;color:#FFF0CD;font-size:18px;text-shadow:0 2px 0 #2B1D14,0 0 8px #2B1D14">' + inj.name + '. Il se tient la jambe.</div>';
+  fxl.appendChild(cu); cu.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250 * TS, fill: 'forwards' });
+  vig('pulse');
+  cu.firstChild.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1) translateY(4px)' }], { duration: 2400 * TS, fill: 'forwards' });
+  await sleep(2300);
+  cu.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400 * TS, fill: 'forwards' }); setTimeout(() => cu.remove(), 450 * TS);
+  vig('off'); cam.style.filter = 'saturate(.55) brightness(.85)';
+  fire(camTo(440, 245, 1.28, 1800));
+  mates.forEach((m, i) => { fire(go(m, { x: m._s.x + (i === 2 ? 250 : -230), y: 300 }, 1300)); setMood(m, 'hurt'); fire(pose(m, { aL: 160, aR: -160 }, 800)); });
+  setMood(cos, 'shock'); fire(pose(cos, { aL: 150, aR: -150 }, 700));
+  fire(run(m2, { x: 340 }, 1500, 210)); await run(m1, { x: 380 }, 1500, 210);
+  stret.style.transform = 'translate(-220px,356px)'; stret.animate([{ transform: 'translate(-220px,356px)' }, { transform: 'translate(360px,356px)' }], { duration: 1500 * TS, fill: 'forwards', easing: 'ease-out' });
+  big('BLESSURE GRAVE', 'dim', 2400);
+  cap(inj.name + ' : absent ' + (c.days ? Math.round(c.days / 30) + ' mois environ' : 'longtemps') + '. Le groupe est touché.');
+  await sleep(1700);
+  fire(go(mat, { x: 480, y: 350, r: -90 }, 700));
+  await sleep(800);
+  [mat, m1, m2].forEach((x) => fire(go(x, { x: x._s.x - 700 }, 3800, 'ease-in-out')));
+  stret.animate([{ transform: 'translate(360px,356px)' }, { transform: 'translate(-340px,356px)' }], { duration: 3800 * TS, fill: 'forwards', easing: 'ease-in-out' });
+  floatTxt('applaudissements', 660, 120, 3000, -20);
+  fire(camTo(300, 245, 1.2, 3800));
+  await sleep(3200);
+  cam.style.transition = 'opacity .8s'; cam.style.opacity = .1; await sleep(900);
+};
+
+/* ---------- API ---------- */
+function ensure() {
+  if (root) return;
+  const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
+  root = document.createElement('div'); root.id = 'scn'; root.hidden = true;
+  root.innerHTML = '<div id="scFrame"><div id="scShk"><div id="scCam"></div></div><div id="scFx"><div class="vig" id="vig"></div><div class="flash" id="flash"></div><div class="bar t"></div><div class="bar b"></div></div></div><button class="scskip" data-sc="skip">Passer ⏭</button>';
+  document.body.appendChild(root);
+  cam = root.querySelector('#scCam'); shk = root.querySelector('#scShk'); fxl = root.querySelector('#scFx'); frame = root.querySelector('#scFrame');
+  root.addEventListener('click', (e) => { if (e.target.closest('[data-sc="skip"]')) stop(); });
+  addEventListener('resize', fit);
+  addEventListener('unhandledrejection', (e) => { if (e.reason instanceof Cancel) e.preventDefault(); });
+}
+function fit() { if (!root || root.hidden) return; const s = Math.min(root.clientWidth / W, root.clientHeight / H); frame.style.transform = 'scale(' + s + ')'; }
+function finish() { if (root) root.hidden = true; const r = curRes; curRes = null; if (r) r(); }
+function stop() { SID++; finish(); }
+function play(name, ctx, ts) {
+  ensure(); if (curRes) stop();
+  return new Promise((res) => {
+    curRes = res; TS = ts || 1; SID++; const id = SID;
+    cam.style.filter = ''; cam.style.opacity = ''; cam.style.transition = ''; shk.style.transform = '';
+    fxl.querySelectorAll('.big,.sub,.cap').forEach((e) => e.remove()); vig('off'); frame.classList.remove('on');
+    root.hidden = false; fit();
+    setTimeout(async () => {
+      if (id !== SID) return;
+      try { await SCENES[name](ctx); } catch (e) { if (!(e instanceof Cancel)) console.error(e); }
+      if (id === SID) { bars(false); await new Promise((r) => setTimeout(r, 150)); if (id === SID) finish(); }
+    }, 30);
+  });
+}
+return { play, stop, get on() { return !!curRes; } };
+})();

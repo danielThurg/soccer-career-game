@@ -413,6 +413,7 @@ function simBlock() {
     const us = Math.random() < posU, X = us ? U : Oo, Y = us ? Oo : U;
     M.ball = us ? 'U' : 'O';
     if (Math.random() < 0.009) { penaltyEvent(us); continue; }
+    if (Math.random() < 0.012) { freekickEvent(us); continue; }
     if (Math.random() < 0.0035) { redEvent(Math.random() < 0.5); }
     const r = X.mid / (X.mid + Y.def * 0.95), reach = 0.2 + 0.55 * r;
     if (Math.random() > reach) { if (Math.random() < 0.4) { const d = names(!us, 'def'); M.feed.push({ t: M.min + "' " + d.name + ' ' + pick(['coupe la passe.', 'intercepte le ballon.', 'repousse l’attaque.']), c: '' }); } continue; }
@@ -439,6 +440,18 @@ function penaltyEvent(us) {
   M.ev.push({ min: M.min, t: 'pen', us, p: tk.id || tk.name, ok });
   if (ok) goalFor(us, tk, 'transforme le penalty.');
   else { M.feed.push({ t: M.min + "' ARRÊTÉ ! " + (us ? 'Le gardien adverse' : names(true, 'gk').name) + ' détourne le penalty de ' + tk.name + '.', c: us ? 'o' : 'g' }); if (us && tk.id) { tk.moral = clamp(tk.moral - 5, 0, 100); tk.pm = 1; } }
+}
+function freekickEvent(us) {
+  let tk;
+  if (us) { tk = G.lineup.map(P).filter((p) => p && p.pos !== 'GB' && M.redP.indexOf(p.id) < 0).sort((a, b) => (b.st.tec + (b.tal === 'tireur' ? 12 : 0)) - (a.st.tec + (a.tal === 'tireur' ? 12 : 0)))[0]; if (!tk) return; } else tk = { name: pick(T(M.opp).names.slice(1)), id: null };
+  const skill = us ? (tk.st.tec - 50) / 400 + (tk.tal === 'tireur' ? 0.06 : 0) : 0;
+  const r = Math.random(), pg = 0.11 + skill, pp = 0.09;
+  const out = r < pg ? 'goal' : r < pg + pp ? 'post' : 'miss';
+  M.feed.push({ t: M.min + "' COUP FRANC dangereux pour " + (us ? 'nous' : T(M.opp).name) + '. ' + tk.name + ' se place.', c: us ? 'g' : 'o' });
+  M.ev.push({ min: M.min, t: 'fk', us, p: tk.id || tk.name, out });
+  if (out === 'goal') goalFor(us, tk, 'enroule un coup franc magnifique.');
+  else if (out === 'post') M.feed.push({ t: M.min + "' BARRE ! Le coup franc de " + tk.name + ' fait trembler la transversale.', c: us ? 'o' : 'g' });
+  else M.feed.push({ t: M.min + "' Le coup franc de " + tk.name + ' est ' + pick(['bien repoussé par le gardien.', 'au-dessus.', 'dans le mur.']), c: '' });
 }
 function redEvent(us) {
   if (us) {

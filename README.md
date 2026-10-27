@@ -58,3 +58,11 @@ moral, fatigue, blessures, discussions avec les joueurs, entraînement, finances
 Le jeu dispose d'un menu principal et d'une installation sur l'écran d'accueil. La clé de sauvegarde de la V3 est `scg-save-v3` (l'ancienne V2 reste dans le navigateur, inchangée). Les sauvegardes restent propres au navigateur et à l'origine du lien.
 
 `worker.mjs` sert la version autonome sur Cloudflare Workers, avec les icônes, le manifeste et le cache hors ligne. Pour publier une modification : `python3 build.py` (assemble `index.html` depuis `src/`), puis `node scripts/build-worker.mjs` et `npx wrangler deploy`.
+
+## Scènes cinématiques (V3.1)
+
+Les moments forts d'un match sont maintenant joués en scène animée avec **tes vrais joueurs et ton maillot** (adversaires générés avec les couleurs du club) :
+
+- **Penalty** (pour ou contre toi, but ou arrêt), **coup franc** (nouvel événement de match : but, barre ou raté), **carton rouge** (toi ou l'adversaire), **blessure grave** (jouée après le coup de sifflet final), **trophée** (titre de division et Coupe du Roi, à la fin de saison).
+- Bouton **🎬 On/Off** dans l'écran de match (mémorisé), **Passer ⏭** pendant une scène. Les scènes sont coupées en vitesse ×4.
+- Code : `src/scenes.js` (`Scenes.play(nom, ctx)`), déclenchement dans `liveTick` / `handleStop` de `src/ui2.js`, événement `fk` dans `src/engine.js`.
