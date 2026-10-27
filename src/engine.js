@@ -57,7 +57,7 @@ function newGame() {
     teams.push({ id, name: n, short: n.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(' ').map((w) => w[0]).join('').slice(0, 3).toUpperCase(), div: d, s: id === ME ? DBASE[3] : DBASE[d] + rnd(-5, 5), tilt: { a: ri(-4, 4), d: ri(-4, 4), m: ri(-3, 3) }, col: [c1, c2], names: Array.from({ length: 7 }, () => pick(SURN)) });
   }));
   const players = P0.map((o) => { const p = JSON.parse(JSON.stringify(o)); Object.keys(p.st).forEach((k) => { p.st[k] = Math.max(18, p.st[k] - 7); }); return finishPlayer(p); });
-  G = { v: 3, season: 1, day: 1, teams, players, formation: '1-3-2-1', lineup: [], ment: 'eq', captain: 'rafa', penTaker: 'samir', train: 'physique', coh: 55, budget: 15000, supp: 320, board: 60, kit: { c: ['#C46A55', '#FFF0CD'], s: 'stripes' }, staff: JSON.parse(JSON.stringify(STAFF0)), fac: { pitch: 1, cap: 1, vip: 0, lights: 0, train: 1, med: 1, shop: 0 }, stad: { pitch: '#7FA077', ps: 'stripes', seat: '#C46A55', seat2: '#FFF0CD' }, inbox: [], news: [], mid: 0, mlog: [], hist: [], pid: 0, market: [], lastXI: [], tips: {}, msgCd: 0, oppBoost: 0, form5: [], offers: 0, pressDone: 0, recDay: 0 };
+  G = { v: 3, season: 1, day: 1, teams, players, formation: '1-3-2-1', lineup: [], ment: 'eq', captain: 'rafa', penTaker: 'samir', train: 'physique', coh: 55, budget: 15000, supp: 320, board: 60, kit: { c: ['#C46A55', '#FFF0CD'], s: 'stripes', g: ['#5E7A5A', '#2F4A2E'] }, roles: {}, staff: JSON.parse(JSON.stringify(STAFF0)), fac: { pitch: 1, cap: 1, vip: 0, lights: 0, train: 1, med: 1, shop: 0 }, stad: { pitch: '#7FA077', ps: 'stripes', seat: '#C46A55', seat2: '#FFF0CD' }, inbox: [], news: [], mid: 0, mlog: [], hist: [], pid: 0, market: [], lastXI: [], tips: {}, msgCd: 0, oppBoost: 0, form5: [], offers: 0, pressDone: 0, recDay: 0 };
   T(ME).s = DBASE[3] + 1;
   buildSeason(true);
   fitLineup();
@@ -66,7 +66,7 @@ function newGame() {
   save();
 }
 function save() { try { localStorage.setItem(SAVE, JSON.stringify(G)); } catch (e) { /* ignore */ } }
-function load() { try { const s = localStorage.getItem(SAVE); if (s) { const g = JSON.parse(s); if (g && g.v === 3) { G = g; return true; } } } catch (e) { /* ignore */ } return false; }
+function load() { try { const s = localStorage.getItem(SAVE); if (s) { const g = JSON.parse(s); if (g && g.v === 3) { G = g; G.roles = G.roles || {}; G.kit.g = G.kit.g || ['#5E7A5A', '#2F4A2E']; return true; } } } catch (e) { /* ignore */ } return false; }
 function news(t) { G.news.unshift({ d: G.day, s: G.season, t }); if (G.news.length > 30) G.news.pop(); }
 
 /* ---------- Season / calendar ---------- */
@@ -129,6 +129,31 @@ function nextMy() {
 /* ---------- Lineup ---------- */
 const slots = () => { const f = FM[G.formation]; return ['GB'].concat(Array(f[0]).fill('DEF'), Array(f[1]).fill('MIL'), Array(f[2]).fill('ATT')); };
 const avail = (p) => !p.inj && !p.susp;
+const DEFROLE = { GB: 'gk', DEF: 'cb', MIL: 'b2b', ATT: 'st' };
+function rowOf(i, form) {
+  const f = FM[form || G.formation]; if (i === 0) return { cat: 'GB', x: 50, y: 93 };
+  let k = i - 1, n, y, cat;
+  if (k < f[0]) { cat = 'DEF'; n = f[0]; y = 73; } else if (k < f[0] + f[1]) { cat = 'MIL'; n = f[1]; y = 50; k -= f[0]; } else { cat = 'ATT'; n = f[2]; y = 24; k -= f[0] + f[1]; }
+  const xs = n === 1 ? [50] : n === 2 ? [32, 68] : [18, 50, 82];
+  return { cat, x: xs[k], y };
+}
+const rolesFor = (i) => { const r = rowOf(i); return ROLES[r.cat].filter((o) => !o.side || Math.abs(r.x - 50) >= 15); };
+function slotSet(i) {
+  G.roles = G.roles || {}; let s = G.roles[i]; const ok = rolesFor(i);
+  if (!s || !ok.some((o) => o.k === s.r)) s = G.roles[i] = { r: DEFROLE[rowOf(i).cat], d: 1, w: 1 };
+  return s;
+}
+const roleDef = (i) => { const s = slotSet(i); return ROLES[rowOf(i).cat].find((o) => o.k === s.r); };
+function slotXY(i) {
+  const r = rowOf(i), s = slotSet(i), ro = roleDef(i), sg = r.x < 50 ? -1 : r.x > 50 ? 1 : 0;
+  const dy = ro.dy + (s.d - 1) * 10, dx = ro.dx + (s.w - 1) * 9;
+  return { x: clamp(r.x + sg * dx, 6, 94), y: clamp(r.y - dy, r.cat === 'GB' ? 70 : 8, 97) };
+}
+function fitOf(p, ro) {
+  if (!p) return 0; let v = 0; for (const k in ro.w) v += ro.w[k] * (p.st[k] || 40);
+  if (ro.tal && p.tal && ro.tal.indexOf(p.tal) >= 0) v += 6;
+  return Math.round(clamp((v - 35) / 45, 0, 1) * 100);
+}
 function fitLineup() {
   const sl = slots(), old = {}, res = [];
   (G.lineup || []).forEach((id) => { const p = P(id); if (p && avail(p)) (old[p.pos] = old[p.pos] || []).push(id); });
@@ -139,6 +164,7 @@ function fitLineup() {
     res.push(id);
   });
   G.lineup = res;
+  sl.forEach((_, i) => slotSet(i));
   if (!P(G.captain)) G.captain = G.players.slice().sort((a, b) => b.age - a.age)[0].id;
   if (!P(G.penTaker)) G.penTaker = (G.lineup.map(P).filter((p) => p && p.pos !== 'GB').sort((a, b) => b.st.tec - a.st.tec)[0] || G.players[0]).id;
 }
@@ -151,6 +177,9 @@ function teamStr(fz, hf) {
     v *= perf(p) * (fz || 1); out[line] += v; cnt[line]++;
     const t = p.tal && TAL[p.tal];
     if (t && t.ok(p)) bon[t.line] += t.b; else if (p.tal === 'contre' && p.moral < 40) bon.att -= 6;
+    const ro = roleDef(i), st = slotSet(i), q = fitOf(p, ro) / 100 * 1.5 - 0.5;
+    for (const l in ro.fx) bon[l] += ro.fx[l] * q * (ro.fx[l] > 0 ? 1 : 1);
+    bon.att += (st.d - 1) * 0.8; bon.def -= (st.d - 1) * 0.8; bon.att += (st.w - 1) * 0.4; bon.mid -= (st.w - 1) * 0.2;
   });
   ['gk', 'def', 'mid', 'att'].forEach((l) => { const n = cnt[l] || 1; out[l] = l === 'gk' ? out[l] + bon[l] : out[l] / n * (0.82 + 0.09 * n) + bon[l] * (fz || 1); });
   const cf = 0.97 + 0.06 * G.coh / 100, mt = MENT[G.ment], ad = 1 + 0.03 * (staff('adj').lvl - 1);
@@ -392,8 +421,9 @@ function startMatch() {
 }
 function names(userSide, line) {
   if (userSide) {
-    const sl = slots(); const c = G.lineup.map((id, i) => ({ p: P(id), pos: sl[i] })).filter((x) => x.p && M.redP.indexOf(x.p.id) < 0);
-    const w = (x) => line === 'att' ? ({ ATT: 6, MIL: 2.5, DEF: 0.4, GB: 0 }[x.pos]) : line === 'def' ? ({ DEF: 6, MIL: 1.5, ATT: 0.3, GB: 0 }[x.pos]) : line === 'gk' ? (x.pos === 'GB' ? 1 : 0) : ({ MIL: 6, ATT: 2, DEF: 1, GB: 0 }[x.pos]);
+    const sl = slots(); const c = G.lineup.map((id, i) => ({ p: P(id), pos: sl[i], sh: id && roleDef(i).sh })).filter((x) => x.p && M.redP.indexOf(x.p.id) < 0);
+    const w0 = (x) => line === 'att' ? ({ ATT: 6, MIL: 2.5, DEF: 0.4, GB: 0 }[x.pos]) : line === 'def' ? ({ DEF: 6, MIL: 1.5, ATT: 0.3, GB: 0 }[x.pos]) : line === 'gk' ? (x.pos === 'GB' ? 1 : 0) : ({ MIL: 6, ATT: 2, DEF: 1, GB: 0 }[x.pos]);
+    const w = (x) => line === 'att' ? w0(x) * (0.35 + 0.65 * (x.sh == null ? 1 : x.sh)) : w0(x);
     const tot = c.reduce((a, x) => a + w(x), 0); let r = Math.random() * tot;
     for (const x of c) { r -= w(x); if (r <= 0) return x.p; }
     return c[0].p;
@@ -412,17 +442,17 @@ function simBlock() {
   for (let k = 0; k < n; k++) {
     const us = Math.random() < posU, X = us ? U : Oo, Y = us ? Oo : U;
     M.ball = us ? 'U' : 'O';
-    if (Math.random() < 0.009) { penaltyEvent(us); continue; }
-    if (Math.random() < 0.012) { freekickEvent(us); continue; }
+    if (Math.random() < 0.009) { M.seq.push({ us, res: 'pen' }); penaltyEvent(us); continue; }
+    if (Math.random() < 0.012) { M.seq.push({ us, res: 'fk' }); freekickEvent(us); continue; }
     if (Math.random() < 0.0035) { redEvent(Math.random() < 0.5); }
     const r = X.mid / (X.mid + Y.def * 0.95), reach = 0.2 + 0.55 * r;
-    if (Math.random() > reach) { if (Math.random() < 0.4) { const d = names(!us, 'def'); M.feed.push({ t: M.min + "' " + d.name + ' ' + pick(['coupe la passe.', 'intercepte le ballon.', 'repousse l’attaque.']), c: '' }); } continue; }
+    if (Math.random() > reach) { const d0 = names(!us, 'def'); M.seq.push({ us, res: 'lost', st: 'mid', who: d0.id || d0.name }); if (Math.random() < 0.4) { M.feed.push({ t: M.min + "' " + d0.name + ' ' + pick(['coupe la passe.', 'intercepte le ballon.', 'repousse l’attaque.']), c: '' }); } continue; }
     const s = X.att / (X.att + Y.def * 0.9);
-    if (Math.random() > 0.4 + 0.35 * s) { if (Math.random() < 0.5) { const a = names(us, 'att'); M.feed.push({ t: M.min + "' " + a.name + ' ' + pick(['perd son duel.', 'rate son contrôle.', 'est trop lent.']), c: '' }); } continue; }
+    if (Math.random() > 0.4 + 0.35 * s) { const a = names(us, 'att'); M.seq.push({ us, res: 'lost', st: 'att', who: a.id || a.name }); if (Math.random() < 0.5) { M.feed.push({ t: M.min + "' " + a.name + ' ' + pick(['perd son duel.', 'rate son contrôle.', 'est trop lent.']), c: '' }); } continue; }
     const goalP = 0.12 + 0.28 * X.att / (X.att + Y.gk * 1.1), sh = names(us, 'att'), roll = Math.random();
-    if (roll < goalP) { goalFor(us, sh, ''); }
-    else if (roll < goalP + (1 - goalP) * 0.55) { const g = names(!us, 'gk'); M.feed.push({ t: M.min + "' " + g.name + ' ' + pick(['détourne le tir', 'réalise l’arrêt', 'sort le grand jeu']) + ' devant ' + sh.name + '.', c: '' }); }
-    else M.feed.push({ t: M.min + "' " + sh.name + ' ' + pick(['tire au-dessus.', 'frappe à côté.', 'touche le poteau !']), c: '' });
+    if (roll < goalP) { M.seq.push({ us, res: 'goal', who: sh.id || sh.name }); goalFor(us, sh, ''); }
+    else if (roll < goalP + (1 - goalP) * 0.55) { M.seq.push({ us, res: 'save', who: sh.id || sh.name }); const g = names(!us, 'gk'); M.feed.push({ t: M.min + "' " + g.name + ' ' + pick(['détourne le tir', 'réalise l’arrêt', 'sort le grand jeu']) + ' devant ' + sh.name + '.', c: '' }); }
+    else { M.seq.push({ us, res: 'miss', who: sh.id || sh.name }); M.feed.push({ t: M.min + "' " + sh.name + ' ' + pick(['tire au-dessus.', 'frappe à côté.', 'touche le poteau !']), c: '' }); }
   }
 }
 function goalFor(us, sh, tag) {
@@ -460,7 +490,7 @@ function redEvent(us) {
     M.feed.push({ t: M.min + "' CARTON ROUGE ! " + p.name + ' est expulsé. On termine à 6.', c: 'o' }); M.ev.push({ min: M.min, t: 'red', us: true, p: p.id });
   } else { if (M.red[1] >= 1) return; M.red[1]++; M.feed.push({ t: M.min + "' CARTON ROUGE pour " + pick(T(M.opp).names.slice(1)) + '. L’adversaire joue à 6.', c: 'g' }); M.ev.push({ min: M.min, t: 'red', us: false }); }
 }
-function stepBlock() { M.b++; M.min = M.b * 3; simBlock(); if (M.b >= 30) M.done = true; }
+function stepBlock() { M.seq = []; M.b++; M.min = M.b * 3; simBlock(); if (M.b >= 30) M.done = true; }
 function playAll() { while (!M.done) { if (M.b === 15 && !M.htm) M.htm = { a: 0, d: 0, m: 0 }; stepBlock(); } }
 function applyResult() {
   const m = G.match, gu = M.sc[0], go = M.sc[1], win = gu > go, draw = gu === go, lose = gu < go;
@@ -487,9 +517,9 @@ function applyResult() {
       let pr0 = 50 + (gu - go) * 5 + gm * 14 + rnd(-10, 10);
       if ((p.pos === 'DEF' || p.pos === 'GB') && go === 0) pr0 += 8;
       if (p.pm) { pr0 -= 8; p.pm = 0; }
-      if (p.pos === 'ATT' && !gm) { p.drought++; if (p.drought >= 3) { p.moral = clamp(p.moral - 3, 0, 100); pr0 -= 6; } }
+      if (p.pos === 'ATT' && !gm && (M.mine.indexOf(p.id) < 0 || roleDef(M.mine.indexOf(p.id)).sh >= 1)) { p.drought++; if (p.drought >= 3) { p.moral = clamp(p.moral - 3, 0, 100); pr0 -= 6; } }
       p.form = clamp(p.form * 0.55 + pr0 * 0.45, 5, 98);
-      const fzm = MENT[G.ment].fat; p.fat = clamp(p.fat + (22 + rnd(0, 8)) * fzm * (1 - 0.04 * G.fac.med), 0, 100);
+      const si0 = M.mine.indexOf(p.id), fzm = MENT[G.ment].fat * (si0 >= 0 && roleDef(si0).fat || 1); p.fat = clamp(p.fat + (22 + rnd(0, 8)) * fzm * (1 - 0.04 * G.fac.med), 0, 100);
       p.moral = clamp(p.moral + (win ? 4 : draw ? 0.5 : -3) + gm * 3, 0, 100);
       const risk = (0.022 + 0.0007 * Math.max(0, p.fat - 55)) * (1 - 0.05 * staff('phy').lvl - 0.03 * G.fac.pitch) * (G.fac.pitch >= 3 ? 0.9 : 1);
       if (Math.random() < risk) { const serious = Math.random() < 0.1; p.inj = serious ? ri(40, 90) : ri(4, 22); news(p.name + (serious ? ' : blessure grave, absent ' + p.inj + ' jours.' : ' se blesse, absent ' + p.inj + ' jours.')); if (serious) { M.serious = p.id; } else if (!M.injured) M.injured = p.id; }

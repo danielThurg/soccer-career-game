@@ -66,3 +66,12 @@ Les moments forts d'un match sont maintenant joués en scène animée avec **tes
 - **Penalty** (pour ou contre toi, but ou arrêt), **coup franc** (nouvel événement de match : but, barre ou raté), **carton rouge** (toi ou l'adversaire), **blessure grave** (jouée après le coup de sifflet final), **trophée** (titre de division et Coupe du Roi, à la fin de saison).
 - Bouton **🎬 On/Off** dans l'écran de match (mémorisé), **Passer ⏭** pendant une scène. Les scènes sont coupées en vitesse ×4.
 - Code : `src/scenes.js` (`Scenes.play(nom, ctx)`), déclenchement dans `liveTick` / `handleStop` de `src/ui2.js`, événement `fk` dans `src/engine.js`.
+
+## V4 : tactique, match vertical, club vivant
+
+- **Onglet Tactique (premier de la barre du bas)** : terrain vertical aux couleurs de ton stade. Touche un joueur pour lui donner un **rôle** adapté à son poste (récupérateur, box-to-box, meneur, ailier, latéral offensif, numéro 10, renard des surfaces…), une **adéquation en %** calculée sur ses stats et son talent, et des **consignes** de profondeur et de largeur. Le jeton bouge sur le terrain, et les rôles changent les forces de l'équipe et qui tire.
+- **Match** : terrain vertical avec 14 jetons nommés. Chaque séquence est jouée (passes, interception, tir, arrêt, but) et les équipes montent ou reculent selon qui a le ballon. Ta formation, tes rôles et tes consignes se voient directement sur le terrain. Les scènes cinématiques restent pour penalty, coup franc, rouge, blessure et trophée.
+- **Club** : stade et campus qui changent à chaque amélioration (tribunes, loges, éclairage, centre d'entraînement, médical, boutique), aperçu du niveau suivant avant d'acheter, animation de chantier terminé. Pelouse et sièges personnalisables.
+- **Équipement** : choix des couleurs, du motif et du maillot gardien, proposé au début de chaque saison.
+- **Calendrier** allégé : prochains matchs, état de la Coupe, classement de la division.
+- Code : `src/pitch.js` (terrain + animation), rôles dans `src/data.js` (`ROLES`) et `src/engine.js` (`slotXY`, `fitOf`, `teamStr`).

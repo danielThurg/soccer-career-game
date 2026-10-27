@@ -12,7 +12,7 @@ function render() {
   const th = THEME[UI.screen]; app.style.setProperty('--acc', th[0]); app.style.setProperty('--accfg', th[1]);
   const old = app.querySelector('.scr'), st = old ? old.scrollTop : 0;
   const body = { home: sHome, eff: sEff, tac: sTac, cal: sCal, club: sClub }[UI.screen]();
-  app.innerHTML = topBar() + '<div class="scr">' + body + '</div>' + navBar();
+  app.innerHTML = (UI.screen === 'tac' ? '' : topBar()) + '<div class="scr"' + (UI.screen === 'tac' ? ' style="padding:6px 8px"' : '') + '>' + body + '</div>' + navBar();
   const n = app.querySelector('.scr'); if (n) n.scrollTop = st;
   renderOv();
 }
@@ -21,7 +21,12 @@ function renderLite() { if (UI.screen === 'home') render(); else { const t = app
 /* ---------- Overlays ---------- */
 function renderOv() {
   if (!UI.ov) { ovl.innerHTML = ''; return; }
-  const f = { msg: ovMsg, press: ovPress, pre: ovPre, match: ovMatch, season: ovSeason, talk: ovTalk }[UI.ov];
+  if (UI.ov === 'match') {
+    const w = ovl.querySelector('.mwrap');
+    if (w && w.dataset.m === String(UI.mid)) { const p = matchParts(); ovl.querySelector('#mSb').innerHTML = p.sb; ovl.querySelector('#mCtl').innerHTML = p.ctrl; const fe = ovl.querySelector('#mFeed'); fe.innerHTML = p.feed; fe.scrollTop = fe.scrollHeight; return; }
+    ovl.innerHTML = '<div class="ov">' + ovMatch() + '</div>'; MA.attach(ovl.querySelector('.mpv')); return;
+  }
+  const f = { msg: ovMsg, press: ovPress, pre: ovPre, season: ovSeason, talk: ovTalk, kit: ovKit }[UI.ov];
   ovl.innerHTML = '<div class="ov">' + f() + '</div>';
   const fd = ovl.querySelector('.feed'); if (fd) fd.parentElement.scrollTop = fd.parentElement.scrollHeight;
   const ch = ovl.querySelector('.chat'); if (ch) ch.scrollTop = ch.scrollHeight;
@@ -66,16 +71,9 @@ function ovPre() {
     (warn.length ? '<div style="margin-top:6px;background:#F3E0B0;border-radius:10px;padding:5px 9px;font-weight:800;font-size:12px">⚠ ' + warn.join(' · ') + '</div>' : '') +
     '<div class="row" style="gap:8px;margin-top:8px"><button class="btn grow" data-a="edit">Modifier la compo</button><button class="btn pri grow" data-a="kick" style="font-size:15px">⚽ Lancer le match</button></div></div>';
 }
-function ovMatch() {
-  const ot = T(M.opp), mine = M.home;
-  const bx = M.ball === 'U' ? 14 : M.ball === 'O' ? -14 : 0, by = 12 + (M.b * 37 % 76);
-  const tk = [];
-  tokenPos().forEach((q, i) => { const p = P(M.mine[i]); const a = pitchPt(clamp(q[0] * 0.5 + bx * 0.35, 3, 97), q[1]); tk.push({ x: a.x, y: a.y, s: a.s, c: i === 0 ? ['#5E7A5A', '#2F4A2E'] : teamCol(ME), sk: p ? p.look.skin : null }); const b = pitchPt(clamp(100 - q[0] * 0.5 + bx * 0.35, 3, 97), 100 - q[1]); tk.push({ x: b.x, y: b.y, s: b.s, c: i === 0 ? ['#8A8F98', '#4B4F57'] : teamCol(M.opp), sk: null }); });
-  tk.sort((a, b2) => a.y - b2.y);
-  const bp = pitchPt(clamp(50 + bx * 2.2, 8, 92), by), ballO = { x: bp.x, y: bp.y };
-  const bg = mine ? stadiumSvg(myStadium({ id: 'mt', fill: clamp(M.att / CAPS[G.fac.cap], 0.15, 1), night: G.fac.lights > 0 && M.b > 10, on: G.fac.lights > 0, score: M.sc[0] + '-' + M.sc[1], tok: tk, ball: ballO })) : stadiumSvg({ id: 'aw', pitch: '#7FA077', ps: 'stripes', seat: teamCol(M.opp)[0], seat2: teamCol(M.opp)[1], cap: M.neutral ? 5 : clamp(5 - ot.div, 2, 4), vip: M.neutral ? 2 : 0, lights: ot.div < 2 || M.neutral ? 2 : 0, pq: 3, fill: M.neutral ? 0.95 : 0.7, name: M.neutral ? 'FINALE' : ot.short + ' ' + 'ARENA'.slice(0, 0), night: M.neutral, on: M.neutral, score: M.sc[0] + '-' + M.sc[1], tok: tk, ball: ballO });
+function matchParts() {
   const hs = M.home ? [ME, M.opp] : [M.opp, ME], sc = M.home ? M.sc : [M.sc[1], M.sc[0]];
-  const sb = '<div class="sbx">' + badge(hs[0], 26) + '<span class="s">' + sc[0] + '</span><span style="font-weight:800;font-size:12px;min-width:34px;text-align:center">' + (M.over ? 'FIN' : M.min + '\'') + '</span><span class="s">' + sc[1] + '</span>' + badge(hs[1], 26) + '</div>';
+  const sb = '<div class="sbx" style="position:static;transform:none;justify-content:center">' + badge(hs[0], 26) + '<span class="s">' + sc[0] + '</span><span style="font-weight:800;font-size:12px;min-width:34px;text-align:center">' + (M.over ? 'FIN' : M.min + '\'') + '</span><span class="s">' + sc[1] + '</span>' + badge(hs[1], 26) + '</div>';
   const feed = '<div class="feed">' + M.feed.map((f) => '<div class="' + f.c + '">' + f.t + '</div>').join('') + '</div>';
   let ctrl;
   if (M.over) {
@@ -87,9 +85,21 @@ function ovMatch() {
   } else if (UI.ht) {
     ctrl = '<div class="card"><b>Mi-temps ' + M.sc[0] + '-' + M.sc[1] + '</b> · Causerie<div class="col" style="gap:4px;margin-top:5px"><button class="chbtn" data-a="ht" data-i="enc">Encourager : le milieu monte d’un cran</button><button class="chbtn" data-a="ht" data-i="push">Exiger plus : attaque +4, défense −2</button><button class="chbtn" data-a="ht" data-i="safe">Se resserrer : défense +4, attaque −3</button></div></div>';
   } else {
-    ctrl = '<div class="row" style="gap:6px"><span class="muted" style="font-weight:800;font-size:11px">Vitesse</span><div class="seg" style="width:140px">' + [1, 2, 4].map((v) => '<button class="' + (UI.mspeed === v ? 'on' : '') + '" data-a="mspeed" data-i="' + v + '">×' + v + '</button>').join('') + '</div><button class="btn sm" data-a="scn" style="margin-left:auto">🎬 ' + (UI.scn === false ? 'Off' : 'On') + '</button><button class="btn sm" data-a="skip">Passer ⏭</button></div>';
+    ctrl = '<div class="row" style="gap:6px"><div class="seg" style="width:112px">' + [1, 2, 4].map((v) => '<button class="' + (UI.mspeed === v ? 'on' : '') + '" data-a="mspeed" data-i="' + v + '">×' + v + '</button>').join('') + '</div><button class="btn sm" data-a="scn" style="margin-left:auto">🎬 ' + (UI.scn === false ? 'Off' : 'On') + '</button><button class="btn sm" data-a="skip">Passer ⏭</button></div>';
   }
-  return '<div class="md" style="width:min(820px,100%);height:min(350px,100%);display:flex;gap:8px;padding:8px;overflow:hidden"><div style="flex:0 0 52%;position:relative;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:#000">' + bg + sb + '</div><div class="col" style="flex:1;min-width:0"><div class="card" style="flex:1;min-height:0;overflow:auto;padding:6px">' + feed + '</div>' + ctrl + '</div></div>';
+  return { sb, feed, ctrl };
+}
+function matchStad() {
+  const ot = T(M.opp);
+  return M.home ? stadSt({ fill: clamp(M.att / Math.max(1, CAPS[G.fac.cap]), 0.15, 1), night: G.fac.lights > 0 && M.b > 10 })
+    : { pitch: '#7FA077', ps: 'stripes', seat: teamCol(M.opp)[0], cap: M.neutral ? 5 : clamp(5 - ot.div, 2, 4), vip: M.neutral ? 2 : 0, lights: ot.div < 2 || M.neutral ? 2 : 0, pq: 3, fill: M.neutral ? 0.95 : 0.7, night: M.neutral };
+}
+function ovMatch() {
+  const ot = T(M.opp), p = matchParts(), ban = M.home ? stadiumSvg(myStadium({ id: 'mb', fill: clamp(M.att / Math.max(1, CAPS[G.fac.cap]), 0.15, 1), night: G.fac.lights > 0 && M.b > 10, on: G.fac.lights > 0, score: '' })) : stadiumSvg({ id: 'ab', pitch: '#7FA077', ps: 'stripes', seat: teamCol(M.opp)[0], seat2: teamCol(M.opp)[1], cap: M.neutral ? 5 : clamp(5 - ot.div, 2, 4), vip: M.neutral ? 2 : 0, lights: ot.div < 2 || M.neutral ? 2 : 0, pq: 3, fill: M.neutral ? 0.95 : 0.7, night: M.neutral, on: M.neutral, name: ot.short });
+  return '<div class="md mwrap" data-m="' + UI.mid + '" style="width:min(850px,100%);height:min(362px,100%);display:flex;gap:10px;padding:8px;overflow:hidden"><div class="pbox" id="mPitch" style="flex:none">' + MA.html(matchStad()) + '</div><div class="col" style="flex:1;min-width:0"><div style="height:74px;flex:none;border:2px solid var(--ink);border-radius:10px;overflow:hidden;position:relative">' + ban + '</div><div id="mSb">' + p.sb + '</div><div class="card" id="mFeed" style="flex:1;min-height:0;overflow:auto;padding:6px">' + p.feed + '</div><div id="mCtl">' + p.ctrl + '</div></div></div>';
+}
+function ovKit() {
+  return '<div class="md" style="max-width:560px"><div style="font-size:12px;font-weight:800;text-align:center" class="muted">NOUVELLE SAISON ' + G.season + ' · ' + DIVS[myDiv()].n.toUpperCase() + '</div><div style="font-size:19px;font-weight:800;text-align:center;margin:1px 0 6px">Choisis tes couleurs</div>' + kitEditor(true) + '<button class="btn pri big" data-a="kitdone">Valider et partir ▶</button></div>';
 }
 function ovSeason() {
   const h = G.lastRec, d = myDiv();
@@ -140,21 +150,20 @@ function oppTaker(name) {
   return { name: name, num: i + 1, build: 0.9 + ((hs >>> 2) & 15) / 40, look: { skin: SKIN[(hs >>> 3) % SKIN.length], hair: HAIR[(hs >>> 5) % HAIR.length], hc: HCOL[(hs >>> 7) % HCOL.length], beard: BEARD[(hs >>> 9) % BEARD.length], bc: HCOL[(hs >>> 7) % HCOL.length] }, kit: teamCol(M.opp), kitStyle: 'stripes', pos: 'MIL' };
 }
 function scnOn() { return UI.scn !== false && UI.mspeed < 4; }
-function liveTick() {
-  if (!UI.live) return;
+async function liveTick() {
+  if (!UI.live) return; const my = UI.mid;
   if (M.b === 15 && !M.htDone) { M.htDone = true; UI.ht = true; renderOv(); return; }
   stepBlock();
   const evs = M.ev.slice(M.evN || 0); M.evN = M.ev.length;
   let sc = null;
   if (scnOn()) for (const e of evs) { sc = sceneFor(e); if (sc) break; }
-  const after = () => {
-    if (!UI.live) return;
-    if (M.done) { applyResult(); UI.live = false; }
-    renderOv();
-    if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; }
-    if (!M.over) LT = setTimeout(liveTick, 430 / UI.mspeed);
-  };
-  if (sc) { Scenes.play(sc[0], sc[1]).then(after); } else { if (M.done) { applyResult(); UI.live = false; } renderOv(); if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; } if (!M.over) LT = setTimeout(liveTick, 430 / UI.mspeed); }
+  if (sc) { await Scenes.play(sc[0], sc[1]); if (!UI.live || my !== UI.mid) return; }
+  await MA.block(M.seq, UI.mspeed);
+  if (!UI.live || my !== UI.mid) return;
+  if (M.done) { applyResult(); UI.live = false; }
+  renderOv();
+  if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; }
+  if (!M.over) LT = setTimeout(liveTick, 40);
 }
 
 /* ---------- Actions ---------- */
@@ -179,31 +188,38 @@ const ACT = {
   pnext() { UI.pq = (UI.pq || 0) + 1; renderOv(); },
   pend() { G.presser = null; UI.ov = null; UI.pq = 0; save(); runSim(); },
   edit() { UI.ov = null; UI.screen = 'tac'; render(); },
-  kick() { startMatch(); UI.mspeed = UI.speed > 2 ? 2 : 1; UI.live = true; UI.ht = false; UI.ov = 'match'; renderOv(); LT = setTimeout(liveTick, 600); },
+  kick() { startMatch(); UI.mid = (UI.mid || 0) + 1; UI.mspeed = UI.speed > 2 ? 2 : 1; UI.live = true; UI.ht = false; UI.ov = 'match'; renderOv(); LT = setTimeout(liveTick, 600); },
   mspeed(d) { UI.mspeed = +d.i; renderOv(); },
   scn() { UI.scn = UI.scn === false; try { localStorage.setItem('scg-scn', UI.scn === false ? '0' : '1'); } catch (e) {} renderOv(); },
-  skip() { Scenes.stop(); clearTimeout(LT); UI.live = false; UI.ht = false; if (!M.htDone) M.htDone = true; if (!M.htm) M.htm = { a: 0, d: 0, m: 0 }; while (!M.done) stepBlock(); applyResult(); renderOv(); },
+  skip() { Scenes.stop(); MA.stop(); clearTimeout(LT); UI.live = false; UI.ht = false; if (!M.htDone) M.htDone = true; if (!M.htm) M.htm = { a: 0, d: 0, m: 0 }; while (!M.done) stepBlock(); applyResult(); renderOv(); },
   ht(d) { M.htm = d.i === 'enc' ? { a: 2, d: 1, m: 4 } : d.i === 'push' ? { a: 4, d: -2, m: 1 } : { a: -3, d: 4, m: 0 }; if (d.i === 'enc') G.lineup.map(P).forEach((p) => { if (p) p.moral = clamp(p.moral + 2, 0, 100); }); UI.ht = false; M.feed.push({ t: 'Reprise de la seconde période.', c: '' }); renderOv(); LT = setTimeout(liveTick, 500); },
   after() { UI.ov = null; UI.live = false; M = null; render(); runSim(); },
-  newseason() { UI.ov = null; render(); },
+  newseason() { UI.ov = 'kit'; renderOv(); },
   /* effectif */
   talk(d) { UI.talk = d.i; UI.talkMsg = ''; UI.ov = 'talk'; renderOv(); },
   tone(d) { const p = P(UI.talk), tt = TALK[p.trait][d.i]; p.moral = clamp(p.moral + tt[0], 0, 100); p.talkDay = G.day; UI.talkMsg = tt[1].replace(/^Il /, p.name + ' ') + ' (' + (tt[0] > 0 ? '+' : '') + tt[0] + ' moral)'; if (d.i === 'pro') { p.promise = { t: 'start', until: G.day + 9 }; } renderOv(); render(); },
   capt(d) { applyFx([['captain', d.i]]); toast(P(d.i).name + ' est capitaine'); render(); },
   listp(d) { const p = P(d.i); p.listed = !p.listed; toast(p.listed ? p.name + ' mis en vente' : p.name + ' retiré de la vente'); render(); },
   /* tactique */
-  tsel(d) { UI.tsel = UI.tsel === d.i ? null : d.i; if (UI.tsel && d.second) return; render(); },
-  bench(d) { if (!UI.tsel) { toast('Touche d’abord un titulaire'); return; } const i = G.lineup.indexOf(UI.tsel); const p = P(d.i); if (!avail(p)) { toast(p.name + ' est indisponible'); return; } G.lineup[i] = d.i; UI.tsel = null; save(); render(); },
-  auto() { G.lineup = []; fitLineup(); UI.tsel = null; toast('Meilleur onze placé'); save(); render(); },
-  form(d) { G.formation = d.i; fitLineup(); render(); },
+  tsel(d) { UI.ts = +d.i; render(); },
+  role(d) { const s = slotSet(UI.ts); s.r = d.i; s.d = 1; s.w = 1; save(); render(); },
+  ins(d) { const s = slotSet(UI.ts); s[d.k] = +d.i; save(); render(); },
+  rolesreset() { G.roles = {}; fitLineup(); save(); render(); },
+  bench(d) { const p = P(d.i); if (!avail(p)) { toast(p.name + ' est indisponible'); return; } G.lineup[UI.ts] = d.i; save(); render(); },
+  auto() { G.lineup = []; fitLineup(); toast('Meilleur onze placé'); save(); render(); },
+  form(d) { G.formation = d.i; G.roles = {}; fitLineup(); UI.ts = 1; save(); render(); },
   ment(d) { G.ment = d.i; render(); },
   /* club */
-  kit(d) { G.kit.c[+d.k] = d.i; render(); },
-  kitstyle(d) { G.kit.s = d.i; render(); },
+  kit(d) { G.kit.c[+d.k] = d.i; save(); UI.ov === 'kit' ? renderOv() : render(); },
+  kitstyle(d) { G.kit.s = d.i; save(); UI.ov === 'kit' ? renderOv() : render(); },
+  kitg(d) { G.kit.g = KGK[+d.i].slice(); save(); UI.ov === 'kit' ? renderOv() : render(); },
+  kitdone() { UI.ov = null; render(); },
+  fsel(d) { UI.fsel = d.i; render(); },
+  prev() { UI.prev = UI.prev === false; render(); },
   look(d) { const s = staff(d.i), k = d.k, nx = (arr, v) => arr[(arr.indexOf(v) + 1) % arr.length]; if (k === 'hair') s.look.hair = nx(HAIR, s.look.hair); else if (k === 'hc') s.look.hc = nx(HCOL, s.look.hc); else if (k === 'skin') s.look.skin = nx(SKIN, s.look.skin); else s.look.beard = nx(['stubble', 'goatee', 'full', 'stache', undefined], s.look.beard); if (k === 'hc') s.look.bc = s.look.hc; save(); render(); },
   ustaff(d) { const e = upgradeStaff(d.i); toast(e || 'Staff amélioré'); render(); },
   stad(d) { G.stad[d.k] = d.i; save(); render(); },
-  ufac(d) { const e = upgrade(d.i); toast(e || FAC[d.i].n + ' améliorée'); render(); },
+  ufac(d) { const e = upgrade(d.i); toast(e || '🏗 Chantier terminé : ' + FAC[d.i].n + ' niveau ' + G.fac[d.i]); if (!e) { UI.built = true; setTimeout(() => { UI.built = false; }, 1200); } render(); },
   night() { UI.night = !UI.night; render(); },
   buy(d) { const e = buy(d.i); toast(e || 'Joueur signé'); render(); },
   sellnow(d) { const e = sellNow(d.i); toast(e || 'Joueur vendu'); render(); },
@@ -212,7 +228,6 @@ const ACT = {
 document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-a]'); if (!el) return;
   const a = el.dataset.a;
-  if (a === 'tsel' && UI.tsel && UI.tsel !== el.dataset.i) { const i = G.lineup.indexOf(UI.tsel), j = G.lineup.indexOf(el.dataset.i); if (i >= 0 && j >= 0) { const t = G.lineup[i]; G.lineup[i] = G.lineup[j]; G.lineup[j] = t; UI.tsel = null; render(); return; } }
   if (ACT[a]) ACT[a](el.dataset, el);
 });
 document.addEventListener('change', (e) => {

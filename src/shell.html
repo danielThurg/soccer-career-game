@@ -138,6 +138,33 @@ tr.me td{background:var(--cream)}
 @media(max-height:500px) and (orientation:landscape){.launcher{grid-template-columns:1fr 1fr;padding:22px 7%;gap:30px;text-align:left}.launch-copy{order:0}.launch-art{order:0;max-width:300px}.launch-kicker{justify-content:flex-start;margin-bottom:12px}.launch-title{font-size:48px}.launch-tag{font-size:18px;margin:14px 0 8px}.launch-desc{font-size:12px;line-height:1.4;margin:0 0 14px}.launch-play{min-height:46px;font-size:16px}.launch-save{margin:10px 0}.launch-options{justify-content:flex-start;gap:6px}.launch-options button{min-height:34px;padding:5px 9px;font-size:10px}.launch-footer{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .menu-button{flex:none;min-height:34px}
+
+.pv{position:relative;height:100%;max-width:100%;border-radius:8px;overflow:hidden;border:2px solid var(--ink);background:#2a3a2a;flex:none}
+.pf{position:absolute}
+.tk2{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;z-index:3;transition:left .38s ease,top .38s ease;pointer-events:auto;cursor:pointer}
+.tk2 .b{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;text-shadow:0 1px 0 #2B1D14,1px 0 0 #2B1D14,-1px 0 0 #2B1D14,0 -1px 0 #2B1D14;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.tk2 .nm{background:rgba(43,29,20,.88);color:#FFF0CD;font-size:8.5px;font-weight:800;padding:0 5px;border-radius:99px;white-space:nowrap;line-height:1.35}
+.tk2 .rl{background:var(--gold);color:var(--ink);font-size:7.5px;font-weight:800;padding:0 4px;border-radius:99px;margin-top:1px;line-height:1.35}
+.tk2.opp .b{width:21px;height:21px;font-size:9.5px;opacity:.95}.tk2.opp .nm{font-size:7.5px;background:rgba(43,29,20,.7)}
+.tk2.sel .b{box-shadow:0 0 0 3px var(--gold),0 0 0 5px var(--ink)}.tk2.sel{z-index:6}
+.tk2.has .b{box-shadow:0 0 0 2.5px #fff,0 0 8px 3px rgba(255,240,150,.8)}
+.tk2.mine .b{transform:scale(1.04)}
+.bl2{position:absolute;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 50%,#d8d2c6 100%);border:1.6px solid var(--ink);z-index:8;transition:left .3s ease-in-out,top .3s ease-in-out;box-shadow:0 2px 2px rgba(0,0,0,.35)}
+.mpv.shot .bl2{transition-duration:.26s;transition-timing-function:ease-in}
+.mpv.goal::after{content:'BUT !';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:34px;color:#FFF0CD;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;background:rgba(240,194,83,.28);z-index:12;animation:pop .5s ease both}
+@keyframes pop{0%{transform:scale(2.4);opacity:0}40%{opacity:1}100%{transform:scale(1)}}
+.mpv.turn{animation:nudge .25s}@keyframes nudge{50%{filter:brightness(1.12)}}
+.pbox{display:flex;justify-content:center;align-items:stretch;min-height:0;min-width:0}
+.rolebtn{display:block;width:100%;text-align:left;padding:5px 8px;border:2px solid var(--line);border-radius:10px;background:var(--paper);font-weight:800;font-size:11.5px;cursor:pointer;margin-bottom:4px}
+.rolebtn.on{border-color:var(--ink);background:var(--cream);box-shadow:0 2px 0 var(--ink)}
+.rolebtn small{display:block;font-weight:700;color:var(--muted);font-size:10px;line-height:1.25}
+.fitbar{height:8px;border-radius:5px;background:var(--line2);border:1.5px solid var(--ink);overflow:hidden}.fitbar i{display:block;height:100%}
+.hs{position:relative;border:2px solid var(--ink);border-radius:12px;overflow:hidden;cursor:pointer;padding:0;background:#000}
+.hot2{position:absolute;border-radius:10px;border:2px dashed rgba(255,240,205,.0);cursor:pointer;background:transparent}
+.hot2.on{border-color:#FFF0CD;background:rgba(255,240,205,.12)}
+@keyframes build{0%{transform:scale(.96);filter:brightness(1.8) saturate(1.4)}40%{transform:scale(1.03)}100%{transform:scale(1);filter:none}}
+.built{animation:build .9s ease}
+.nav2{display:flex;gap:4px;margin-bottom:5px}
 </style>
 </head>
 <body>
@@ -154,6 +181,7 @@ tr.me td{background:var(--cream)}
 /*DATA*/
 /*ENGINE*/
 /*UI1*/
+/*PITCH*/
 /*SCENES*/
 /*UI2*/
 /*LAUNCH*/

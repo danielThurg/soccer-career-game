@@ -103,3 +103,37 @@ const NWEEKS = 19, SEND = 7 * NWEEKS;
 const DAYN = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const dayName = (d) => DAYN[(d - 1) % 7];
 const weekOf = (d) => Math.ceil(d / 7);
+
+/* ---------- Rôles & consignes (par poste du onze) ----------
+   dy : profondeur (+ = plus haut vers le but adverse), dx : largeur (vers la touche)
+   fx : bonus aux lignes d'équipe à pleine adéquation, w : poids des stats pour l'adéquation,
+   sh : tendance à tirer, side : réservé aux postes excentrés, tal : talents qui collent au rôle */
+const ROLES = {
+  GB: [
+    { k: 'gk', n: 'Gardien', s: 'GB', d: 'Reste sur sa ligne et protège le but.', dy: 0, dx: 0, fx: {}, w: { gk: 1 }, sh: 0 },
+    { k: 'sweep', n: 'Gardien-libéro', s: 'GB', d: 'Sort loin pour relancer et couvrir. Plus de passes, mais risque sur les ballons dans le dos.', dy: 14, dx: 0, fx: { mid: 1.6, def: 0.8 }, w: { gk: 0.6, tec: 0.4 }, sh: 0 }
+  ],
+  DEF: [
+    { k: 'cb', n: 'Défenseur central', s: 'DF', d: 'Tient sa zone, dégage simple.', dy: 0, dx: 0, fx: { def: 1 }, w: { def: 0.6, phy: 0.4 }, sh: 0.3, tal: ['chef', 'mur'] },
+    { k: 'stop', n: 'Stoppeur', s: 'STO', d: 'Monte presser le porteur. Gagne des ballons haut, mais laisse du vide derrière.', dy: 9, dx: 0, fx: { def: 1.8, mid: 0.8 }, w: { def: 0.45, phy: 0.35, spd: 0.2 }, sh: 0.3, tal: ['sprint', 'lecture'] },
+    { k: 'lib', n: 'Libéro', s: 'LIB', d: 'Reste en couverture, derrière ses partenaires. Très sûr, peu de relances.', dy: -9, dx: 0, fx: { def: 2.4, att: -0.8 }, w: { def: 0.6, tec: 0.4 }, sh: 0.2, tal: ['lecture', 'chef'] },
+    { k: 'wb', n: 'Latéral offensif', s: 'LAT↑', d: 'Monte sur toute la ligne de touche et centre. Soutient l’attaque, laisse son côté ouvert.', dy: 22, dx: 12, fx: { att: 1.8, mid: 1.4, def: -2 }, w: { spd: 0.4, tec: 0.35, phy: 0.25 }, sh: 0.7, side: true, tal: ['sprint', 'vitesse'] },
+    { k: 'fb', n: 'Latéral prudent', s: 'LAT', d: 'Garde la ligne et ferme son couloir.', dy: 2, dx: 8, fx: { def: 1.4, mid: 0.4 }, w: { def: 0.55, spd: 0.25, phy: 0.2 }, sh: 0.3, side: true, tal: ['mur'] }
+  ],
+  MIL: [
+    { k: 'rec', n: 'Récupérateur', s: 'REC', d: 'Reste devant la défense et coupe les passes. Ne monte presque jamais.', dy: -13, dx: 0, fx: { def: 2.4, mid: 0.6, att: -1.4 }, w: { def: 0.5, phy: 0.35, spd: 0.15 }, sh: 0.3, tal: ['milieu', 'lecture'] },
+    { k: 'b2b', n: 'Box-to-box', s: 'B2B', d: 'Va-et-vient permanent. Complet, mais se fatigue plus.', dy: 0, dx: 0, fx: { mid: 1.6, def: 0.6, att: 0.6 }, w: { phy: 0.35, tec: 0.35, spd: 0.3 }, sh: 0.6, tal: ['moteur'], fat: 1.25 },
+    { k: 'meneur', n: 'Meneur de jeu', s: 'MJ', d: 'Joue haut, entre les lignes. Crée les occasions, défend peu.', dy: 12, dx: 0, fx: { mid: 2, att: 1.6, def: -1.6 }, w: { tec: 0.6, att: 0.25, spd: 0.15 }, sh: 0.9, tal: ['laser'] },
+    { k: 'wing', n: 'Ailier', s: 'AIL', d: 'Colle à la touche, centre et déborde.', dy: 8, dx: 20, fx: { att: 2, mid: 0.5, def: -1 }, w: { spd: 0.45, tec: 0.4, att: 0.15 }, sh: 0.8, side: true, tal: ['vitesse', 'sprint'] }
+  ],
+  ATT: [
+    { k: 'st', n: 'Avant-centre', s: 'AC', d: 'Reste dans la surface, fixe les défenseurs.', dy: 0, dx: 0, fx: { att: 2 }, w: { att: 0.6, phy: 0.25, tec: 0.15 }, sh: 1.35, tal: ['finisseur'] },
+    { k: 'n10', n: 'Numéro 10', s: 'N°10', d: 'Décroche pour toucher le ballon et lancer ses partenaires. Moins de tirs, plus de passes.', dy: -15, dx: 0, fx: { mid: 2, att: 0.6 }, w: { tec: 0.6, att: 0.25, spd: 0.15 }, sh: 0.7, tal: ['laser', 'vitesse'] },
+    { k: 'fox', n: 'Renard des surfaces', s: 'REN', d: 'Attend le ballon au point de penalty. Presque rien d’autre.', dy: 6, dx: 0, fx: { att: 3, mid: -1 }, w: { att: 0.8, spd: 0.2 }, sh: 1.8, tal: ['finisseur', 'contre'] },
+    { k: 'wide', n: 'Attaquant de côté', s: 'ATC', d: 'Joue large, rentre sur son pied fort.', dy: 3, dx: 20, fx: { att: 1.6, mid: 0.6 }, w: { spd: 0.4, tec: 0.35, att: 0.25 }, sh: 1, side: true, tal: ['vitesse', 'contre'] }
+  ]
+};
+const INS_D = ['Retrait', 'Normal', 'Avancé'], INS_W = ['Axe', 'Normal', 'Large'];
+
+const KGK = [['#5E7A5A', '#2F4A2E'], ['#F0C253', '#B8872E'], ['#DF9287', '#B23A3A'], ['#438BC0', '#1F4A7A'], ['#2B1D14', '#4B3527'], ['#7A5AA8', '#4B3478']];
+const FACVIS = { pitch: 'Pelouse plus dense, moins de zones abîmées.', cap: 'Tribunes plus hautes, toit, puis tribunes latérales.', vip: 'Loges vitrées au-dessus de la tribune centrale.', lights: 'Pylônes supplémentaires : le stade s’allume.', train: 'Bâtiment plus haut et terrain d’entraînement agrandi.', med: 'Nouvelle aile médicale.', shop: 'Boutique plus grande et plus de drapeaux.' };

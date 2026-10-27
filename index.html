@@ -138,6 +138,33 @@ tr.me td{background:var(--cream)}
 @media(max-height:500px) and (orientation:landscape){.launcher{grid-template-columns:1fr 1fr;padding:22px 7%;gap:30px;text-align:left}.launch-copy{order:0}.launch-art{order:0;max-width:300px}.launch-kicker{justify-content:flex-start;margin-bottom:12px}.launch-title{font-size:48px}.launch-tag{font-size:18px;margin:14px 0 8px}.launch-desc{font-size:12px;line-height:1.4;margin:0 0 14px}.launch-play{min-height:46px;font-size:16px}.launch-save{margin:10px 0}.launch-options{justify-content:flex-start;gap:6px}.launch-options button{min-height:34px;padding:5px 9px;font-size:10px}.launch-footer{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .menu-button{flex:none;min-height:34px}
+
+.pv{position:relative;height:100%;max-width:100%;border-radius:8px;overflow:hidden;border:2px solid var(--ink);background:#2a3a2a;flex:none}
+.pf{position:absolute}
+.tk2{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;z-index:3;transition:left .38s ease,top .38s ease;pointer-events:auto;cursor:pointer}
+.tk2 .b{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;text-shadow:0 1px 0 #2B1D14,1px 0 0 #2B1D14,-1px 0 0 #2B1D14,0 -1px 0 #2B1D14;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.tk2 .nm{background:rgba(43,29,20,.88);color:#FFF0CD;font-size:8.5px;font-weight:800;padding:0 5px;border-radius:99px;white-space:nowrap;line-height:1.35}
+.tk2 .rl{background:var(--gold);color:var(--ink);font-size:7.5px;font-weight:800;padding:0 4px;border-radius:99px;margin-top:1px;line-height:1.35}
+.tk2.opp .b{width:21px;height:21px;font-size:9.5px;opacity:.95}.tk2.opp .nm{font-size:7.5px;background:rgba(43,29,20,.7)}
+.tk2.sel .b{box-shadow:0 0 0 3px var(--gold),0 0 0 5px var(--ink)}.tk2.sel{z-index:6}
+.tk2.has .b{box-shadow:0 0 0 2.5px #fff,0 0 8px 3px rgba(255,240,150,.8)}
+.tk2.mine .b{transform:scale(1.04)}
+.bl2{position:absolute;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 50%,#d8d2c6 100%);border:1.6px solid var(--ink);z-index:8;transition:left .3s ease-in-out,top .3s ease-in-out;box-shadow:0 2px 2px rgba(0,0,0,.35)}
+.mpv.shot .bl2{transition-duration:.26s;transition-timing-function:ease-in}
+.mpv.goal::after{content:'BUT !';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:34px;color:#FFF0CD;-webkit-text-stroke:3px var(--ink);paint-order:stroke fill;background:rgba(240,194,83,.28);z-index:12;animation:pop .5s ease both}
+@keyframes pop{0%{transform:scale(2.4);opacity:0}40%{opacity:1}100%{transform:scale(1)}}
+.mpv.turn{animation:nudge .25s}@keyframes nudge{50%{filter:brightness(1.12)}}
+.pbox{display:flex;justify-content:center;align-items:stretch;min-height:0;min-width:0}
+.rolebtn{display:block;width:100%;text-align:left;padding:5px 8px;border:2px solid var(--line);border-radius:10px;background:var(--paper);font-weight:800;font-size:11.5px;cursor:pointer;margin-bottom:4px}
+.rolebtn.on{border-color:var(--ink);background:var(--cream);box-shadow:0 2px 0 var(--ink)}
+.rolebtn small{display:block;font-weight:700;color:var(--muted);font-size:10px;line-height:1.25}
+.fitbar{height:8px;border-radius:5px;background:var(--line2);border:1.5px solid var(--ink);overflow:hidden}.fitbar i{display:block;height:100%}
+.hs{position:relative;border:2px solid var(--ink);border-radius:12px;overflow:hidden;cursor:pointer;padding:0;background:#000}
+.hot2{position:absolute;border-radius:10px;border:2px dashed rgba(255,240,205,.0);cursor:pointer;background:transparent}
+.hot2.on{border-color:#FFF0CD;background:rgba(255,240,205,.12)}
+@keyframes build{0%{transform:scale(.96);filter:brightness(1.8) saturate(1.4)}40%{transform:scale(1.03)}100%{transform:scale(1);filter:none}}
+.built{animation:build .9s ease}
+.nav2{display:flex;gap:4px;margin-bottom:5px}
 </style>
 </head>
 <body>
@@ -344,6 +371,40 @@ const DAYN = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const dayName = (d) => DAYN[(d - 1) % 7];
 const weekOf = (d) => Math.ceil(d / 7);
 
+/* ---------- Rôles & consignes (par poste du onze) ----------
+   dy : profondeur (+ = plus haut vers le but adverse), dx : largeur (vers la touche)
+   fx : bonus aux lignes d'équipe à pleine adéquation, w : poids des stats pour l'adéquation,
+   sh : tendance à tirer, side : réservé aux postes excentrés, tal : talents qui collent au rôle */
+const ROLES = {
+  GB: [
+    { k: 'gk', n: 'Gardien', s: 'GB', d: 'Reste sur sa ligne et protège le but.', dy: 0, dx: 0, fx: {}, w: { gk: 1 }, sh: 0 },
+    { k: 'sweep', n: 'Gardien-libéro', s: 'GB', d: 'Sort loin pour relancer et couvrir. Plus de passes, mais risque sur les ballons dans le dos.', dy: 14, dx: 0, fx: { mid: 1.6, def: 0.8 }, w: { gk: 0.6, tec: 0.4 }, sh: 0 }
+  ],
+  DEF: [
+    { k: 'cb', n: 'Défenseur central', s: 'DF', d: 'Tient sa zone, dégage simple.', dy: 0, dx: 0, fx: { def: 1 }, w: { def: 0.6, phy: 0.4 }, sh: 0.3, tal: ['chef', 'mur'] },
+    { k: 'stop', n: 'Stoppeur', s: 'STO', d: 'Monte presser le porteur. Gagne des ballons haut, mais laisse du vide derrière.', dy: 9, dx: 0, fx: { def: 1.8, mid: 0.8 }, w: { def: 0.45, phy: 0.35, spd: 0.2 }, sh: 0.3, tal: ['sprint', 'lecture'] },
+    { k: 'lib', n: 'Libéro', s: 'LIB', d: 'Reste en couverture, derrière ses partenaires. Très sûr, peu de relances.', dy: -9, dx: 0, fx: { def: 2.4, att: -0.8 }, w: { def: 0.6, tec: 0.4 }, sh: 0.2, tal: ['lecture', 'chef'] },
+    { k: 'wb', n: 'Latéral offensif', s: 'LAT↑', d: 'Monte sur toute la ligne de touche et centre. Soutient l’attaque, laisse son côté ouvert.', dy: 22, dx: 12, fx: { att: 1.8, mid: 1.4, def: -2 }, w: { spd: 0.4, tec: 0.35, phy: 0.25 }, sh: 0.7, side: true, tal: ['sprint', 'vitesse'] },
+    { k: 'fb', n: 'Latéral prudent', s: 'LAT', d: 'Garde la ligne et ferme son couloir.', dy: 2, dx: 8, fx: { def: 1.4, mid: 0.4 }, w: { def: 0.55, spd: 0.25, phy: 0.2 }, sh: 0.3, side: true, tal: ['mur'] }
+  ],
+  MIL: [
+    { k: 'rec', n: 'Récupérateur', s: 'REC', d: 'Reste devant la défense et coupe les passes. Ne monte presque jamais.', dy: -13, dx: 0, fx: { def: 2.4, mid: 0.6, att: -1.4 }, w: { def: 0.5, phy: 0.35, spd: 0.15 }, sh: 0.3, tal: ['milieu', 'lecture'] },
+    { k: 'b2b', n: 'Box-to-box', s: 'B2B', d: 'Va-et-vient permanent. Complet, mais se fatigue plus.', dy: 0, dx: 0, fx: { mid: 1.6, def: 0.6, att: 0.6 }, w: { phy: 0.35, tec: 0.35, spd: 0.3 }, sh: 0.6, tal: ['moteur'], fat: 1.25 },
+    { k: 'meneur', n: 'Meneur de jeu', s: 'MJ', d: 'Joue haut, entre les lignes. Crée les occasions, défend peu.', dy: 12, dx: 0, fx: { mid: 2, att: 1.6, def: -1.6 }, w: { tec: 0.6, att: 0.25, spd: 0.15 }, sh: 0.9, tal: ['laser'] },
+    { k: 'wing', n: 'Ailier', s: 'AIL', d: 'Colle à la touche, centre et déborde.', dy: 8, dx: 20, fx: { att: 2, mid: 0.5, def: -1 }, w: { spd: 0.45, tec: 0.4, att: 0.15 }, sh: 0.8, side: true, tal: ['vitesse', 'sprint'] }
+  ],
+  ATT: [
+    { k: 'st', n: 'Avant-centre', s: 'AC', d: 'Reste dans la surface, fixe les défenseurs.', dy: 0, dx: 0, fx: { att: 2 }, w: { att: 0.6, phy: 0.25, tec: 0.15 }, sh: 1.35, tal: ['finisseur'] },
+    { k: 'n10', n: 'Numéro 10', s: 'N°10', d: 'Décroche pour toucher le ballon et lancer ses partenaires. Moins de tirs, plus de passes.', dy: -15, dx: 0, fx: { mid: 2, att: 0.6 }, w: { tec: 0.6, att: 0.25, spd: 0.15 }, sh: 0.7, tal: ['laser', 'vitesse'] },
+    { k: 'fox', n: 'Renard des surfaces', s: 'REN', d: 'Attend le ballon au point de penalty. Presque rien d’autre.', dy: 6, dx: 0, fx: { att: 3, mid: -1 }, w: { att: 0.8, spd: 0.2 }, sh: 1.8, tal: ['finisseur', 'contre'] },
+    { k: 'wide', n: 'Attaquant de côté', s: 'ATC', d: 'Joue large, rentre sur son pied fort.', dy: 3, dx: 20, fx: { att: 1.6, mid: 0.6 }, w: { spd: 0.4, tec: 0.35, att: 0.25 }, sh: 1, side: true, tal: ['vitesse', 'contre'] }
+  ]
+};
+const INS_D = ['Retrait', 'Normal', 'Avancé'], INS_W = ['Axe', 'Normal', 'Large'];
+
+const KGK = [['#5E7A5A', '#2F4A2E'], ['#F0C253', '#B8872E'], ['#DF9287', '#B23A3A'], ['#438BC0', '#1F4A7A'], ['#2B1D14', '#4B3527'], ['#7A5AA8', '#4B3478']];
+const FACVIS = { pitch: 'Pelouse plus dense, moins de zones abîmées.', cap: 'Tribunes plus hautes, toit, puis tribunes latérales.', vip: 'Loges vitrées au-dessus de la tribune centrale.', lights: 'Pylônes supplémentaires : le stade s’allume.', train: 'Bâtiment plus haut et terrain d’entraînement agrandi.', med: 'Nouvelle aile médicale.', shop: 'Boutique plus grande et plus de drapeaux.' };
+
 /* ===== ENGINE ===== */
 let G = null, M = null;
 const SAVE = 'scg-save-v3', ME = 30;
@@ -403,7 +464,7 @@ function newGame() {
     teams.push({ id, name: n, short: n.replace(/[^A-Za-zÀ-ÿ ]/g, '').split(' ').map((w) => w[0]).join('').slice(0, 3).toUpperCase(), div: d, s: id === ME ? DBASE[3] : DBASE[d] + rnd(-5, 5), tilt: { a: ri(-4, 4), d: ri(-4, 4), m: ri(-3, 3) }, col: [c1, c2], names: Array.from({ length: 7 }, () => pick(SURN)) });
   }));
   const players = P0.map((o) => { const p = JSON.parse(JSON.stringify(o)); Object.keys(p.st).forEach((k) => { p.st[k] = Math.max(18, p.st[k] - 7); }); return finishPlayer(p); });
-  G = { v: 3, season: 1, day: 1, teams, players, formation: '1-3-2-1', lineup: [], ment: 'eq', captain: 'rafa', penTaker: 'samir', train: 'physique', coh: 55, budget: 15000, supp: 320, board: 60, kit: { c: ['#C46A55', '#FFF0CD'], s: 'stripes' }, staff: JSON.parse(JSON.stringify(STAFF0)), fac: { pitch: 1, cap: 1, vip: 0, lights: 0, train: 1, med: 1, shop: 0 }, stad: { pitch: '#7FA077', ps: 'stripes', seat: '#C46A55', seat2: '#FFF0CD' }, inbox: [], news: [], mid: 0, mlog: [], hist: [], pid: 0, market: [], lastXI: [], tips: {}, msgCd: 0, oppBoost: 0, form5: [], offers: 0, pressDone: 0, recDay: 0 };
+  G = { v: 3, season: 1, day: 1, teams, players, formation: '1-3-2-1', lineup: [], ment: 'eq', captain: 'rafa', penTaker: 'samir', train: 'physique', coh: 55, budget: 15000, supp: 320, board: 60, kit: { c: ['#C46A55', '#FFF0CD'], s: 'stripes', g: ['#5E7A5A', '#2F4A2E'] }, roles: {}, staff: JSON.parse(JSON.stringify(STAFF0)), fac: { pitch: 1, cap: 1, vip: 0, lights: 0, train: 1, med: 1, shop: 0 }, stad: { pitch: '#7FA077', ps: 'stripes', seat: '#C46A55', seat2: '#FFF0CD' }, inbox: [], news: [], mid: 0, mlog: [], hist: [], pid: 0, market: [], lastXI: [], tips: {}, msgCd: 0, oppBoost: 0, form5: [], offers: 0, pressDone: 0, recDay: 0 };
   T(ME).s = DBASE[3] + 1;
   buildSeason(true);
   fitLineup();
@@ -412,7 +473,7 @@ function newGame() {
   save();
 }
 function save() { try { localStorage.setItem(SAVE, JSON.stringify(G)); } catch (e) { /* ignore */ } }
-function load() { try { const s = localStorage.getItem(SAVE); if (s) { const g = JSON.parse(s); if (g && g.v === 3) { G = g; return true; } } } catch (e) { /* ignore */ } return false; }
+function load() { try { const s = localStorage.getItem(SAVE); if (s) { const g = JSON.parse(s); if (g && g.v === 3) { G = g; G.roles = G.roles || {}; G.kit.g = G.kit.g || ['#5E7A5A', '#2F4A2E']; return true; } } } catch (e) { /* ignore */ } return false; }
 function news(t) { G.news.unshift({ d: G.day, s: G.season, t }); if (G.news.length > 30) G.news.pop(); }
 
 /* ---------- Season / calendar ---------- */
@@ -475,6 +536,31 @@ function nextMy() {
 /* ---------- Lineup ---------- */
 const slots = () => { const f = FM[G.formation]; return ['GB'].concat(Array(f[0]).fill('DEF'), Array(f[1]).fill('MIL'), Array(f[2]).fill('ATT')); };
 const avail = (p) => !p.inj && !p.susp;
+const DEFROLE = { GB: 'gk', DEF: 'cb', MIL: 'b2b', ATT: 'st' };
+function rowOf(i, form) {
+  const f = FM[form || G.formation]; if (i === 0) return { cat: 'GB', x: 50, y: 93 };
+  let k = i - 1, n, y, cat;
+  if (k < f[0]) { cat = 'DEF'; n = f[0]; y = 73; } else if (k < f[0] + f[1]) { cat = 'MIL'; n = f[1]; y = 50; k -= f[0]; } else { cat = 'ATT'; n = f[2]; y = 24; k -= f[0] + f[1]; }
+  const xs = n === 1 ? [50] : n === 2 ? [32, 68] : [18, 50, 82];
+  return { cat, x: xs[k], y };
+}
+const rolesFor = (i) => { const r = rowOf(i); return ROLES[r.cat].filter((o) => !o.side || Math.abs(r.x - 50) >= 15); };
+function slotSet(i) {
+  G.roles = G.roles || {}; let s = G.roles[i]; const ok = rolesFor(i);
+  if (!s || !ok.some((o) => o.k === s.r)) s = G.roles[i] = { r: DEFROLE[rowOf(i).cat], d: 1, w: 1 };
+  return s;
+}
+const roleDef = (i) => { const s = slotSet(i); return ROLES[rowOf(i).cat].find((o) => o.k === s.r); };
+function slotXY(i) {
+  const r = rowOf(i), s = slotSet(i), ro = roleDef(i), sg = r.x < 50 ? -1 : r.x > 50 ? 1 : 0;
+  const dy = ro.dy + (s.d - 1) * 10, dx = ro.dx + (s.w - 1) * 9;
+  return { x: clamp(r.x + sg * dx, 6, 94), y: clamp(r.y - dy, r.cat === 'GB' ? 70 : 8, 97) };
+}
+function fitOf(p, ro) {
+  if (!p) return 0; let v = 0; for (const k in ro.w) v += ro.w[k] * (p.st[k] || 40);
+  if (ro.tal && p.tal && ro.tal.indexOf(p.tal) >= 0) v += 6;
+  return Math.round(clamp((v - 35) / 45, 0, 1) * 100);
+}
 function fitLineup() {
   const sl = slots(), old = {}, res = [];
   (G.lineup || []).forEach((id) => { const p = P(id); if (p && avail(p)) (old[p.pos] = old[p.pos] || []).push(id); });
@@ -485,6 +571,7 @@ function fitLineup() {
     res.push(id);
   });
   G.lineup = res;
+  sl.forEach((_, i) => slotSet(i));
   if (!P(G.captain)) G.captain = G.players.slice().sort((a, b) => b.age - a.age)[0].id;
   if (!P(G.penTaker)) G.penTaker = (G.lineup.map(P).filter((p) => p && p.pos !== 'GB').sort((a, b) => b.st.tec - a.st.tec)[0] || G.players[0]).id;
 }
@@ -497,6 +584,9 @@ function teamStr(fz, hf) {
     v *= perf(p) * (fz || 1); out[line] += v; cnt[line]++;
     const t = p.tal && TAL[p.tal];
     if (t && t.ok(p)) bon[t.line] += t.b; else if (p.tal === 'contre' && p.moral < 40) bon.att -= 6;
+    const ro = roleDef(i), st = slotSet(i), q = fitOf(p, ro) / 100 * 1.5 - 0.5;
+    for (const l in ro.fx) bon[l] += ro.fx[l] * q * (ro.fx[l] > 0 ? 1 : 1);
+    bon.att += (st.d - 1) * 0.8; bon.def -= (st.d - 1) * 0.8; bon.att += (st.w - 1) * 0.4; bon.mid -= (st.w - 1) * 0.2;
   });
   ['gk', 'def', 'mid', 'att'].forEach((l) => { const n = cnt[l] || 1; out[l] = l === 'gk' ? out[l] + bon[l] : out[l] / n * (0.82 + 0.09 * n) + bon[l] * (fz || 1); });
   const cf = 0.97 + 0.06 * G.coh / 100, mt = MENT[G.ment], ad = 1 + 0.03 * (staff('adj').lvl - 1);
@@ -738,8 +828,9 @@ function startMatch() {
 }
 function names(userSide, line) {
   if (userSide) {
-    const sl = slots(); const c = G.lineup.map((id, i) => ({ p: P(id), pos: sl[i] })).filter((x) => x.p && M.redP.indexOf(x.p.id) < 0);
-    const w = (x) => line === 'att' ? ({ ATT: 6, MIL: 2.5, DEF: 0.4, GB: 0 }[x.pos]) : line === 'def' ? ({ DEF: 6, MIL: 1.5, ATT: 0.3, GB: 0 }[x.pos]) : line === 'gk' ? (x.pos === 'GB' ? 1 : 0) : ({ MIL: 6, ATT: 2, DEF: 1, GB: 0 }[x.pos]);
+    const sl = slots(); const c = G.lineup.map((id, i) => ({ p: P(id), pos: sl[i], sh: id && roleDef(i).sh })).filter((x) => x.p && M.redP.indexOf(x.p.id) < 0);
+    const w0 = (x) => line === 'att' ? ({ ATT: 6, MIL: 2.5, DEF: 0.4, GB: 0 }[x.pos]) : line === 'def' ? ({ DEF: 6, MIL: 1.5, ATT: 0.3, GB: 0 }[x.pos]) : line === 'gk' ? (x.pos === 'GB' ? 1 : 0) : ({ MIL: 6, ATT: 2, DEF: 1, GB: 0 }[x.pos]);
+    const w = (x) => line === 'att' ? w0(x) * (0.35 + 0.65 * (x.sh == null ? 1 : x.sh)) : w0(x);
     const tot = c.reduce((a, x) => a + w(x), 0); let r = Math.random() * tot;
     for (const x of c) { r -= w(x); if (r <= 0) return x.p; }
     return c[0].p;
@@ -758,17 +849,17 @@ function simBlock() {
   for (let k = 0; k < n; k++) {
     const us = Math.random() < posU, X = us ? U : Oo, Y = us ? Oo : U;
     M.ball = us ? 'U' : 'O';
-    if (Math.random() < 0.009) { penaltyEvent(us); continue; }
-    if (Math.random() < 0.012) { freekickEvent(us); continue; }
+    if (Math.random() < 0.009) { M.seq.push({ us, res: 'pen' }); penaltyEvent(us); continue; }
+    if (Math.random() < 0.012) { M.seq.push({ us, res: 'fk' }); freekickEvent(us); continue; }
     if (Math.random() < 0.0035) { redEvent(Math.random() < 0.5); }
     const r = X.mid / (X.mid + Y.def * 0.95), reach = 0.2 + 0.55 * r;
-    if (Math.random() > reach) { if (Math.random() < 0.4) { const d = names(!us, 'def'); M.feed.push({ t: M.min + "' " + d.name + ' ' + pick(['coupe la passe.', 'intercepte le ballon.', 'repousse l’attaque.']), c: '' }); } continue; }
+    if (Math.random() > reach) { const d0 = names(!us, 'def'); M.seq.push({ us, res: 'lost', st: 'mid', who: d0.id || d0.name }); if (Math.random() < 0.4) { M.feed.push({ t: M.min + "' " + d0.name + ' ' + pick(['coupe la passe.', 'intercepte le ballon.', 'repousse l’attaque.']), c: '' }); } continue; }
     const s = X.att / (X.att + Y.def * 0.9);
-    if (Math.random() > 0.4 + 0.35 * s) { if (Math.random() < 0.5) { const a = names(us, 'att'); M.feed.push({ t: M.min + "' " + a.name + ' ' + pick(['perd son duel.', 'rate son contrôle.', 'est trop lent.']), c: '' }); } continue; }
+    if (Math.random() > 0.4 + 0.35 * s) { const a = names(us, 'att'); M.seq.push({ us, res: 'lost', st: 'att', who: a.id || a.name }); if (Math.random() < 0.5) { M.feed.push({ t: M.min + "' " + a.name + ' ' + pick(['perd son duel.', 'rate son contrôle.', 'est trop lent.']), c: '' }); } continue; }
     const goalP = 0.12 + 0.28 * X.att / (X.att + Y.gk * 1.1), sh = names(us, 'att'), roll = Math.random();
-    if (roll < goalP) { goalFor(us, sh, ''); }
-    else if (roll < goalP + (1 - goalP) * 0.55) { const g = names(!us, 'gk'); M.feed.push({ t: M.min + "' " + g.name + ' ' + pick(['détourne le tir', 'réalise l’arrêt', 'sort le grand jeu']) + ' devant ' + sh.name + '.', c: '' }); }
-    else M.feed.push({ t: M.min + "' " + sh.name + ' ' + pick(['tire au-dessus.', 'frappe à côté.', 'touche le poteau !']), c: '' });
+    if (roll < goalP) { M.seq.push({ us, res: 'goal', who: sh.id || sh.name }); goalFor(us, sh, ''); }
+    else if (roll < goalP + (1 - goalP) * 0.55) { M.seq.push({ us, res: 'save', who: sh.id || sh.name }); const g = names(!us, 'gk'); M.feed.push({ t: M.min + "' " + g.name + ' ' + pick(['détourne le tir', 'réalise l’arrêt', 'sort le grand jeu']) + ' devant ' + sh.name + '.', c: '' }); }
+    else { M.seq.push({ us, res: 'miss', who: sh.id || sh.name }); M.feed.push({ t: M.min + "' " + sh.name + ' ' + pick(['tire au-dessus.', 'frappe à côté.', 'touche le poteau !']), c: '' }); }
   }
 }
 function goalFor(us, sh, tag) {
@@ -806,7 +897,7 @@ function redEvent(us) {
     M.feed.push({ t: M.min + "' CARTON ROUGE ! " + p.name + ' est expulsé. On termine à 6.', c: 'o' }); M.ev.push({ min: M.min, t: 'red', us: true, p: p.id });
   } else { if (M.red[1] >= 1) return; M.red[1]++; M.feed.push({ t: M.min + "' CARTON ROUGE pour " + pick(T(M.opp).names.slice(1)) + '. L’adversaire joue à 6.', c: 'g' }); M.ev.push({ min: M.min, t: 'red', us: false }); }
 }
-function stepBlock() { M.b++; M.min = M.b * 3; simBlock(); if (M.b >= 30) M.done = true; }
+function stepBlock() { M.seq = []; M.b++; M.min = M.b * 3; simBlock(); if (M.b >= 30) M.done = true; }
 function playAll() { while (!M.done) { if (M.b === 15 && !M.htm) M.htm = { a: 0, d: 0, m: 0 }; stepBlock(); } }
 function applyResult() {
   const m = G.match, gu = M.sc[0], go = M.sc[1], win = gu > go, draw = gu === go, lose = gu < go;
@@ -833,9 +924,9 @@ function applyResult() {
       let pr0 = 50 + (gu - go) * 5 + gm * 14 + rnd(-10, 10);
       if ((p.pos === 'DEF' || p.pos === 'GB') && go === 0) pr0 += 8;
       if (p.pm) { pr0 -= 8; p.pm = 0; }
-      if (p.pos === 'ATT' && !gm) { p.drought++; if (p.drought >= 3) { p.moral = clamp(p.moral - 3, 0, 100); pr0 -= 6; } }
+      if (p.pos === 'ATT' && !gm && (M.mine.indexOf(p.id) < 0 || roleDef(M.mine.indexOf(p.id)).sh >= 1)) { p.drought++; if (p.drought >= 3) { p.moral = clamp(p.moral - 3, 0, 100); pr0 -= 6; } }
       p.form = clamp(p.form * 0.55 + pr0 * 0.45, 5, 98);
-      const fzm = MENT[G.ment].fat; p.fat = clamp(p.fat + (22 + rnd(0, 8)) * fzm * (1 - 0.04 * G.fac.med), 0, 100);
+      const si0 = M.mine.indexOf(p.id), fzm = MENT[G.ment].fat * (si0 >= 0 && roleDef(si0).fat || 1); p.fat = clamp(p.fat + (22 + rnd(0, 8)) * fzm * (1 - 0.04 * G.fac.med), 0, 100);
       p.moral = clamp(p.moral + (win ? 4 : draw ? 0.5 : -3) + gm * 3, 0, 100);
       const risk = (0.022 + 0.0007 * Math.max(0, p.fat - 55)) * (1 - 0.05 * staff('phy').lvl - 0.03 * G.fac.pitch) * (G.fac.pitch >= 3 ? 0.9 : 1);
       if (Math.random() < risk) { const serious = Math.random() < 0.1; p.inj = serious ? ri(40, 90) : ri(4, 22); news(p.name + (serious ? ' : blessure grave, absent ' + p.inj + ' jours.' : ' se blesse, absent ' + p.inj + ' jours.')); if (serious) { M.serious = p.id; } else if (!M.injured) M.injured = p.id; }
@@ -907,7 +998,7 @@ function staffCost(s) { return s.lvl >= 5 ? null : 2500 * s.lvl; }
 function upgradeStaff(id) { const s = staff(id), c = staffCost(s); if (c === null) return 'Niveau max'; if (G.budget < c) return 'Budget insuffisant'; G.budget -= c; s.lvl++; save(); return null; }
 
 /* ===== UI helpers & screens ===== */
-const UI = { screen: 'home', sel: 'rafa', flt: 'Tous', tsel: null, ctab: 'cal1', cdiv: 3, club: 'kit', mk: 'mkt', ov: null, msgSel: null, run: false, speed: 1, toast: '', talk: null, talkMsg: '', ms: null, mt: null, ht: false };
+const UI = { screen: 'home', sel: 'rafa', flt: 'Tous', tsel: null, ctab: 'cal1', cdiv: 3, club: 'stad', fsel: 'cap', prev: true, mk: 'mkt', ov: null, msgSel: null, run: false, speed: 1, toast: '', talk: null, talkMsg: '', ms: null, mt: null, ht: false };
 const THEME = { home: ['#FFF0CD', '#2B1D14', 'Accueil'], eff: ['#86AD78', '#263E23', 'Effectif'], tac: ['#F0C253', '#493118', 'Tactique'], cal: ['#438BC0', '#FFFAF0', 'Calendrier'], club: ['#DF9287', '#462B25', 'Club'] };
 const ICON = {
   home: '<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',
@@ -916,8 +1007,8 @@ const ICON = {
   cal: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
   club: '<svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>'
 };
-const NAVO = ['cal', 'eff', 'home', 'tac', 'club'];
-const pv = (p) => Object.assign({}, p, { kit: p.pos === 'GB' ? (p.kit || ['#5E7A5A', '#2F4A2E']) : G.kit.c, kitStyle: p.pos === 'GB' ? 'plain' : G.kit.s, captain: p.id === G.captain, inj: p.inj });
+const NAVO = ['tac', 'eff', 'home', 'cal', 'club'];
+const pv = (p) => Object.assign({}, p, { kit: p.pos === 'GB' ? G.kit.g : G.kit.c, kitStyle: p.pos === 'GB' ? 'plain' : G.kit.s, captain: p.id === G.captain, inj: p.inj });
 const headH = (p, s, mood) => '<div class="hd" style="width:' + s + 'px;height:' + s + 'px">' + chibi(pv(p), 'head', mood || moodOf(p).mood) + '</div>';
 const bust = (p, mood) => chibi(pv(p), 'bust', mood || moodOf(p).mood);
 function badge(id, s) {
@@ -938,7 +1029,7 @@ function hsh(i) { let x = (i * 374761393 + 668265263) | 0; x = (x ^ (x >>> 13)) 
 function stadiumSvg(o) {
   const night = !!o.night, cap = o.cap, rows = 3 + cap, sh = 22 + cap * 11, top = 118 - sh, W = 400;
   const sc = o.seat, sc2 = o.seat2, SPEC = ['#4B3527', '#F0C253', '#438BC0', '#DF9287', '#FFF0CD', '#2B1D14', '#86AD78'];
-  let s = '<svg viewBox="0 0 400 230" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%">';
+  let s = '<svg viewBox="' + (o.vb || '0 0 400 230') + '" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%">';
   s += '<defs><linearGradient id="sk' + o.id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + (night ? '#141C2B' : '#9FD3E8') + '"/><stop offset="1" stop-color="' + (night ? '#34455C' : '#F6EBCB') + '"/></linearGradient></defs>';
   s += '<rect width="400" height="230" fill="url(#sk' + o.id + ')"/>';
   if (!night) s += '<circle cx="330" cy="26" r="14" fill="#FFE49A"/><ellipse cx="80" cy="32" rx="30" ry="8" fill="#fff" opacity=".8"/><ellipse cx="110" cy="38" rx="22" ry="6" fill="#fff" opacity=".8"/>';
@@ -1041,69 +1132,105 @@ function sEff() {
   return '<div class="g2"><div class="col"><div class="fl">' + flts + '</div><div class="col grow" style="overflow:auto;gap:5px">' + rows + '</div></div><div class="card" style="overflow:auto">' + det + '</div></div>';
 }
 
-/* ---------- Tactique ---------- */
-function tokenPos() {
-  const f = FM[G.formation], res = [[8, 50]], ys = (n) => Array.from({ length: n }, (_, i) => 50 + (i - (n - 1) / 2) * (n === 3 ? 28 : n === 2 ? 36 : 0));
-  [[f[0], 28], [f[1], 52], [f[2], 76]].forEach((r) => ys(r[0]).forEach((y) => res.push([r[1], y])));
-  return res;
-}
+/* ---------- Tactique : composition, rôles, consignes ---------- */
+const stadSt = (o) => Object.assign({ pitch: G.stad.pitch, ps: G.stad.ps, seat: G.stad.seat, cap: G.fac.cap, vip: G.fac.vip, lights: G.fac.lights, pq: G.fac.pitch, fill: 0.75 }, o || {});
 function sTac() {
-  const sl = slots(), pos = tokenPos();
-  const toks = G.lineup.map((id, i) => { const p = P(id); if (!p) return ''; const m = moodOf(p); return '<button class="tk' + (UI.tsel === id ? ' sel' : '') + '" style="left:' + pos[i][0] + '%;top:' + pos[i][1] + '%" data-a="tsel" data-i="' + id + '"><span class="h" style="border-color:' + m.col + '">' + chibi(pv(p), 'bust', m.mood) + '</span><span class="n">' + p.name + ' ' + rate(p) + '</span></button>'; }).join('');
-  const pitch = '<div class="pitch"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><g fill="none" stroke="#FFFDF8" stroke-width=".9" opacity=".8"><rect x="2" y="3" width="96" height="94"/><line x1="50" y1="3" x2="50" y2="97"/><circle cx="50" cy="50" r="10"/><rect x="2" y="30" width="14" height="40"/><rect x="84" y="30" width="14" height="40"/></g></svg>' + toks + '</div>';
+  const sl = slots(); if (UI.ts == null || UI.ts >= sl.length) UI.ts = 1;
+  const si = UI.ts, sp = P(G.lineup[si]), cat = rowOf(si).cat, ro = roleDef(si), st = slotSet(si);
+  const toks = G.lineup.map((id, i) => { const p = P(id); if (!p) return ''; const q = slotXY(i), r = roleDef(i); return PitchV.tok({ a: 'tsel', i, x: q.x, y: q.y, name: p.name, num: p.num, col: i === 0 ? G.kit.g : G.kit.c, ks: i === 0 ? 'plain' : G.kit.s, sub: r.s, cls: i === si ? 'sel' : '' }); }).join('');
+  const pitch = '<div class="pbox">' + PitchV.field(stadSt(), toks, {}) + '</div>';
   const fm = Object.keys(FM).map((f) => '<button class="' + (G.formation === f ? 'on' : '') + '" data-a="form" data-i="' + f + '">' + f.slice(2) + '</button>').join('');
   const mt = Object.keys(MENT).map((k) => '<button class="' + (G.ment === k ? 'on' : '') + '" data-a="ment" data-i="' + k + '">' + MENT[k].n + '</button>').join('');
-  const bn = benchList().sort((a, b) => ['GB', 'DEF', 'MIL', 'ATT'].indexOf(a.pos) - ['GB', 'DEF', 'MIL', 'ATT'].indexOf(b.pos)).map((p) => { const m = moodOf(p), sel = UI.tsel; return '<div class="prow' + (sel ? ' hot' : '') + '" data-a="bench" data-i="' + p.id + '">' + headH(p, 28) + '<div class="grow"><b style="font-size:12px">' + p.name + '</b><div class="muted" style="font-size:10px;font-weight:800">' + p.pos + ' · ' + m.label + '</div></div><b style="color:' + col(rate(p)) + '">' + rate(p) + '</b></div>'; }).join('');
   const lu = G.lineup.map(P).filter(Boolean), opts = (cur) => lu.map((p) => '<option value="' + p.id + '"' + (p.id === cur ? ' selected' : '') + '>' + p.name + '</option>').join('');
-  return '<div class="g3t"><div class="col"><div class="card"><h3>Formation</h3><div class="seg">' + fm + '</div><div class="muted" style="font-size:11px;font-weight:700;margin-top:4px">' + FNOTE[G.formation] + '</div></div><div class="card"><h3>Mentalité</h3><div class="seg">' + mt + '</div><div class="muted" style="font-size:11px;font-weight:700;margin-top:4px">' + MENT[G.ment].t + '</div></div>' +
-    '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:3px"><b style="font-size:12px">Penaltys</b><select data-sel="pen">' + opts(G.penTaker) + '</select></div><div class="row" style="justify-content:space-between"><b style="font-size:12px">Capitaine</b><select data-sel="cap">' + opts(G.captain) + '</select></div></div></div>' +
-    pitch + '<div class="col"><div class="card" style="flex:1;min-height:0;overflow:auto"><h3 style="margin:0 0 4px">Banc</h3><div class="muted" style="font-size:10.5px;font-weight:700;margin-bottom:4px">' + (UI.tsel ? 'Touche un remplaçant pour l’échanger.' : 'Touche un titulaire, puis un remplaçant.') + '</div><div class="col" style="gap:4px">' + bn + '</div></div></div></div>';
+  const left = '<div class="col" style="overflow:auto"><div class="card" style="padding:7px"><h3 style="margin:0 0 4px">Formation</h3><div class="seg" style="flex-wrap:wrap">' + fm + '</div><div class="muted" style="font-size:10px;font-weight:700;margin-top:3px">' + FNOTE[G.formation] + '</div></div>' +
+    '<div class="card" style="padding:7px"><h3 style="margin:0 0 4px">Mentalité</h3><div class="seg" style="flex-wrap:wrap">' + mt + '</div><div class="muted" style="font-size:10px;font-weight:700;margin-top:3px">' + MENT[G.ment].t + '</div></div>' +
+    '<div class="card" style="padding:7px"><div class="row" style="justify-content:space-between;margin-bottom:3px"><b style="font-size:11.5px">Penaltys</b><select data-sel="pen">' + opts(G.penTaker) + '</select></div><div class="row" style="justify-content:space-between"><b style="font-size:11.5px">Capitaine</b><select data-sel="cap">' + opts(G.captain) + '</select></div></div>' +
+    '<button class="btn sm" data-a="auto">⚡ Meilleur onze</button><button class="btn sm" data-a="rolesreset">↺ Rôles par défaut</button></div>';
+  // panneau du poste sélectionné
+  let panel = '';
+  if (sp) {
+    const m = moodOf(sp), fit = fitOf(sp, ro), fcol = fit >= 70 ? '#86AD78' : fit >= 45 ? '#F0C253' : '#DF9287';
+    const rl = rolesFor(si).map((o) => { const f = fitOf(sp, o); return '<button class="rolebtn' + (o.k === st.r ? ' on' : '') + '" data-a="role" data-i="' + o.k + '"><span class="row" style="justify-content:space-between"><span>' + o.n + '</span><span style="color:' + (f >= 70 ? '#4E8A48' : f >= 45 ? '#B8872E' : '#C46A55') + '">' + f + ' %</span></span><small>' + o.d + '</small></button>'; }).join('');
+    const sg = rowOf(si).x === 50 ? 0 : 1;
+    const seg = (key, arr, v) => '<div class="seg">' + arr.map((l, j) => '<button class="' + (v === j ? 'on' : '') + '" data-a="ins" data-k="' + key + '" data-i="' + j + '">' + l + '</button>').join('') + '</div>';
+    const bn = benchList().filter((p) => cat === 'GB' ? p.pos === 'GB' : p.pos !== 'GB').sort((a, b) => rate(b) - rate(a)).map((p) => '<div class="prow hot" data-a="bench" data-i="' + p.id + '" style="padding:3px 6px">' + headH(p, 24) + '<div class="grow"><b style="font-size:11.5px">' + p.name + '</b><div class="muted" style="font-size:9.5px;font-weight:800">' + p.pos + ' · ' + moodOf(p).label + ' · ' + fitOf(p, ro) + ' % rôle</div></div><b style="color:' + col(rate(p)) + '">' + rate(p) + '</b></div>').join('') || '<div class="muted" style="font-size:11px;font-weight:700">Aucun remplaçant à ce poste.</div>';
+    panel = '<div class="card" style="overflow:auto;padding:8px"><div class="row" style="gap:8px;margin-bottom:5px">' + headH(sp, 38) + '<div class="grow"><b style="font-size:15px">' + sp.name + '</b><div class="muted" style="font-size:10.5px;font-weight:800">' + sp.pos + ' · ' + bLabel(sp.build) + (sp.tal ? ' · ' + TAL[sp.tal].n : '') + '</div></div><div style="text-align:right"><b style="font-size:20px;color:' + col(rate(sp)) + '">' + rate(sp) + '</b><div><span class="tag" style="background:' + m.bg + ';color:' + m.fg + ';font-size:9px">' + m.label + '</span></div></div></div>' +
+      '<div class="row" style="gap:6px;margin-bottom:6px"><span style="font-size:11px;font-weight:800;white-space:nowrap">Adéquation au rôle</span><div class="fitbar grow"><i style="width:' + fit + '%;background:' + fcol + '"></i></div><b style="font-size:12px">' + fit + ' %</b></div>' +
+      '<h3 style="margin:0 0 4px;font-size:12px">Rôle</h3>' + rl +
+      '<h3 style="margin:6px 0 3px;font-size:12px">Consignes</h3><div class="row" style="gap:6px;margin-bottom:4px"><span style="width:62px;font-size:11px;font-weight:800">Profondeur</span><div class="grow">' + seg('d', INS_D, st.d) + '</div></div>' +
+      (sg ? '<div class="row" style="gap:6px"><span style="width:62px;font-size:11px;font-weight:800">Largeur</span><div class="grow">' + seg('w', INS_W, st.w) + '</div></div>' : '<div class="muted" style="font-size:10px;font-weight:700">Poste axial : pas de consigne de largeur.</div>') +
+      '<h3 style="margin:8px 0 4px;font-size:12px">Remplacer par…</h3><div class="col" style="gap:4px">' + bn + '</div></div>';
+  } else panel = '<div class="card">Poste vide.</div>';
+  return '<div style="display:grid;grid-template-columns:23% auto 1fr;gap:9px;height:100%">' + left + pitch + panel + '</div>';
 }
 
-/* ---------- Calendrier ---------- */
+/* ---------- Calendrier (version légère) ---------- */
+function calRows() {
+  return G.cal.map((ev) => {
+    let opp = null, h = null, sc = null, lab, done = ev.day < G.day || (ev.day === G.day && !G.match);
+    if (ev.t === 'L') { const f = G.fix[myDiv()][ev.r], i = f.findIndex((x) => x[0] === ME || x[1] === ME); opp = f[i][0] === ME ? f[i][1] : f[i][0]; h = f[i][0] === ME; const r = G.res[myDiv()][ev.r]; if (r && r[i]) sc = h ? r[i] : [r[i][1], r[i][0]]; lab = 'Ligue'; }
+    else { const hist = G.cup.hist.find((x) => x.r === ev.r); const t = hist ? hist.ties.find((x) => x.a === ME || x.b === ME) : G.cup.r === ev.r ? G.cup.cur.find((x) => x.a === ME || x.b === ME) : null; lab = 'Coupe'; if (!t) return null; opp = t.a === ME ? t.b : t.a; h = t.a === ME; const g = ev.r === 5 ? t.l2 : t.l1; if (g) sc = (ev.r === 5 ? t.b === ME : t.a === ME) ? g : [g[1], g[0]]; }
+    return { ev, opp, h, sc, lab, done };
+  }).filter(Boolean);
+}
 function sCal() {
-  const tabs = [['cal1', 'Classement'], ['cal2', 'Matchs'], ['cal3', 'Coupe du Roi']].map((t) => '<button class="' + (UI.ctab === t[0] ? 'on' : '') + '" data-a="ctab" data-i="' + t[0] + '">' + t[1] + '</button>').join('');
-  let body = '';
-  if (UI.ctab === 'cal1') {
-    const dv = [0, 1, 2, 3].map((d) => '<button class="' + (UI.cdiv === d ? 'on' : '') + '" data-a="cdiv" data-i="' + d + '">' + DIVS[d].n.replace('Division ', 'D') + '</button>').join('');
-    const tb = divTable(UI.cdiv);
-    const rows = tb.map((r, i) => '<tr class="' + (r.id === ME ? 'me' : '') + '"><td style="width:22px;color:' + (i < 2 && UI.cdiv > 0 ? '#4E8A48' : i > 7 && UI.cdiv < 3 ? '#C46A55' : 'inherit') + '">' + (i + 1) + '</td><td><span class="row" style="gap:5px">' + badge(r.id, 18) + r.n + '</span></td><td>' + r.pl + '</td><td>' + r.w + '</td><td>' + r.d + '</td><td>' + r.l + '</td><td>' + (r.gf - r.ga) + '</td><td><b>' + r.pts + '</b></td></tr>').join('');
-    body = '<div class="row" style="gap:8px;align-items:flex-start;height:100%"><div class="col" style="width:92px"><div class="seg" style="flex-direction:column;gap:5px">' + dv + '</div><div class="card" style="font-size:10.5px;font-weight:700;padding:6px"><span style="color:#4E8A48">● Montée (2)</span><br><span style="color:#C46A55">● Relégation (2)</span><br>Objectif : ' + G.obj.t + '</div></div><div class="card grow cal1" style="padding:4px 8px;overflow:auto;height:100%"><table><tr class="muted"><th>#</th><th>Club</th><th>J</th><th>V</th><th>N</th><th>D</th><th>+/-</th><th>Pts</th></tr>' + rows + '</table></div></div>';
-  } else if (UI.ctab === 'cal2') {
-    const evs = G.cal.map((ev) => {
-      let opp = null, h = null, sc = null, lab, done = ev.day < G.day || (ev.day === G.day && !G.match);
-      if (ev.t === 'L') { const f = G.fix[myDiv()][ev.r], i = f.findIndex((x) => x[0] === ME || x[1] === ME); opp = f[i][0] === ME ? f[i][1] : f[i][0]; h = f[i][0] === ME; const r = G.res[myDiv()][ev.r]; if (r && r[i]) sc = h ? r[i] : [r[i][1], r[i][0]]; lab = 'Ligue · J' + (ev.r + 1); }
-      else { const hist = G.cup.hist.find((x) => x.r === ev.r); const t = hist ? hist.ties.find((x) => x.a === ME || x.b === ME) : G.cup.r === ev.r ? G.cup.cur.find((x) => x.a === ME || x.b === ME) : null; lab = CUPR[ev.r]; if (!t) return '<div class="evr"><span class="muted">' + dayName(ev.day) + ' S' + weekOf(ev.day) + '</span><span>' + lab + '</span><span class="muted">—</span><span></span></div>'; opp = t.a === ME ? t.b : t.a; h = t.a === ME; const g = ev.r === 5 ? t.l2 : t.l1; if (g) sc = (ev.r === 5 ? t.b === ME : t.a === ME) ? g : [g[1], g[0]]; }
-      const res = sc ? (sc[0] > sc[1] ? 'V' : sc[0] < sc[1] ? 'D' : 'N') : '';
-      return '<div class="evr' + (ev.day === G.day ? ' cur' : '') + '"><span class="muted">' + dayName(ev.day) + ' S' + weekOf(ev.day) + '</span><span>' + lab + '</span><span class="row" style="gap:5px">' + badge(opp, 18) + (h ? '' : '@ ') + T(opp).name + '</span><span>' + (sc ? '<span class="fm ' + res + '">' + sc[0] + '-' + sc[1] + '</span>' : done ? '' : '<span class="muted">à venir</span>') + '</span></div>';
-    }).join('');
-    body = '<div class="card" style="height:100%;overflow:auto;padding:6px 8px"><div class="col" style="gap:3px">' + evs + '</div></div>';
-  } else {
-    const C = G.cup, cols = [];
-    for (let r = 0; r <= 6; r++) {
-      const hist = C.hist.find((x) => x.r === r); const ties = hist ? hist.ties : C.r === r ? C.cur : (r === 5 && C.r === 5 ? C.cur : null);
-      const th = ties ? ties.map((t) => { const sc = t.l2 ? tieAgg(t) : t.l1; const meT = t.a === ME || t.b === ME; return '<div class="tie' + (meT ? ' me' : '') + '"><div class="' + (t.w === t.a ? 'w' : '') + '">' + T(t.a).name + '<b>' + (sc ? sc[0] : '') + '</b></div><div class="' + (t.w === t.b ? 'w' : '') + '">' + T(t.b).name + '<b>' + (sc ? sc[1] : '') + '</b></div>' + (t.pen ? '<small>tab ' + t.pen[0] + '-' + t.pen[1] + '</small>' : '') + '</div>'; }).join('') : '<div class="muted" style="font-size:11px;font-weight:700">À tirer</div>';
-      cols.push('<div class="cc"><div class="ch2">' + CUPR[r] + '<br><span class="muted" style="font-weight:700;font-size:10px">Sem. ' + CUPW[r] + '</span></div>' + th + '</div>');
-    }
-    body = '<div class="row" style="gap:7px;align-items:flex-start;height:100%;overflow:auto">' + cols.join('') + '</div>';
-  }
-  return '<div class="fl">' + tabs + '</div><div style="height:calc(100% - 38px)">' + body + '</div>';
+  const rows = calRows(), past = rows.filter((r) => r.done).slice(-2), next = rows.filter((r) => !r.done).slice(0, 4);
+  const line = (r) => { const res = r.sc ? (r.sc[0] > r.sc[1] ? 'V' : r.sc[0] < r.sc[1] ? 'D' : 'N') : ''; return '<div class="evr' + (r.ev.day === G.day ? ' cur' : '') + '" style="grid-template-columns:48px 1fr 54px"><span class="muted">' + dayName(r.ev.day) + ' S' + weekOf(r.ev.day) + '</span><span class="row" style="gap:5px;min-width:0">' + badge(r.opp, 18) + '<span class="trunc" style="color:var(--ink);font-size:12px">' + (r.h ? '' : '@ ') + T(r.opp).name + '</span><span class="tag" style="background:' + (r.lab === 'Coupe' ? '#F0C253' : '#EAD3B0') + ';font-size:9px">' + r.lab + '</span></span><span>' + (r.sc ? '<span class="fm ' + res + '">' + r.sc[0] + '-' + r.sc[1] + '</span>' : '<span class="muted">à venir</span>') + '</span></div>'; };
+  const cupTxt = G.cup.champ === ME ? 'Vainqueur !' : meInCup() ? 'En lice · ' + CUPR[G.cup.r] : G.cup.champ !== null ? 'Terminée' : 'Éliminé';
+  const d = UI.cdiv == null ? myDiv() : UI.cdiv, tb = divTable(d);
+  const dv = [0, 1, 2, 3].map((x) => '<button class="' + (d === x ? 'on' : '') + '" data-a="cdiv" data-i="' + x + '">D' + (x + 1) + '</button>').join('');
+  const trs = tb.map((r, i) => '<tr class="' + (r.id === ME ? 'me' : '') + '"><td style="width:20px;color:' + (i < 2 && d > 0 ? '#4E8A48' : i > 7 && d < 3 ? '#C46A55' : 'inherit') + '">' + (i + 1) + '</td><td><span class="row" style="gap:5px">' + badge(r.id, 16) + r.n + '</span></td><td>' + r.pl + '</td><td>' + (r.gf - r.ga) + '</td><td><b>' + r.pts + '</b></td></tr>').join('');
+  return '<div style="display:grid;grid-template-columns:44% 1fr;gap:9px;height:100%"><div class="col" style="overflow:auto"><div class="card" style="padding:7px"><div class="row" style="justify-content:space-between"><b style="font-size:12px">Coupe du Roi</b><span style="font-size:11px;font-weight:800">' + cupTxt + '</span></div><div class="muted" style="font-size:10.5px;font-weight:700;margin-top:2px">Objectif : ' + G.obj.t + '</div></div><div class="card" style="padding:6px 8px;flex:1"><h3 style="margin:0 0 3px">Matchs</h3><div class="col" style="gap:3px">' + past.map(line).join('') + (past.length ? '<div style="border-top:1.5px dashed var(--line);margin:2px 0"></div>' : '') + (next.map(line).join('') || '<div class="muted">Saison terminée.</div>') + '</div></div></div><div class="card cal1" style="padding:4px 8px;overflow:auto"><div class="seg" style="margin-bottom:4px;width:190px">' + dv + '</div><table><tr class="muted"><th>#</th><th>Club</th><th>J</th><th>+/-</th><th>Pts</th></tr>' + trs + '</table></div></div>';
+}
+
+/* ---------- Campus (centre d'entraînement, médical, boutique) ---------- */
+function campusSvg(o) {
+  const tl = Math.max(1, o.train), ml = Math.max(0, o.med), sl = Math.max(0, o.shop), sc = G.stad.seat, sc2 = G.stad.seat2, hl = o.hl;
+  const ink = '#2B1D14'; let s = '<svg viewBox="' + (o.vb || '0 0 400 96') + '" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" style="display:block;width:100%;height:100%"><rect width="400" height="96" fill="#CBE3C0"/><rect y="78" width="400" height="18" fill="#B9A27E"/><path d="M0 78H400" stroke="' + ink + '" stroke-width="2"/>';
+  const badge2 = (x, y) => '<g><rect x="' + (x - 14) + '" y="' + (y - 9) + '" width="28" height="13" rx="6" fill="#F0C253" stroke="' + ink + '" stroke-width="1.6"/><text x="' + x + '" y="' + (y + 1) + '" text-anchor="middle" font-family="Nunito" font-weight="800" font-size="8.5" fill="' + ink + '">NEUF</text></g>';
+  // centre d'entraînement
+  { const w = 56 + tl * 7, h = 12 + tl * 9, x = 12; s += '<rect x="' + x + '" y="' + (78 - h) + '" width="' + w + '" height="' + h + '" fill="#E3D3B3" stroke="' + ink + '" stroke-width="2.2"/><rect x="' + (x - 3) + '" y="' + (78 - h - 5) + '" width="' + (w + 6) + '" height="6" fill="#8A5A34" stroke="' + ink + '" stroke-width="2"/>';
+    for (let r = 0; r < Math.min(tl, 4); r++) for (let c = 0; c < 2 + Math.floor(tl / 2); c++) s += '<rect x="' + (x + 6 + c * 13) + '" y="' + (78 - h + 6 + r * 9) + '" width="8" height="5" fill="#CFE3E8" stroke="' + ink + '" stroke-width="1"/>';
+    s += '<rect x="' + (x + w + 4) + '" y="64" width="' + (22 + tl * 8) + '" height="14" fill="#86AD78" stroke="' + ink + '" stroke-width="1.8"/><path d="M' + (x + w + 4 + (22 + tl * 8) / 2) + ' 64v14" stroke="#fff" stroke-width="1.2"/>';
+    if (hl === 'train') s += badge2(x + w / 2, 78 - h - 12); }
+  // centre médical
+  { const x = 190, w = 40 + ml * 8, h = ml ? 14 + ml * 7 : 8; if (ml) { s += '<rect x="' + x + '" y="' + (78 - h) + '" width="' + w + '" height="' + h + '" fill="#FFFDF8" stroke="' + ink + '" stroke-width="2.2"/>' + (ml >= 3 ? '<rect x="' + (x + w) + '" y="' + (78 - h + 8) + '" width="' + (10 + ml * 2) + '" height="' + (h - 8) + '" fill="#FFFDF8" stroke="' + ink + '" stroke-width="2"/>' : '') + '<rect x="' + (x + w / 2 - 6) + '" y="' + (78 - h + 3) + '" width="12" height="12" fill="#E34B3F" stroke="' + ink + '" stroke-width="1.4"/><path d="M' + (x + w / 2) + ' ' + (78 - h + 5) + 'v8M' + (x + w / 2 - 4) + ' ' + (78 - h + 9) + 'h8" stroke="#fff" stroke-width="2.2"/>'; for (let c = 0; c < ml; c++) s += '<rect x="' + (x + 5 + c * 10) + '" y="' + (78 - 15) + '" width="6" height="9" fill="#CFE3E8" stroke="' + ink + '" stroke-width="1"/>'; }
+    else s += '<rect x="' + x + '" y="70" width="40" height="8" fill="#E8E1D0" stroke="' + ink + '" stroke-width="1.6" stroke-dasharray="3 2"/>';
+    if (hl === 'med') s += badge2(x + w / 2, 78 - h - 6); }
+  // boutique
+  { const x = 300, w = 34 + sl * 10, h = sl ? 20 + sl * 3 : 8; if (sl) { s += '<rect x="' + x + '" y="' + (78 - h) + '" width="' + w + '" height="' + h + '" fill="#FFF0CD" stroke="' + ink + '" stroke-width="2.2"/>';
+      for (let i = 0; i < Math.floor(w / 7); i++) s += '<rect x="' + (x + i * 7) + '" y="' + (78 - h - 6) + '" width="7" height="9" fill="' + (i % 2 ? sc2 : sc) + '" stroke="' + ink + '" stroke-width="1"/>';
+      s += '<rect x="' + (x + 6) + '" y="' + (78 - 13) + '" width="' + (w - 12) + '" height="13" fill="#CFE3E8" stroke="' + ink + '" stroke-width="1.4"/>';
+      for (let f = 0; f < sl; f++) s += '<path d="M' + (x + 4 + f * 9) + ' ' + (78 - h - 6) + 'v-14" stroke="' + ink + '" stroke-width="1.6"/><path d="M' + (x + 4 + f * 9) + ' ' + (78 - h - 20) + 'h9l-3 4 3 4h-9z" fill="' + (f % 2 ? sc2 : sc) + '" stroke="' + ink + '" stroke-width="1"/>'; }
+    else s += '<rect x="' + x + '" y="70" width="34" height="8" fill="#E8E1D0" stroke="' + ink + '" stroke-width="1.6" stroke-dasharray="3 2"/>';
+    if (hl === 'shop') s += badge2(x + w / 2, 78 - h - 24); }
+  return s + '</svg>';
+}
+const facLv = (k) => G.fac[k] + (UI.prev !== false && UI.fsel === k && upgradeCost(k) !== null ? 1 : 0);
+function kitEditor(ov) {
+  const demo = [G.players.find((p) => p.pos === 'GB'), P(G.captain), G.players.filter((p) => p.pos === 'ATT')[0], G.players.filter((p) => p.pos === 'MIL')[0]].filter(Boolean);
+  const sw = (i) => KCOL.map((c) => '<button class="sw' + (G.kit.c[i] === c ? ' on' : '') + '" style="background:' + c + '" data-a="kit" data-k="' + i + '" data-i="' + c + '"></button>').join('');
+  const gk = KGK.map((c, j) => '<button class="sw' + (G.kit.g[0] === c[0] ? ' on' : '') + '" style="background:linear-gradient(135deg,' + c[0] + ' 55%,' + c[1] + ' 55%)" data-a="kitg" data-i="' + j + '"></button>').join('');
+  return '<div class="row" style="gap:8px;align-items:stretch;height:' + (ov ? '230px' : '100%') + '"><div class="card" style="flex:0 0 46%;display:flex;align-items:flex-end;justify-content:space-around;background:linear-gradient(#FFF0CD,#F3E0B0);padding:8px">' + demo.map((p) => '<div style="width:' + Math.floor(96 / demo.length) + '%;max-width:84px">' + chibi(pv(p), 'full', 'happy') + '<div style="text-align:center;font-size:9.5px;font-weight:800">' + p.name + '</div></div>').join('') + '</div><div class="card grow" style="overflow:auto"><h3 style="margin:0 0 3px">Couleur principale</h3><div class="swrap">' + sw(0) + '</div><h3 style="margin:6px 0 3px">Couleur secondaire</h3><div class="swrap">' + sw(1) + '</div><h3 style="margin:6px 0 3px">Motif</h3><div class="seg" style="flex-wrap:wrap">' + KSTY.map((s) => '<button class="' + (G.kit.s === s[0] ? 'on' : '') + '" data-a="kitstyle" data-i="' + s[0] + '">' + s[1] + '</button>').join('') + '</div><h3 style="margin:6px 0 3px">Gardien</h3><div class="swrap">' + gk + '</div></div></div>';
 }
 
 /* ---------- Club ---------- */
 function sClub() {
-  const tabs = [['kit', 'Équipement'], ['staff', 'Staff'], ['stad', 'Stade'], ['transfers', 'Transferts'], ['fin', 'Finances']].map((t) => '<button class="' + (UI.club === t[0] ? 'on' : '') + '" data-a="club" data-i="' + t[0] + '">' + t[1] + '</button>').join('');
+  const tabs = [['stad', 'Stade'], ['kit', 'Équipement'], ['staff', 'Staff'], ['transfers', 'Transferts'], ['fin', 'Finances']].map((t) => '<button class="' + (UI.club === t[0] ? 'on' : '') + '" data-a="club" data-i="' + t[0] + '">' + t[1] + '</button>').join('');
   let body = '';
   if (UI.club === 'kit') {
-    const demo = [P('kofi') || G.players.find((p) => p.pos === 'GB'), P(G.captain), G.players.filter((p) => p.pos === 'ATT')[0], G.players.filter((p) => p.pos === 'MIL')[0]].filter(Boolean);
-    const sw = (k, i) => KCOL.map((c) => '<button class="sw' + (G.kit.c[i] === c ? ' on' : '') + '" style="background:' + c + '" data-a="kit" data-k="' + i + '" data-i="' + c + '"></button>').join('');
-    body = '<div class="row" style="gap:8px;align-items:stretch;height:100%"><div class="card" style="flex:0 0 54%;display:flex;align-items:flex-end;justify-content:space-around;background:linear-gradient(#FFF0CD,#F3E0B0);padding:8px">' + demo.map((p) => '<div style="width:22%;max-width:90px">' + chibi(pv(p), 'full', 'happy') + '<div style="text-align:center;font-size:10px;font-weight:800">' + p.name + '</div></div>').join('') + '</div><div class="card grow" style="overflow:auto"><h3 style="margin:0 0 3px">Couleur principale</h3><div class="swrap">' + sw('c', 0) + '</div><h3 style="margin:6px 0 3px">Couleur secondaire</h3><div class="swrap">' + sw('c', 1) + '</div><h3 style="margin:6px 0 3px">Motif</h3><div class="seg" style="flex-wrap:wrap">' + KSTY.map((s) => '<button class="' + (G.kit.s === s[0] ? 'on' : '') + '" data-a="kitstyle" data-i="' + s[0] + '">' + s[1] + '</button>').join('') + '</div></div></div>';
+    body = kitEditor(false);
   } else if (UI.club === 'staff') {
     body = '<div class="row" style="gap:8px;align-items:stretch;height:100%">' + G.staff.map((s) => { const c = staffCost(s); return '<div class="card grow col" style="align-items:center;text-align:center;gap:3px;min-width:0"><div style="width:96px;height:100px;background:#F3E0B0;border-radius:12px;overflow:hidden">' + chibi(staffView(s.id), 'bust', 'happy') + '</div><div class="muted" style="font-size:10px;font-weight:800">' + s.role.toUpperCase() + '</div><b style="font-size:13px">' + s.name + '</b>' + pips(s.lvl) + '<div style="font-size:10.5px;font-weight:700;min-height:28px">' + STAFF_FX[s.id] + '</div><div class="row" style="gap:3px;flex-wrap:wrap;justify-content:center">' + [['hair', '💇'], ['hc', '🎨'], ['skin', '🧑'], ['beard', '🧔']].map((b) => '<button class="btn sm ico" data-a="look" data-i="' + s.id + '" data-k="' + b[0] + '">' + b[1] + '</button>').join('') + '</div><button class="btn sm pri" data-a="ustaff" data-i="' + s.id + '"' + (c === null ? ' disabled' : '') + '>' + (c === null ? 'Niveau max' : 'Améliorer · ' + fmt(c)) + '</button></div>'; }).join('') + '</div>';
   } else if (UI.club === 'stad') {
-    const swc = (arr, key) => arr.map((c) => '<button class="sw' + (G.stad[key] === c ? ' on' : '') + '" style="background:' + c + '" data-a="stad" data-k="' + key + '" data-i="' + c + '"></button>').join('');
-    const facs = Object.keys(FAC).map((k) => { const c = upgradeCost(k); return '<div class="frow"><span style="font-size:18px">' + FAC[k].ico + '</span><div class="grow"><b style="font-size:12px">' + FAC[k].n + '</b> ' + pips(G.fac[k]) + '<div class="muted" style="font-size:10px;font-weight:700">' + FAC[k].fx + '</div></div><button class="btn sm pri" data-a="ufac" data-i="' + k + '"' + (c === null ? ' disabled' : '') + '>' + (c === null ? 'Max' : fmt(c)) + '</button></div>'; }).join('');
-    body = '<div class="row" style="gap:8px;align-items:stretch;height:100%"><div class="col" style="flex:0 0 50%"><div class="card" style="padding:0;overflow:hidden;flex:1;min-height:0">' + stadiumSvg(myStadium({ id: 'ed', night: UI.night, on: UI.night })) + '</div><div class="row" style="gap:6px"><span class="muted" style="font-size:11px;font-weight:800">Capacité ' + CAPS[G.fac.cap] + ' places · ' + Math.round(clamp(G.supp / CAPS[G.fac.cap], 0, 1) * 100) + ' % remplies</span><button class="btn sm" data-a="night" style="margin-left:auto">' + (UI.night ? '☀ Jour' : '🌙 Nuit') + '</button></div></div><div class="card grow" style="overflow:auto"><h3 style="margin:0 0 3px">Pelouse</h3><div class="swrap">' + swc(PITCHC, 'pitch') + '</div><div class="seg" style="margin-top:4px">' + PITCHS.map((s) => '<button class="' + (G.stad.ps === s[0] ? 'on' : '') + '" data-a="stad" data-k="ps" data-i="' + s[0] + '">' + s[1] + '</button>').join('') + '</div><h3 style="margin:6px 0 3px">Sièges</h3><div class="swrap">' + swc(SEATC, 'seat') + '</div><h3 style="margin:6px 0 3px">Lettres / bandeaux</h3><div class="swrap">' + swc(SEATC, 'seat2') + '</div><h3 style="margin:8px 0 3px">Améliorations</h3>' + facs + '</div></div>';
+    const k = UI.fsel, l = G.fac[k], cost = upgradeCost(k), pvw = UI.prev !== false && cost !== null;
+    const st = myStadium({ id: 'ed', cap: facLv('cap'), vip: facLv('vip'), lights: facLv('lights'), pq: facLv('pitch'), night: UI.night, on: UI.night });
+    const chips = Object.keys(FAC).map((x) => '<button class="btn sm' + (UI.fsel === x ? ' pri' : '') + '" data-a="fsel" data-i="' + x + '" style="padding:0 5px;min-height:34px;flex-direction:column;line-height:1"><span style="font-size:14px">' + FAC[x].ico + '</span><span style="font-size:8.5px">' + G.fac[x] + '/5</span></button>').join('');
+    const nowT = k === 'cap' ? CAPS[l] + ' places' : 'Niveau ' + l, nextT = cost === null ? 'Niveau max' : k === 'cap' ? CAPS[l + 1] + ' places' : 'Niveau ' + (l + 1);
+    const swc = (arr, key) => arr.map((c) => '<button class="sw" style="background:' + c + ';' + (G.stad[key] === c ? 'box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--ink)' : '') + '" data-a="stad" data-k="' + key + '" data-i="' + c + '"></button>').join('');
+    body = '<div class="row" style="gap:8px;align-items:flex-start"><div class="col" style="flex:0 0 49%;min-width:0"><div class="hs' + (UI.built ? ' built' : '') + '" style="cursor:default;background:#9FD3E8"><div style="aspect-ratio:400/192">' + stadiumSvg(Object.assign(st, { vb: '0 6 400 192' })) + '</div><div style="aspect-ratio:400/74;border-top:2px solid var(--ink)">' + campusSvg({ vb: '0 22 400 74', train: facLv('train'), med: facLv('med'), shop: facLv('shop'), hl: pvw ? k : null }) + '</div><button class="btn sm" data-a="night" style="position:absolute;top:6px;right:6px;min-height:26px">' + (UI.night ? '☀ Jour' : '🌙 Nuit') + '</button></div><div class="muted" style="font-size:10.5px;font-weight:800">' + CAPS[G.fac.cap] + ' places · ' + Math.round(clamp(G.supp / CAPS[G.fac.cap], 0, 1) * 100) + ' % remplies</div></div>' +
+      '<div class="col grow"><div class="row" style="gap:3px;justify-content:space-between">' + chips + '</div><div class="card" style="padding:8px"><div class="row" style="gap:8px"><span style="font-size:24px">' + FAC[k].ico + '</span><div class="grow"><b style="font-size:14px">' + FAC[k].n + '</b> ' + pips(l) + '<div class="muted" style="font-size:10.5px;font-weight:700">' + FAC[k].fx + '</div></div></div><div class="row" style="gap:6px;margin:6px 0;font-weight:800;font-size:12px"><span class="tag" style="background:#EAD3B0">' + nowT + '</span><span>→</span><span class="tag" style="background:#D7E2CF">' + nextT + '</span></div><div style="font-size:11px;font-weight:700;margin-bottom:6px">À l’écran : ' + FACVIS[k] + '</div><div class="row" style="gap:6px"><button class="btn pri grow" data-a="ufac" data-i="' + k + '"' + (cost === null ? ' disabled' : '') + '>' + (cost === null ? 'Niveau maximum' : 'Construire · ' + fmt(cost)) + '</button><button class="btn sm" data-a="prev">👁 Aperçu ' + (UI.prev === false ? 'Off' : 'On') + '</button></div></div>' +
+      '<div class="card" style="padding:8px"><h3 style="margin:0 0 3px">Pelouse</h3><div class="swrap">' + swc(PITCHC, 'pitch') + '</div><div class="seg" style="flex-wrap:wrap;margin-top:5px">' + PITCHS.map((x) => '<button class="' + (G.stad.ps === x[0] ? 'on' : '') + '" data-a="stad" data-k="ps" data-i="' + x[0] + '">' + x[1] + '</button>').join('') + '</div><h3 style="margin:7px 0 3px">Sièges</h3><div class="swrap">' + swc(SEATC, 'seat') + '</div><h3 style="margin:7px 0 3px">Couleur du nom / pubs</h3><div class="swrap">' + swc(SEATC, 'seat2') + '</div></div></div></div>';
   } else if (UI.club === 'transfers') {
     const sub = '<div class="seg" style="width:240px"><button class="' + (UI.mk === 'mkt' ? 'on' : '') + '" data-a="mk" data-i="mkt">Marché (' + G.market.length + ')</button><button class="' + (UI.mk === 'mine' ? 'on' : '') + '" data-a="mk" data-i="mine">Mes joueurs</button></div>';
     const rowsM = (UI.mk === 'mkt' ? G.market : G.players).map((p) => { const mine = UI.mk === 'mine', price = mine ? Math.round(valueOf(p) * 0.75 / 10) * 10 : valueOf(p); return '<div class="prow">' + headH(p, 34, 'neutral') + '<div class="grow"><b>' + p.name + '</b><div class="muted" style="font-size:10.5px;font-weight:800">' + p.pos + ' · ' + p.age + ' ans · ' + (mine ? 'Moral ' + Math.round(p.moral) : p.from) + ' · ' + bLabel(p.build) + (p.tal ? ' · ' + TAL[p.tal].n : '') + '</div></div><div style="text-align:center;min-width:56px"><b style="font-size:16px;color:' + col(rate(p)) + '">' + rate(p) + '</b><div class="muted" style="font-size:10px;font-weight:800">pot ' + p.pot + '</div></div><button class="btn sm pri" data-a="' + (mine ? 'sellnow' : 'buy') + '" data-i="' + p.id + '" style="min-width:88px">' + (mine ? 'Vendre ' : 'Acheter ') + fmt(price) + '</button></div>'; }).join('');
@@ -1113,8 +1240,148 @@ function sClub() {
     const wk = G.wk || { inc: 0, wages: 0 };
     body = '<div class="row" style="gap:8px;align-items:stretch;height:100%"><div class="col" style="flex:0 0 40%"><div class="card"><h3>Budget</h3><div style="font-size:24px;font-weight:800;color:' + (G.budget < 0 ? '#C46A55' : '#4E8A48') + '">' + fmt(G.budget) + '</div><div class="muted" style="font-size:11px;font-weight:700">Semaine : +' + fmt(wk.inc) + ' revenus, −' + fmt(wk.wages) + ' salaires</div></div><div class="card"><h3>Conseil d’administration</h3>' + meter('Confiance', G.board, moralCol(G.board)) + '<div class="muted" style="font-size:11px;font-weight:700;margin-top:3px">Objectif : ' + G.obj.t + '</div></div></div><div class="card grow" style="overflow:auto"><h3>Historique</h3><table><tr class="muted"><th>Saison</th><th>Division</th><th>Rang</th><th>Résultat</th><th>Coupe</th></tr>' + hist + '</table><div class="muted" style="font-size:11px;font-weight:700;margin-top:6px">Supporters : ' + Math.round(G.supp) + ' · Prix du billet : ' + fmt(DIVS[myDiv()].price) + '</div><button class="btn sm" style="margin-top:8px" data-a="reset">' + (UI.rst ? 'Confirmer : tout effacer' : 'Nouvelle partie') + '</button></div></div>';
   }
-  return '<div class="fl">' + tabs + '</div><div style="height:calc(100% - 38px)">' + body + '</div>';
+  return '<div class="fl">' + tabs + '</div><div' + (UI.club === 'stad' ? '' : ' style="height:calc(100% - 38px)"') + '>' + body + '</div>';
 }
+
+/* ===== Terrain vertical + animation de match ===== */
+const PitchV = (() => {
+  const FW = 68, FH = 105; let uid = 0;
+  const SPEC = ['#4B3527', '#F0C253', '#438BC0', '#DF9287', '#FFF0CD', '#2B1D14', '#86AD78'];
+  const hh = (i) => { let x = (i * 374761393 + 668265263) | 0; x = (x ^ (x >>> 13)) * 1274126177 | 0; return ((x ^ (x >>> 16)) >>> 0) / 4294967295; };
+  const ringOf = (cap) => 2.4 + cap * 1.7;
+  function kitBg(c, s) {
+    if (s === 'stripes') return 'repeating-linear-gradient(90deg,' + c[0] + ' 0 5px,' + c[1] + ' 5px 8px)';
+    if (s === 'hoops') return 'repeating-linear-gradient(0deg,' + c[0] + ' 0 5px,' + c[1] + ' 5px 8px)';
+    if (s === 'half') return 'linear-gradient(90deg,' + c[0] + ' 50%,' + c[1] + ' 50%)';
+    if (s === 'sash') return 'linear-gradient(135deg,' + c[0] + ' 0 38%,' + c[1] + ' 38% 62%,' + c[0] + ' 62%)';
+    return c[0];
+  }
+  /* st : { pitch, ps, seat, seat2, cap, vip, lights, pq, fill, night } ; inner : html des jetons */
+  function field(st, inner, o) {
+    o = o || {}; const id = 'pv' + (++uid), r = ringOf(st.cap || 1), W = FW + 2 * r, H = FH + 2 * r;
+    const c1 = st.pitch, c2 = shade(st.pitch, -16), seat = st.seat, dark = shade(seat, -50);
+    let s = '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;display:block" preserveAspectRatio="none">';
+    s += '<defs><pattern id="' + id + 'd" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="12" fill="' + c2 + '"/></pattern></defs>';
+    s += '<rect width="' + W + '" height="' + H + '" fill="' + seat + '" rx="3"/><rect x="' + (r * 0.55) + '" y="' + (r * 0.55) + '" width="' + (W - r * 1.1) + '" height="' + (H - r * 1.1) + '" fill="' + dark + '" opacity=".55" rx="2"/>';
+    // spectateurs
+    const fill = st.fill == null ? 0.7 : st.fill; let k = 0;
+    const dot = (x, y) => { k++; if (hh(k + 7) < fill) s += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + Math.min(1, r * 0.11).toFixed(2) + '" fill="' + SPEC[Math.floor(hh(k) * SPEC.length)] + '"/>'; };
+    const rows = Math.max(1, Math.round(r / 3.4));
+    for (let q = 0; q < rows; q++) { const d = r * (0.18 + 0.62 * (q + 0.5) / rows); for (let x = d; x < W - d; x += 2.6) { dot(x, d); dot(x + 1.3, H - d); } for (let y = d + 2.6; y < H - d - 2; y += 2.6) { dot(d, y); dot(W - d, y + 1.3); } }
+    // VIP
+    if (st.vip > 0) s += '<rect x="' + (r * 0.12) + '" y="' + (H * 0.38) + '" width="' + (r * 0.76) + '" height="' + (H * 0.24) + '" rx="1" fill="#CFE3E8" stroke="#F0C253" stroke-width=".7"/>' + [0, 1, 2].slice(0, 1 + st.vip).map((j) => '<rect x="' + (r * 0.2) + '" y="' + (H * 0.42 + j * H * 0.06) + '" width="' + (r * 0.6) + '" height="' + (H * 0.035) + '" fill="#F0C253" opacity=".8"/>').join('');
+    // pelouse
+    s += '<g transform="translate(' + r + ',' + r + ')"><rect width="' + FW + '" height="' + FH + '" fill="' + c1 + '"/>';
+    if (st.ps === 'stripes') for (let i = 0; i < 14; i += 2) s += '<rect y="' + (i * FH / 14) + '" width="' + FW + '" height="' + (FH / 14) + '" fill="' + c2 + '"/>';
+    else if (st.ps === 'checks') for (let i = 0; i < 14; i++) for (let j = 0; j < 6; j++) if ((i + j) % 2) s += '<rect x="' + (j * FW / 6) + '" y="' + (i * FH / 14) + '" width="' + (FW / 6) + '" height="' + (FH / 14) + '" fill="' + c2 + '"/>';
+    else if (st.ps === 'diag') s += '<rect width="' + FW + '" height="' + FH + '" fill="url(#' + id + 'd)"/>';
+    if ((st.pq || 3) <= 2) [[12, 92, 5, 2.4], [52, 14, 4, 2], [34, 56, 6, 2.5], [56, 86, 4, 2]].slice(0, 4 - (st.pq || 3) + 1).forEach((e) => { s += '<ellipse cx="' + e[0] + '" cy="' + e[1] + '" rx="' + e[2] + '" ry="' + e[3] + '" fill="#9A8456" opacity=".55"/>'; });
+    s += '<g stroke="#FFFDF8" stroke-width=".55" fill="none" opacity=".9"><rect width="' + FW + '" height="' + FH + '"/><line x1="0" y1="52.5" x2="' + FW + '" y2="52.5"/><circle cx="34" cy="52.5" r="9.15"/><rect x="13.85" y="0" width="40.3" height="16.5"/><rect x="13.85" y="88.5" width="40.3" height="16.5"/><rect x="24.85" y="0" width="18.3" height="5.5"/><rect x="24.85" y="99.5" width="18.3" height="5.5"/><path d="M26.7 16.5 A9.15 9.15 0 0 0 41.3 16.5"/><path d="M26.7 88.5 A9.15 9.15 0 0 1 41.3 88.5"/><rect x="30.5" y="-2" width="7" height="2" stroke-width=".7"/><rect x="30.5" y="105" width="7" height="2" stroke-width=".7"/></g><circle cx="34" cy="52.5" r=".7" fill="#FFFDF8"/><circle cx="34" cy="11" r=".6" fill="#FFFDF8"/><circle cx="34" cy="94" r=".6" fill="#FFFDF8"/></g>';
+    // projecteurs
+    const nl = !st.lights ? 0 : st.lights <= 2 ? 2 : 4, lit = o.night || st.night || st.on;
+    [[1.4, 1.4], [W - 1.4, H - 1.4], [W - 1.4, 1.4], [1.4, H - 1.4]].slice(0, nl).forEach((p) => { s += (lit ? '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4" fill="#FFF6D8" opacity=".35"/>' : '') + '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.3" fill="' + (lit ? '#FFF6D8' : '#C9CFD6') + '" stroke="#2B1D14" stroke-width=".4"/>'; });
+    if (st.night || o.night) s += '<rect width="' + W + '" height="' + H + '" fill="#0A1020" opacity=".18"/>';
+    s += '</svg>';
+    return '<div class="pv' + (o.cls ? ' ' + o.cls : '') + '" style="aspect-ratio:' + W.toFixed(2) + '/' + H.toFixed(2) + (o.style ? ';' + o.style : '') + '">' + s + '<div class="pf" style="left:' + (r / W * 100).toFixed(3) + '%;top:' + (r / H * 100).toFixed(3) + '%;right:' + (r / W * 100).toFixed(3) + '%;bottom:' + (r / H * 100).toFixed(3) + '%">' + inner + '</div></div>';
+  }
+  function tok(o) {
+    const c = o.col, bg = kitBg(c, o.ks || 'plain');
+    return '<div class="tk2' + (o.cls ? ' ' + o.cls : '') + '" ' + (o.id != null ? 'data-id="' + o.id + '" ' : '') + (o.a ? 'data-a="' + o.a + '" data-i="' + o.i + '" ' : '') + 'style="left:' + o.x.toFixed(1) + '%;top:' + o.y.toFixed(1) + '%"><span class="b" style="background:' + bg + ';color:' + (o.ks === 'plain' || !o.ks ? c[1] : '#FFF') + '">' + (o.num != null ? o.num : '') + '</span><span class="nm">' + o.name + '</span>' + (o.sub ? '<span class="rl">' + o.sub + '</span>' : '') + '</div>';
+  }
+  return { field, tok, kitBg, FW, FH };
+})();
+
+/* ---------- Animation du match : jetons nommés, passes, tirs ---------- */
+const MA = (() => {
+  let root = null, K = null, id = 0, spd = 1, ball = null;
+  const oform = () => Object.keys(FM)[M.opp % 4];
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms / spd));
+  const ok = () => root && root.isConnected;
+  function toks() {
+    const mine = G.lineup.map((pid, i) => { const p = P(pid); return p ? { i, id: pid, name: p.name, num: p.num, gk: i === 0 } : null; });
+    const mi = M.mine.map((pid, i) => { const p = P(pid); return { i, id: pid, name: p.name, num: p.num, gk: i === 0 }; });
+    void mine; return mi;
+  }
+  function ours() { return M.mine.map((pid, i) => { const p = P(pid); return { side: 'u', i, id: pid, name: p.name, num: p.num, gk: i === 0 }; }); }
+  function theirs() { const ot = T(M.opp); return ot.names.map((n, i) => ({ side: 'o', i, id: 'o' + i, name: n, num: i === 0 ? 1 : i + 1, gk: i === 0 })); }
+  function base(t) {
+    if (t.side === 'u') { const q = slotXY(t.i); return { x: q.x, y: q.y }; }
+    const r = rowOf(t.i, oform()); return { x: r.cat === 'GB' ? 50 : clamp(r.x + 11, 10, 90), y: 100 - r.y - (r.cat === 'MIL' ? 7 : 0) + (r.cat === 'GB' ? 2 : 0) };
+  }
+  function html(st) {
+    const ot = T(M.opp), cu = G.kit.c, co = ot.col, parts = [];
+    ours().forEach((t) => { const b = base(t); parts.push(PitchV.tok({ id: 'u' + t.i, x: b.x, y: b.y, name: t.name, num: t.num, col: t.gk ? G.kit.g : cu, ks: t.gk ? 'plain' : G.kit.s, cls: 'mine' })); });
+    theirs().forEach((t) => { const b = base(t); parts.push(PitchV.tok({ id: 'o' + t.i, x: b.x, y: b.y, name: t.name, num: t.num, col: t.gk ? ['#8A8F98', '#4B4F57'] : co, ks: t.gk ? 'plain' : 'stripes', cls: 'opp' })); });
+    parts.push('<div class="bl2" id="mBall" style="left:50%;top:50%"></div>');
+    return PitchV.field(st, parts.join(''), { cls: 'mpv', night: st.night });
+  }
+  function attach(el) {
+    root = el; K = { u: [], o: [] };
+    ours().forEach((t) => { K.u.push(Object.assign({ el: root.querySelector('[data-id="u' + t.i + '"]') }, t)); });
+    theirs().forEach((t) => { K.o.push(Object.assign({ el: root.querySelector('[data-id="o' + t.i + '"]') }, t)); });
+    ball = root.querySelector('#mBall'); id++;
+    lay('M', 50, 0.4);
+  }
+  /* mise en place : l'équipe qui a le ballon monte, l'autre recule ; tout suit le ballon sur la largeur */
+  function lay(side, bx, jit) {
+    if (!ok()) return;
+    K.u.forEach((t) => {
+      const b = base(t), g = t.gk ? 0.25 : 1;
+      const push = side === 'U' ? -7 : side === 'O' ? 4 : 0;
+      t.x = clamp(b.x + (bx - 50) * 0.14 + rnd(-1, 1) * (jit == null ? 1.2 : jit * 3), 4, 96); t.y = clamp(b.y + push * g + rnd(-1, 1) * (jit == null ? 1.2 : jit * 3), 3, 98);
+      t.el.style.left = t.x + '%'; t.el.style.top = t.y + '%';
+    });
+    K.o.forEach((t) => {
+      const b = base(t), g = t.gk ? 0.25 : 1;
+      const push = side === 'O' ? 7 : side === 'U' ? -4 : 0;
+      t.x = clamp(b.x + (bx - 50) * 0.14 + rnd(-1, 1) * (jit == null ? 1.2 : jit * 3), 4, 96); t.y = clamp(b.y + push * g + rnd(-1, 1) * (jit == null ? 1.2 : jit * 3), 3, 98);
+      t.el.style.left = t.x + '%'; t.el.style.top = t.y + '%';
+    });
+  }
+  const mv = (x, y) => { if (ball) { ball.style.left = x + '%'; ball.style.top = y + '%'; } };
+  const hold = (t, on) => { K.u.concat(K.o).forEach((x) => x.el.classList.remove('has')); if (on) t.el.classList.add('has'); };
+  function fwd(t, us) { return us ? 100 - t.y : t.y; }
+  async function entry(en, my) {
+    const us = en.us, A = us ? K.u : K.o, D = us ? K.o : K.u, side = us ? 'U' : 'O';
+    const byWho = (arr, w) => arr.find((t) => t.id === w || t.name === w) || null;
+    let shooter = byWho(A, en.who);
+    if (!shooter) shooter = A.filter((t) => !t.gk).sort((a, b) => fwd(b, us) - fwd(a, us))[0];
+    let cur = pickStart(A, us); lay(side, cur.x); hold(cur, true); mv(cur.x, cur.y); await sleep(260); if (my !== id) return;
+    const steps = en.res === 'lost' && en.st === 'mid' ? 2 : 3 + (Math.random() < 0.5 ? 1 : 0);
+    for (let s = 0; s < steps; s++) {
+      let nx;
+      if (s === steps - 1 && en.res !== 'lost') nx = shooter;
+      else if (s === steps - 1) nx = null;
+      else { const c = A.filter((t) => t !== cur && !t.gk && fwd(t, us) > fwd(cur, us) - 3); const pool = c.length ? c : A.filter((t) => t !== cur && !t.gk); nx = pool.length ? pool[Math.floor(Math.random() * pool.length)] : shooter; }
+      if (!nx) break; if (nx === cur) nx = A.find((t) => t !== cur && !t.gk);
+      lay(side, nx.x); cur = nx; hold(cur, true); mv(cur.x, cur.y); await sleep(300); if (my !== id) return;
+    }
+    if (en.res === 'lost') {
+      const ic = en.st === 'mid' ? (byWho(D, en.who) || D.filter((t) => !t.gk)[0]) : (byWho(D, en.who) && D.filter((t) => !t.gk && fwd(t, !us) > 40)[0]) || D.filter((t) => !t.gk)[0];
+      const it = ic || D[1]; lay(us ? 'O' : 'U', it.x); hold(it, true); mv(it.x, it.y); root.classList.add('turn'); await sleep(420); root.classList.remove('turn'); return;
+    }
+    const gkD = D[0]; const gy = us ? -2.5 : 102.5;
+    hold(shooter, false); root.classList.add('shot');
+    if (en.res === 'goal') { mv(clamp(shooter.x + rnd(-14, 14), 38, 62), gy); await sleep(300); root.classList.add('goal'); gkD.el.style.left = clamp(gkD.x + rnd(-10, 10), 30, 70) + '%'; await sleep(900); root.classList.remove('goal'); lay('M', 50, 0.4); mv(50, 50); }
+    else if (en.res === 'save') { mv(gkD.x + rnd(-3, 3), gkD.y + (us ? 1 : -1)); gkD.el.style.left = clamp(shooter.x, 38, 62) + '%'; await sleep(420); hold(gkD, true); await sleep(250); }
+    else { mv(clamp(shooter.x + (shooter.x > 50 ? 16 : -16), 14, 86), us ? -4 : 104); await sleep(380); mv(gkD.x, gkD.y); hold(gkD, true); await sleep(250); }
+    root.classList.remove('shot');
+    if (ok()) lay(us ? 'O' : 'U', 50);
+  }
+  function pickStart(A, us) {
+    const c = A.filter((t) => !t.gk && fwd(t, us) < 62); const pool = c.length ? c : A;
+    if (Math.random() < 0.12) return A[0];
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  async function block(seq, speed) {
+    spd = speed || 1; const my = ++id; if (!ok()) return;
+    const list = (seq || []).filter((e) => e.res !== 'pen' && e.res !== 'fk');
+    if (!list.length) { lay(M.ball === 'O' ? 'O' : 'U', 50 + rnd(-20, 20)); await sleep(500); return; }
+    for (const e of list.slice(0, 2)) { if (my !== id || !ok()) return; try { await entry(e, my); } catch (x) { /* dom retiré */ } }
+  }
+  const stop = () => { id++; };
+  return { html, attach, block, stop, lay };
+})();
 
 /* ---------- Scènes cinématiques (penalty, coup franc, rouge, trophée, blessure) ---------- */
 const Scenes = (() => {
@@ -1561,7 +1828,7 @@ function render() {
   const th = THEME[UI.screen]; app.style.setProperty('--acc', th[0]); app.style.setProperty('--accfg', th[1]);
   const old = app.querySelector('.scr'), st = old ? old.scrollTop : 0;
   const body = { home: sHome, eff: sEff, tac: sTac, cal: sCal, club: sClub }[UI.screen]();
-  app.innerHTML = topBar() + '<div class="scr">' + body + '</div>' + navBar();
+  app.innerHTML = (UI.screen === 'tac' ? '' : topBar()) + '<div class="scr"' + (UI.screen === 'tac' ? ' style="padding:6px 8px"' : '') + '>' + body + '</div>' + navBar();
   const n = app.querySelector('.scr'); if (n) n.scrollTop = st;
   renderOv();
 }
@@ -1570,7 +1837,12 @@ function renderLite() { if (UI.screen === 'home') render(); else { const t = app
 /* ---------- Overlays ---------- */
 function renderOv() {
   if (!UI.ov) { ovl.innerHTML = ''; return; }
-  const f = { msg: ovMsg, press: ovPress, pre: ovPre, match: ovMatch, season: ovSeason, talk: ovTalk }[UI.ov];
+  if (UI.ov === 'match') {
+    const w = ovl.querySelector('.mwrap');
+    if (w && w.dataset.m === String(UI.mid)) { const p = matchParts(); ovl.querySelector('#mSb').innerHTML = p.sb; ovl.querySelector('#mCtl').innerHTML = p.ctrl; const fe = ovl.querySelector('#mFeed'); fe.innerHTML = p.feed; fe.scrollTop = fe.scrollHeight; return; }
+    ovl.innerHTML = '<div class="ov">' + ovMatch() + '</div>'; MA.attach(ovl.querySelector('.mpv')); return;
+  }
+  const f = { msg: ovMsg, press: ovPress, pre: ovPre, season: ovSeason, talk: ovTalk, kit: ovKit }[UI.ov];
   ovl.innerHTML = '<div class="ov">' + f() + '</div>';
   const fd = ovl.querySelector('.feed'); if (fd) fd.parentElement.scrollTop = fd.parentElement.scrollHeight;
   const ch = ovl.querySelector('.chat'); if (ch) ch.scrollTop = ch.scrollHeight;
@@ -1615,16 +1887,9 @@ function ovPre() {
     (warn.length ? '<div style="margin-top:6px;background:#F3E0B0;border-radius:10px;padding:5px 9px;font-weight:800;font-size:12px">⚠ ' + warn.join(' · ') + '</div>' : '') +
     '<div class="row" style="gap:8px;margin-top:8px"><button class="btn grow" data-a="edit">Modifier la compo</button><button class="btn pri grow" data-a="kick" style="font-size:15px">⚽ Lancer le match</button></div></div>';
 }
-function ovMatch() {
-  const ot = T(M.opp), mine = M.home;
-  const bx = M.ball === 'U' ? 14 : M.ball === 'O' ? -14 : 0, by = 12 + (M.b * 37 % 76);
-  const tk = [];
-  tokenPos().forEach((q, i) => { const p = P(M.mine[i]); const a = pitchPt(clamp(q[0] * 0.5 + bx * 0.35, 3, 97), q[1]); tk.push({ x: a.x, y: a.y, s: a.s, c: i === 0 ? ['#5E7A5A', '#2F4A2E'] : teamCol(ME), sk: p ? p.look.skin : null }); const b = pitchPt(clamp(100 - q[0] * 0.5 + bx * 0.35, 3, 97), 100 - q[1]); tk.push({ x: b.x, y: b.y, s: b.s, c: i === 0 ? ['#8A8F98', '#4B4F57'] : teamCol(M.opp), sk: null }); });
-  tk.sort((a, b2) => a.y - b2.y);
-  const bp = pitchPt(clamp(50 + bx * 2.2, 8, 92), by), ballO = { x: bp.x, y: bp.y };
-  const bg = mine ? stadiumSvg(myStadium({ id: 'mt', fill: clamp(M.att / CAPS[G.fac.cap], 0.15, 1), night: G.fac.lights > 0 && M.b > 10, on: G.fac.lights > 0, score: M.sc[0] + '-' + M.sc[1], tok: tk, ball: ballO })) : stadiumSvg({ id: 'aw', pitch: '#7FA077', ps: 'stripes', seat: teamCol(M.opp)[0], seat2: teamCol(M.opp)[1], cap: M.neutral ? 5 : clamp(5 - ot.div, 2, 4), vip: M.neutral ? 2 : 0, lights: ot.div < 2 || M.neutral ? 2 : 0, pq: 3, fill: M.neutral ? 0.95 : 0.7, name: M.neutral ? 'FINALE' : ot.short + ' ' + 'ARENA'.slice(0, 0), night: M.neutral, on: M.neutral, score: M.sc[0] + '-' + M.sc[1], tok: tk, ball: ballO });
+function matchParts() {
   const hs = M.home ? [ME, M.opp] : [M.opp, ME], sc = M.home ? M.sc : [M.sc[1], M.sc[0]];
-  const sb = '<div class="sbx">' + badge(hs[0], 26) + '<span class="s">' + sc[0] + '</span><span style="font-weight:800;font-size:12px;min-width:34px;text-align:center">' + (M.over ? 'FIN' : M.min + '\'') + '</span><span class="s">' + sc[1] + '</span>' + badge(hs[1], 26) + '</div>';
+  const sb = '<div class="sbx" style="position:static;transform:none;justify-content:center">' + badge(hs[0], 26) + '<span class="s">' + sc[0] + '</span><span style="font-weight:800;font-size:12px;min-width:34px;text-align:center">' + (M.over ? 'FIN' : M.min + '\'') + '</span><span class="s">' + sc[1] + '</span>' + badge(hs[1], 26) + '</div>';
   const feed = '<div class="feed">' + M.feed.map((f) => '<div class="' + f.c + '">' + f.t + '</div>').join('') + '</div>';
   let ctrl;
   if (M.over) {
@@ -1636,9 +1901,21 @@ function ovMatch() {
   } else if (UI.ht) {
     ctrl = '<div class="card"><b>Mi-temps ' + M.sc[0] + '-' + M.sc[1] + '</b> · Causerie<div class="col" style="gap:4px;margin-top:5px"><button class="chbtn" data-a="ht" data-i="enc">Encourager : le milieu monte d’un cran</button><button class="chbtn" data-a="ht" data-i="push">Exiger plus : attaque +4, défense −2</button><button class="chbtn" data-a="ht" data-i="safe">Se resserrer : défense +4, attaque −3</button></div></div>';
   } else {
-    ctrl = '<div class="row" style="gap:6px"><span class="muted" style="font-weight:800;font-size:11px">Vitesse</span><div class="seg" style="width:140px">' + [1, 2, 4].map((v) => '<button class="' + (UI.mspeed === v ? 'on' : '') + '" data-a="mspeed" data-i="' + v + '">×' + v + '</button>').join('') + '</div><button class="btn sm" data-a="scn" style="margin-left:auto">🎬 ' + (UI.scn === false ? 'Off' : 'On') + '</button><button class="btn sm" data-a="skip">Passer ⏭</button></div>';
+    ctrl = '<div class="row" style="gap:6px"><div class="seg" style="width:112px">' + [1, 2, 4].map((v) => '<button class="' + (UI.mspeed === v ? 'on' : '') + '" data-a="mspeed" data-i="' + v + '">×' + v + '</button>').join('') + '</div><button class="btn sm" data-a="scn" style="margin-left:auto">🎬 ' + (UI.scn === false ? 'Off' : 'On') + '</button><button class="btn sm" data-a="skip">Passer ⏭</button></div>';
   }
-  return '<div class="md" style="width:min(820px,100%);height:min(350px,100%);display:flex;gap:8px;padding:8px;overflow:hidden"><div style="flex:0 0 52%;position:relative;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:#000">' + bg + sb + '</div><div class="col" style="flex:1;min-width:0"><div class="card" style="flex:1;min-height:0;overflow:auto;padding:6px">' + feed + '</div>' + ctrl + '</div></div>';
+  return { sb, feed, ctrl };
+}
+function matchStad() {
+  const ot = T(M.opp);
+  return M.home ? stadSt({ fill: clamp(M.att / Math.max(1, CAPS[G.fac.cap]), 0.15, 1), night: G.fac.lights > 0 && M.b > 10 })
+    : { pitch: '#7FA077', ps: 'stripes', seat: teamCol(M.opp)[0], cap: M.neutral ? 5 : clamp(5 - ot.div, 2, 4), vip: M.neutral ? 2 : 0, lights: ot.div < 2 || M.neutral ? 2 : 0, pq: 3, fill: M.neutral ? 0.95 : 0.7, night: M.neutral };
+}
+function ovMatch() {
+  const ot = T(M.opp), p = matchParts(), ban = M.home ? stadiumSvg(myStadium({ id: 'mb', fill: clamp(M.att / Math.max(1, CAPS[G.fac.cap]), 0.15, 1), night: G.fac.lights > 0 && M.b > 10, on: G.fac.lights > 0, score: '' })) : stadiumSvg({ id: 'ab', pitch: '#7FA077', ps: 'stripes', seat: teamCol(M.opp)[0], seat2: teamCol(M.opp)[1], cap: M.neutral ? 5 : clamp(5 - ot.div, 2, 4), vip: M.neutral ? 2 : 0, lights: ot.div < 2 || M.neutral ? 2 : 0, pq: 3, fill: M.neutral ? 0.95 : 0.7, night: M.neutral, on: M.neutral, name: ot.short });
+  return '<div class="md mwrap" data-m="' + UI.mid + '" style="width:min(850px,100%);height:min(362px,100%);display:flex;gap:10px;padding:8px;overflow:hidden"><div class="pbox" id="mPitch" style="flex:none">' + MA.html(matchStad()) + '</div><div class="col" style="flex:1;min-width:0"><div style="height:74px;flex:none;border:2px solid var(--ink);border-radius:10px;overflow:hidden;position:relative">' + ban + '</div><div id="mSb">' + p.sb + '</div><div class="card" id="mFeed" style="flex:1;min-height:0;overflow:auto;padding:6px">' + p.feed + '</div><div id="mCtl">' + p.ctrl + '</div></div></div>';
+}
+function ovKit() {
+  return '<div class="md" style="max-width:560px"><div style="font-size:12px;font-weight:800;text-align:center" class="muted">NOUVELLE SAISON ' + G.season + ' · ' + DIVS[myDiv()].n.toUpperCase() + '</div><div style="font-size:19px;font-weight:800;text-align:center;margin:1px 0 6px">Choisis tes couleurs</div>' + kitEditor(true) + '<button class="btn pri big" data-a="kitdone">Valider et partir ▶</button></div>';
 }
 function ovSeason() {
   const h = G.lastRec, d = myDiv();
@@ -1689,21 +1966,20 @@ function oppTaker(name) {
   return { name: name, num: i + 1, build: 0.9 + ((hs >>> 2) & 15) / 40, look: { skin: SKIN[(hs >>> 3) % SKIN.length], hair: HAIR[(hs >>> 5) % HAIR.length], hc: HCOL[(hs >>> 7) % HCOL.length], beard: BEARD[(hs >>> 9) % BEARD.length], bc: HCOL[(hs >>> 7) % HCOL.length] }, kit: teamCol(M.opp), kitStyle: 'stripes', pos: 'MIL' };
 }
 function scnOn() { return UI.scn !== false && UI.mspeed < 4; }
-function liveTick() {
-  if (!UI.live) return;
+async function liveTick() {
+  if (!UI.live) return; const my = UI.mid;
   if (M.b === 15 && !M.htDone) { M.htDone = true; UI.ht = true; renderOv(); return; }
   stepBlock();
   const evs = M.ev.slice(M.evN || 0); M.evN = M.ev.length;
   let sc = null;
   if (scnOn()) for (const e of evs) { sc = sceneFor(e); if (sc) break; }
-  const after = () => {
-    if (!UI.live) return;
-    if (M.done) { applyResult(); UI.live = false; }
-    renderOv();
-    if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; }
-    if (!M.over) LT = setTimeout(liveTick, 430 / UI.mspeed);
-  };
-  if (sc) { Scenes.play(sc[0], sc[1]).then(after); } else { if (M.done) { applyResult(); UI.live = false; } renderOv(); if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; } if (!M.over) LT = setTimeout(liveTick, 430 / UI.mspeed); }
+  if (sc) { await Scenes.play(sc[0], sc[1]); if (!UI.live || my !== UI.mid) return; }
+  await MA.block(M.seq, UI.mspeed);
+  if (!UI.live || my !== UI.mid) return;
+  if (M.done) { applyResult(); UI.live = false; }
+  renderOv();
+  if (M.done && M.serious && scnOn() && P(M.serious)) { const sp = P(M.serious); M.serious = null; Scenes.play('injury', { p: sp, days: sp.inj }); return; }
+  if (!M.over) LT = setTimeout(liveTick, 40);
 }
 
 /* ---------- Actions ---------- */
@@ -1728,31 +2004,38 @@ const ACT = {
   pnext() { UI.pq = (UI.pq || 0) + 1; renderOv(); },
   pend() { G.presser = null; UI.ov = null; UI.pq = 0; save(); runSim(); },
   edit() { UI.ov = null; UI.screen = 'tac'; render(); },
-  kick() { startMatch(); UI.mspeed = UI.speed > 2 ? 2 : 1; UI.live = true; UI.ht = false; UI.ov = 'match'; renderOv(); LT = setTimeout(liveTick, 600); },
+  kick() { startMatch(); UI.mid = (UI.mid || 0) + 1; UI.mspeed = UI.speed > 2 ? 2 : 1; UI.live = true; UI.ht = false; UI.ov = 'match'; renderOv(); LT = setTimeout(liveTick, 600); },
   mspeed(d) { UI.mspeed = +d.i; renderOv(); },
   scn() { UI.scn = UI.scn === false; try { localStorage.setItem('scg-scn', UI.scn === false ? '0' : '1'); } catch (e) {} renderOv(); },
-  skip() { Scenes.stop(); clearTimeout(LT); UI.live = false; UI.ht = false; if (!M.htDone) M.htDone = true; if (!M.htm) M.htm = { a: 0, d: 0, m: 0 }; while (!M.done) stepBlock(); applyResult(); renderOv(); },
+  skip() { Scenes.stop(); MA.stop(); clearTimeout(LT); UI.live = false; UI.ht = false; if (!M.htDone) M.htDone = true; if (!M.htm) M.htm = { a: 0, d: 0, m: 0 }; while (!M.done) stepBlock(); applyResult(); renderOv(); },
   ht(d) { M.htm = d.i === 'enc' ? { a: 2, d: 1, m: 4 } : d.i === 'push' ? { a: 4, d: -2, m: 1 } : { a: -3, d: 4, m: 0 }; if (d.i === 'enc') G.lineup.map(P).forEach((p) => { if (p) p.moral = clamp(p.moral + 2, 0, 100); }); UI.ht = false; M.feed.push({ t: 'Reprise de la seconde période.', c: '' }); renderOv(); LT = setTimeout(liveTick, 500); },
   after() { UI.ov = null; UI.live = false; M = null; render(); runSim(); },
-  newseason() { UI.ov = null; render(); },
+  newseason() { UI.ov = 'kit'; renderOv(); },
   /* effectif */
   talk(d) { UI.talk = d.i; UI.talkMsg = ''; UI.ov = 'talk'; renderOv(); },
   tone(d) { const p = P(UI.talk), tt = TALK[p.trait][d.i]; p.moral = clamp(p.moral + tt[0], 0, 100); p.talkDay = G.day; UI.talkMsg = tt[1].replace(/^Il /, p.name + ' ') + ' (' + (tt[0] > 0 ? '+' : '') + tt[0] + ' moral)'; if (d.i === 'pro') { p.promise = { t: 'start', until: G.day + 9 }; } renderOv(); render(); },
   capt(d) { applyFx([['captain', d.i]]); toast(P(d.i).name + ' est capitaine'); render(); },
   listp(d) { const p = P(d.i); p.listed = !p.listed; toast(p.listed ? p.name + ' mis en vente' : p.name + ' retiré de la vente'); render(); },
   /* tactique */
-  tsel(d) { UI.tsel = UI.tsel === d.i ? null : d.i; if (UI.tsel && d.second) return; render(); },
-  bench(d) { if (!UI.tsel) { toast('Touche d’abord un titulaire'); return; } const i = G.lineup.indexOf(UI.tsel); const p = P(d.i); if (!avail(p)) { toast(p.name + ' est indisponible'); return; } G.lineup[i] = d.i; UI.tsel = null; save(); render(); },
-  auto() { G.lineup = []; fitLineup(); UI.tsel = null; toast('Meilleur onze placé'); save(); render(); },
-  form(d) { G.formation = d.i; fitLineup(); render(); },
+  tsel(d) { UI.ts = +d.i; render(); },
+  role(d) { const s = slotSet(UI.ts); s.r = d.i; s.d = 1; s.w = 1; save(); render(); },
+  ins(d) { const s = slotSet(UI.ts); s[d.k] = +d.i; save(); render(); },
+  rolesreset() { G.roles = {}; fitLineup(); save(); render(); },
+  bench(d) { const p = P(d.i); if (!avail(p)) { toast(p.name + ' est indisponible'); return; } G.lineup[UI.ts] = d.i; save(); render(); },
+  auto() { G.lineup = []; fitLineup(); toast('Meilleur onze placé'); save(); render(); },
+  form(d) { G.formation = d.i; G.roles = {}; fitLineup(); UI.ts = 1; save(); render(); },
   ment(d) { G.ment = d.i; render(); },
   /* club */
-  kit(d) { G.kit.c[+d.k] = d.i; render(); },
-  kitstyle(d) { G.kit.s = d.i; render(); },
+  kit(d) { G.kit.c[+d.k] = d.i; save(); UI.ov === 'kit' ? renderOv() : render(); },
+  kitstyle(d) { G.kit.s = d.i; save(); UI.ov === 'kit' ? renderOv() : render(); },
+  kitg(d) { G.kit.g = KGK[+d.i].slice(); save(); UI.ov === 'kit' ? renderOv() : render(); },
+  kitdone() { UI.ov = null; render(); },
+  fsel(d) { UI.fsel = d.i; render(); },
+  prev() { UI.prev = UI.prev === false; render(); },
   look(d) { const s = staff(d.i), k = d.k, nx = (arr, v) => arr[(arr.indexOf(v) + 1) % arr.length]; if (k === 'hair') s.look.hair = nx(HAIR, s.look.hair); else if (k === 'hc') s.look.hc = nx(HCOL, s.look.hc); else if (k === 'skin') s.look.skin = nx(SKIN, s.look.skin); else s.look.beard = nx(['stubble', 'goatee', 'full', 'stache', undefined], s.look.beard); if (k === 'hc') s.look.bc = s.look.hc; save(); render(); },
   ustaff(d) { const e = upgradeStaff(d.i); toast(e || 'Staff amélioré'); render(); },
   stad(d) { G.stad[d.k] = d.i; save(); render(); },
-  ufac(d) { const e = upgrade(d.i); toast(e || FAC[d.i].n + ' améliorée'); render(); },
+  ufac(d) { const e = upgrade(d.i); toast(e || '🏗 Chantier terminé : ' + FAC[d.i].n + ' niveau ' + G.fac[d.i]); if (!e) { UI.built = true; setTimeout(() => { UI.built = false; }, 1200); } render(); },
   night() { UI.night = !UI.night; render(); },
   buy(d) { const e = buy(d.i); toast(e || 'Joueur signé'); render(); },
   sellnow(d) { const e = sellNow(d.i); toast(e || 'Joueur vendu'); render(); },
@@ -1761,7 +2044,6 @@ const ACT = {
 document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-a]'); if (!el) return;
   const a = el.dataset.a;
-  if (a === 'tsel' && UI.tsel && UI.tsel !== el.dataset.i) { const i = G.lineup.indexOf(UI.tsel), j = G.lineup.indexOf(el.dataset.i); if (i >= 0 && j >= 0) { const t = G.lineup[i]; G.lineup[i] = G.lineup[j]; G.lineup[j] = t; UI.tsel = null; render(); return; } }
   if (ACT[a]) ACT[a](el.dataset, el);
 });
 document.addEventListener('change', (e) => {
