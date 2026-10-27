@@ -21,7 +21,11 @@ function chibi(p, mode, mood) {
   const arm = (x, band, glove) => '<rect x="' + x + '" y="88" width="' + armW + '" height="28" rx="5" fill="' + sk + '" ' + st + '/><rect x="' + x + '" y="86" width="' + armW + '" height="11" rx="4" fill="' + kit[0] + '" ' + st + '/>' + (band ? '<rect x="' + x + '" y="100" width="' + armW + '" height="5" fill="#F0C253" ' + st + '/>' : '') + (glove ? '<circle cx="' + (x + armW / 2) + '" cy="118" r="6.5" fill="#F0C253" ' + st + '/>' : '');
   armL = arm(alx, p.captain, p.pos === 'GB'); armR = arm(arx, false, p.pos === 'GB');
   torso += '<rect x="' + (cx - tw) + '" y="80" width="' + (tw * 2) + '" height="48" rx="12" fill="' + kit[0] + '" ' + st + '/>';
-  if (p.kitStyle !== 'plain') for (let i = -1; i <= 1; i += 2) torso += '<line x1="' + (cx + i * tw * 0.35) + '" y1="86" x2="' + (cx + i * tw * 0.35) + '" y2="124" stroke="' + kit[1] + '" stroke-width="4" opacity=".9"/>';
+  const ks = p.kitStyle || 'stripes';
+  if (ks === 'stripes') for (let i = -1; i <= 1; i += 2) torso += '<line x1="' + (cx + i * tw * 0.35) + '" y1="86" x2="' + (cx + i * tw * 0.35) + '" y2="124" stroke="' + kit[1] + '" stroke-width="4" opacity=".9"/>';
+  else if (ks === 'hoops') for (let y = 90; y < 118; y += 11) torso += '<rect x="' + (cx - tw + 1) + '" y="' + y + '" width="' + (tw * 2 - 2) + '" height="5.5" fill="' + kit[1] + '" opacity=".95"/>';
+  else if (ks === 'half') torso += '<path d="M' + cx + ' 80 H' + (cx + tw - 12) + ' Q' + (cx + tw) + ' 80 ' + (cx + tw) + ' 92 V116 Q' + (cx + tw) + ' 128 ' + (cx + tw - 12) + ' 128 H' + cx + 'Z" fill="' + kit[1] + '" opacity=".95"/>';
+  else if (ks === 'sash') torso += '<path d="M' + (cx - tw + 3) + ' 84 L' + (cx - tw + 12) + ' 82 L' + (cx + tw - 3) + ' 118 L' + (cx + tw - 12) + ' 120Z" fill="' + kit[1] + '" opacity=".95"/>';
   torso += '<rect x="' + (cx - tw + 1) + '" y="118" width="' + (tw * 2 - 2) + '" height="14" rx="5" fill="' + kit[1] + '" ' + st + '/>';
   torso += '<text x="50" y="108" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="' + (b > 1.2 ? 15 : 13) + '" fill="' + kit[1] + '">' + (p.num || '') + '</text>';
   // head

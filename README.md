@@ -39,8 +39,22 @@ Le jeu fonctionne tout seul, sans serveur. La sauvegarde est dans le navigateur.
 Ce qui est jouable : 5 écrans, 12 matchs par saison, match simulé par zones avec mi-temps tactique,
 moral, fatigue, blessures, discussions avec les joueurs, entraînement, finances et installations.
 
+
+## V3 — Simulation jour par jour (index.html)
+
+- La partie avance **jour par jour** (bouton Continuer, vitesses ×1 ×2 ×4). Elle ne s'arrête que si un joueur ou ton staff t'écrit, pour une conférence de presse, un jour de match ou la fin de saison.
+- **4 divisions de 10 équipes**, 18 matchs par saison (aller-retour). Les 2 premiers montent, les 2 derniers descendent. Tu commences en Division 4.
+- **Coupe du Roi** : les 40 clubs, élimination directe (tour préliminaire, 32es, 16es, quarts), demi-finales aller-retour au cumul, finale. Tirs au but si égalité.
+- **Notes dynamiques** : forme, moral, fatigue et temps de jeu font monter ou descendre la note. Un jeune qui joue progresse. Un buteur muet perd son moral.
+- **Messages** : un joueur veut débuter, tirer les penaltys, a la rage d'être sorti, veut partir. Promesses à tenir.
+- **Conférences de presse** : questions sur un joueur, l'objectif, l'adversaire.
+- **Club** : équipement (couleurs, motif), staff (adjoint, physio, recruteur), transferts, stade personnalisable (pelouse, sièges, tribunes, loges VIP, éclairage, centre médical, boutique), finances.
+- Les matchs à domicile se jouent dans **ton stade** avec tes couleurs.
+- Sauvegarde automatique (localStorage, clé scg-save-v3). Le code source est dans `src/`, `python3 build.py` assemble `index.html`.
+- `animations.html` : démo des scènes cinématiques (penalty, coup franc, carton rouge, trophée, blessure grave), pas encore branchées au jeu.
+
 ## Accès et publication
 
-Le jeu dispose maintenant d’un menu principal, d’une interface mobile en portrait et en paysage, et d’une installation sur l’écran d’accueil. La clé de sauvegarde `scg-save-v2` est conservée. Les sauvegardes restent propres au navigateur et à l’origine du lien.
+Le jeu dispose d'un menu principal et d'une installation sur l'écran d'accueil. La clé de sauvegarde de la V3 est `scg-save-v3` (l'ancienne V2 reste dans le navigateur, inchangée). Les sauvegardes restent propres au navigateur et à l'origine du lien.
 
-`worker.mjs` sert la version autonome sur Cloudflare Workers, avec les icônes, le manifeste et le cache hors ligne. Pour publier une modification : `node scripts/build-worker.mjs` puis `npx wrangler deploy`. Le déploiement exécute aussi automatiquement la génération.
+`worker.mjs` sert la version autonome sur Cloudflare Workers, avec les icônes, le manifeste et le cache hors ligne. Pour publier une modification : `python3 build.py` (assemble `index.html` depuis `src/`), puis `node scripts/build-worker.mjs` et `npx wrangler deploy`.
